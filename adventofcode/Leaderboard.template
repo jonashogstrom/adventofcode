@@ -1,0 +1,150 @@
+﻿<html>
+<head>
+	<meta charset="utf-8">
+	<script type="text/javascript" src="https://www.w3schools.com/lib/w3.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<script>
+
+google.charts.load('current', {packages: ['corechart', 'line']});
+
+function sortTable(n, divName) {
+  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+  table = document.getElementById(divName);
+  switching = true;
+  // Set the sorting direction to ascending:
+  dir = "asc"; 
+  /* Make a loop that will continue until
+  no switching has been done: */
+  while (switching) {
+    // Start by saying: no switching is done:
+    switching = false;
+    rows = table.rows;
+    /* Loop through all table rows (except the
+    first, which contains table headers): */
+    for (i = 1; i < (rows.length - 1); i++) {
+      // Start by saying there should be no switching:
+      shouldSwitch = false;
+      /* Get the two elements you want to compare,
+      one from current row and one from the next: */
+      x = rows[i].getElementsByTagName("TD")[n];
+      y = rows[i + 1].getElementsByTagName("TD")[n];
+      /* Check if the two rows should switch place,
+      based on the direction, asc or desc: */
+	  xValue = Number(x.getAttribute("sort"));
+	  yValue = Number(y.getAttribute("sort"));
+	  if (dir == "asc") {
+        if (xValue > yValue) {
+          // If so, mark as a switch and break the loop:
+          shouldSwitch = true;
+          break;
+        }
+      } else if (dir == "desc") {
+        if (yValue > xValue) {
+          // If so, mark as a switch and break the loop:
+          shouldSwitch = true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+      /* If a switch has been marked, make the switch
+      and mark that a switch has been done: */
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      // Each time a switch is done, increase this count by 1:
+      switchcount ++; 
+    } else {
+      /* If no switching has been done AND the direction is "asc",
+      set the direction to "desc" and run the while loop again. */
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+    }
+  }
+}
+
+function openTab(evt, tabName) {
+  var i, x, tablinks;
+  x = document.getElementsByClassName("tab");
+  for (i = 0; i < x.length; i++) {
+      x[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablink");
+  for (i = 0; i < x.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" w3-red", "");
+  }
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " w3-red";
+}
+
+$(SCRIPT)
+</script>
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 8px;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+th.sortable {
+  cursor:pointer;
+  cursor:hand;
+}
+
+td.gold {
+  background-color: #FFDF00;
+}
+
+td.silver {
+  background-color: #C0C0C0;
+}
+td.bronze {
+  background-color: #BC8A28;
+}
+td.gray {
+  color: #AAAAAA;
+}
+
+.hoverTable{
+	width:100%; 
+	border-collapse:collapse; 
+}
+
+/* Define the hover highlight color for the table row */
+table tr:hover {
+  background-color: #ffff99;
+}
+
+.chart {
+  width: 100%; 
+  min-height: 450px;
+}
+
+.chartrow {
+  margin:0 !important;
+}
+
+</style>
+
+</head>
+<body>
+$(DATA)
+<small>
+Generated at $(GENDATE)<br>
+Data downloaded at $(DATADATE)
+</body>
+</html>
