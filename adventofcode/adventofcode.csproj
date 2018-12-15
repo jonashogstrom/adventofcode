@@ -53,6 +53,8 @@
     <Compile Include="Day11.cs" />
     <Compile Include="Day12.cs" />
     <Compile Include="Day13.cs" />
+    <Compile Include="Day14.cs" />
+    <Compile Include="Day15.cs" />
     <Compile Include="Day2.cs" />
     <Compile Include="Day3.cs" />
     <Compile Include="Day4.cs" />
@@ -82,6 +84,10 @@
     <Content Include="Day12_test.txt" />
     <Content Include="Day13.txt" />
     <Content Include="Day13_test.txt" />
+    <Content Include="Day14.txt" />
+    <Content Include="Day14_test.txt" />
+    <Content Include="Day15.txt" />
+    <Content Include="Day15_test.txt" />
     <Content Include="day2.txt" />
     <Content Include="Day3.txt" />
     <Content Include="Day3_test.txt" />

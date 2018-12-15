@@ -8,7 +8,7 @@ namespace adventofcode
     {
         protected override void Setup()
         {
-            UseTestData = true;
+            UseTestData = false;
             Part1TestSolution = 17;
             Part2TestSolution = 16;
             Part1Solution = 3604;

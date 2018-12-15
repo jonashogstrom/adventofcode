@@ -46,6 +46,7 @@ namespace adventofcode
         public TimeSpan?[][] TimeToComplete { get; set; }
         public TimeSpan?[][] OffsetFromWinner { get; set; }
         public TimeSpan?[] TimeToCompleteStar2 { get; set; }
+        public string Props { get; set; }
     }
 
     public class LeaderBoard

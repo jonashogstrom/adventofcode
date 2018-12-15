@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace adventofcode
 {
@@ -31,10 +25,16 @@ namespace adventofcode
 //                new Day11(),
                 new Day12(),
                 new Day13(),
+                new Day14(),
+                new Day15(),
             };
+
             days.Last().Run();
 
-            if (days.Last().Part2 != null)
+//            foreach(var d in days)
+//                d.Run();
+
+            if (days.Last().Part2 != null || true)
             {
                 new LeaderboardParser().GenerateReport(371692, 2018);
                 new LeaderboardParser().GenerateReport(373164, 2018);

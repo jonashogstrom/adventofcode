@@ -85,7 +85,7 @@ namespace adventofcode
             {
                 if (p.TotalScore > 0)
                 {
-                    logAccumulatedPosition.Append("<tr class=\"item\">" + Cell(p.Name));
+                    logAccumulatedPosition.Append(AddStartOfRowAndNameCell(p));
 
 
                     for (int day = 0; day < leaderboard.HighestDay; day++)
@@ -117,7 +117,7 @@ namespace adventofcode
             {
                 if (p.TotalScore > 0)
                 {
-                    logScoreDiff.Append("<tr class=\"item\">" + Cell(p.Name));
+                    logScoreDiff.Append(AddStartOfRowAndNameCell(p));
 
                     for (int day = 0; day < leaderboard.HighestDay; day++)
                         for (int star = 0; star < 2; star++)
@@ -177,10 +177,10 @@ namespace adventofcode
             {
                 if (p.TotalScore > 0)
                 {
-                    logPositionForStar.Append("<tr class=\"item\">" + Cell(p.Name));
-                    logOffsetFromWinner.Append("<tr class=\"item\">" + Cell(p.Name));
-                    logTotalSolveTime.Append("<tr class=\"item\">" + Cell(p.Name));
-                    logAccumulatedScore.Append("<tr class=\"item\">" + Cell(p.Name));
+                    logPositionForStar.Append(AddStartOfRowAndNameCell(p));
+                    logOffsetFromWinner.Append(AddStartOfRowAndNameCell(p));
+                    logTotalSolveTime.Append(AddStartOfRowAndNameCell(p));
+                    logAccumulatedScore.Append(AddStartOfRowAndNameCell(p));
 
                     for (int day = 0; day < leaderboard.HighestDay; day++)
                         for (int star = 0; star < 2; star++)
@@ -299,7 +299,7 @@ namespace adventofcode
             {
                 if (p.TotalScore > 0)
                 {
-                    logTimeStar2.Append("<tr class=\"item\">" + Cell(p.Name));
+                    logTimeStar2.Append(AddStartOfRowAndNameCell(p));
                     for (int day = 0; day < leaderboard.HighestDay; day++)
                     {
                         var pos = leaderboard.Players.Where(x => x.TimeToCompleteStar2[day].HasValue).OrderBy(x => x.TimeToCompleteStar2[day].Value).ToList().IndexOf(p);
@@ -383,6 +383,16 @@ namespace adventofcode
 
         }
 
+        private static string AddStartOfRowAndNameCell(Player p)
+        {
+            var parts = p.Props.Split(new[] { ',' }, 2);
+            var res = "<tr class=\"item\">";
+            res += Cell(p.Name);
+            res += Cell(parts.Length > 0 ? parts[0].Trim() : "");
+            res += Cell(parts.Length > 1 ? parts[1].Trim() : "");
+            return res;
+        }
+
         private static string GetMedalClass(int pos)
         {
             var medal = "";
@@ -413,7 +423,7 @@ namespace adventofcode
                 var destination = $"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}.json";
 
                 // Create a WebRequest object and assign it a cookie container and make them think your Mozilla ;)
-                cookies.Add(new Cookie("session", _settings["cookie_"+_leaderBoardId], "/", ".adventofcode.com"));
+                cookies.Add(new Cookie("session", _settings["cookie_" + _leaderBoardId], "/", ".adventofcode.com"));
                 var webRequest = (HttpWebRequest)WebRequest.Create(destination);
                 webRequest.Method = "GET";
                 webRequest.Accept = "*/*";
@@ -558,6 +568,17 @@ namespace adventofcode
                 };
                 if (player.Name == null)
                     player.Name = "anonymous " + player.Id;
+                if (!_settings.TryGetValue(player.Id, out var props))
+                {
+                    File.AppendAllLines("..\\..\\settings.txt", new[]
+                    {
+                        "// " + player.Name,
+                        player.Id + "=?, ?"
+                    });
+                }
+                else
+                    player.Props = props;
+
                 var x = jmemberdata.Property("completion_day_level");
                 foreach (JProperty daydata in x.First)
                 {
@@ -585,7 +606,10 @@ namespace adventofcode
         }
         private static string Cell(string value)
         {
-            return $"<td>{value}</td>";
+            var sort = 0;
+            if (value.Length > 0)
+                sort = (byte) value[0];
+            return Cell(value, sort);
         }
         private static string Cell(int value, string htmlClass = "")
         {
@@ -609,14 +633,16 @@ namespace adventofcode
             //            var randomid = _r.Next();
             tableid++;
             var log = new StringBuilder($"<h1>{name}</h1><div style=\"overflow-x:auto;\"> <table id=\"table_{tableid}\"><tr>");
-            log.AppendLine($"<th>{name}</th>");
+            log.AppendLine($"<th onclick=\"sortTable(0, 'table_{tableid}')\" align='left' class='sortable'>{name}</th>");
+            log.AppendLine($"<th onclick=\"sortTable(1, 'table_{tableid}')\" align='left' class='sortable'>Prof</th>");
+            log.AppendLine($"<th onclick=\"sortTable(2, 'table_{tableid}')\" align='left' class='sortable'>BU</th>");
             for (int day = 0; day < highestDay; day++)
                 for (int star = 0; star < starCols; star++)
                 {
                     var colPos = day * starCols + star + 1;
                     var stars = new string('*', star + 1);
                     var cellContent = $"Day {day + 1}<br>{stars}";
-                    log.AppendLine($"<th onclick=\"sortTable({colPos}, 'table_{tableid}')\" align='right' class='sortable'>{cellContent}</th>");
+                    log.AppendLine($"<th onclick=\"sortTable({colPos + 2}, 'table_{tableid}')\" align='right' class='sortable'>{cellContent}</th>");
                 }
             log.AppendLine("</tr>");
             return log;

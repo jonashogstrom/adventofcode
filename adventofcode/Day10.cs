@@ -36,8 +36,8 @@ namespace adventofcode
 
             for (int i = 0; i < input.Length; i++)
             {
-                positions[i].X += speeds[i].X*minTimeToCenter;
-                positions[i].Y += speeds[i].Y*minTimeToCenter;
+                positions[i].X += speeds[i].X * minTimeToCenter;
+                positions[i].Y += speeds[i].Y * minTimeToCenter;
             }
 
             int minxSize = int.MaxValue;
@@ -63,19 +63,30 @@ namespace adventofcode
                 if (xsize > minxSize || ysize > minySize)
                 {
                     var lastMsg = new StringBuilder();
+                    xmin = lastPositions.Min(p => p.X);
+                    xmax = lastPositions.Max(p => p.X);
+                    ymin = lastPositions.Min(p => p.Y);
+                    ymax = lastPositions.Max(p => p.Y);
+                    xsize = xmax - xmin + 1;
+                    ysize = ymax - ymin + 1;
 
                     var sky = new char[ysize][];
                     for (int row = 0; row < ysize; row++)
+                    {
                         sky[row] = new char[xsize];
+                        for (var col = 0; col < xsize; col++)
+                            sky[row][col] = ' ';
+                    }
 
                     for (int i = 0; i < input.Length; i++)
                     {
-                        sky[lastPositions[i].Y -ymin][lastPositions[i].X -xmin] = 'X';
+                        sky[lastPositions[i].Y - ymin][lastPositions[i].X - xmin] = 'X';
                     }
 
                     for (int row = 0; row < ysize; row++)
                         lastMsg.AppendLine((new string(sky[row]).TrimEnd()));
 
+                    var x = lastMsg.ToString();
 
                     Log(lastMsg.ToString());
                     Part2 = seconds - 1;
@@ -84,7 +95,7 @@ namespace adventofcode
 
                 minxSize = Math.Min(minxSize, xsize);
                 minySize = Math.Min(minySize, ysize);
-                lastPositions = positions.Select(p=>new Point(p.X, p.Y)).ToArray();
+                lastPositions = positions.Select(p => new Point(p.X, p.Y)).ToArray();
             }
 
         }

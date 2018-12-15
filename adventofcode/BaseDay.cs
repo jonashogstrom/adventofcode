@@ -62,6 +62,19 @@ namespace adventofcode
             LogAndCompareExpected("Part2", Part2, UseTestData ? Part2TestSolution : Part2Solution);
             PrintFooter(sw);
         }
+        public static T[][] EmptyArr<T>(int rows, int cols, T def)
+        {
+            var res = new T[rows][];
+            for (int row = 0; row < rows; row++)
+            {
+                res[row] = new T[cols];
+                for (int col = 0; col < cols; col++)
+                    res[row][col] = def;
+            }
+
+            return res;
+        }
+
 
         private void LogAndCompareExpected(string label, object value, object expected)
         {
