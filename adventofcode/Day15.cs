@@ -1,31 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
 using System.Text;
-
-using System;
-using System.Collections;
-using Tuple = System.Tuple;
 
 namespace adventofcode
 {
-    // 241251 too high
-    // 217840 too low // not right
-    // 220563 too high
-
-    //Part2: 22366 too low
     internal class Day15 : BaseDay
     {
         protected override void Setup()
         {
             UseTestData = true;
             UseTestData = false;
-
+            LogLevel = UseTestData ? 5 : 0;
             Part1TestSolution = null;
             Part2TestSolution = null;
             Part1Solution = 217890;
@@ -42,35 +29,34 @@ namespace adventofcode
                     answer = int.Parse(row.Substring(2).Trim());
                 else if (row.Trim() == "" && board.Count > 0)
                 {
-                    var attack = 4;
-                    while (RunBoard(board, answer, attack) == RaceEnum.Goblin)
-                        attack++;
-                    board.Clear();
+                    RunBoardWithAttackIncrease(board, answer);
                 }
                 else board.Add(row);
-
             }
 
             if (board.Count > 0)
             {
-                var attack = 3;
-                
-                while (RunBoard(board, answer, attack) == RaceEnum.Goblin)
-                {
-                    attack++;
-                }
-                //Part2 = attack;
+                RunBoardWithAttackIncrease(board, answer);
             }
-
         }
 
-        private RaceEnum RunBoard(List<string> strboard, int answer, int elfAttack)
+        private void RunBoardWithAttackIncrease(List<string> board, int answer)
         {
-            var board = ParseBoard(strboard, elfAttack);
+            var attack = 3;
+            if (UseTestData)
+                Part1TestSolution = answer;
+            while (RunBoard(board, answer, attack) == RaceEnum.Goblin)
+                attack++;
+            board.Clear();
+        }
+
+        private RaceEnum RunBoard(List<string> input, int answer, int elfAttack)
+        {
+            Log(() => "Running board with elfAttack power " + elfAttack, 2);
+            var board = ParseBoard(input, elfAttack);
             var round = 0;
             PrintBoard(board, round);
             var battleTerminated = false;
-            var startelves = board.Soldiers.Count(s => s.Race == RaceEnum.Elf);
             while (!board.BattleOver())
             {
                 // perform round
@@ -84,27 +70,26 @@ namespace adventofcode
                     {
                         battleTerminated = true;
 
-                        Log("BattleOverInMidRound");
-                  //      PrintBoard(board, round);
+                        Log(() => "Battle terminated in the middle of the round", 2);
                         break; // battle over
                     }
 
                     if (!x.CanAttack())
                     {
-                        var s = x.Move();
-//                        if (!string.IsNullOrEmpty(s))
-//                            Log(s);
-                        //PrintBoard(board, round);
+                        var moved = x.Move();
+                        if (UseTestData && moved)
+                        {
+                            PrintBoard(board, round);
+                        }
                     }
 
                     if (x.CanAttack())
                     {
-                        var s = x.Attack();
-                        //Log(s);
-                        var elves = board.Soldiers.Count(s2 => s2.Race == RaceEnum.Elf);
-                        if (elves != startelves && elfAttack > 3)
+                        var kill = x.Attack();
+
+                        if (x.Race == RaceEnum.Goblin && kill && elfAttack > 3)
                         {
-                            Log("Lost an elf!");
+                            Log("Lost an elf!", 2);
                             return RaceEnum.Goblin;
                         }
 
@@ -114,22 +99,34 @@ namespace adventofcode
                 if (!battleTerminated)
                 {
                     round++;
-//                    PrintBoard(board, round);
+                    if (LogLevel > 3)
+                    {
+                        Log("***************************vvvvvvvvvvvvvvvvvv***************************");
+                        PrintBoard(board, round);
+                        Log("***************************^^^^^^^^^^^^^^^^^^***************************");
+                    }
                 }
             }
+
             PrintBoard(board, round);
             var sum = board.Soldiers.Sum(s => s.HP);
             var res = sum * round;
-            if (answer != 0 && answer != res)
-                Log($"Error:  Rounds {round} score: {sum} Total: {res} Expected {answer} Diff: {answer-res}");
-            else
-                Log($"OK: Rounds {round} score: {sum} Total: {res}");
-            if (Part1 == null)
-                Part1 = res;
+            if (elfAttack == 3)
+            {
+                if (answer != 0 && answer != res)
+                    Log(() => $"Error:  Rounds {round} score: {sum} Total: {res} Expected {answer} Diff: {answer - res}", 1);
+                else
+                    Log(() => $"OK: Rounds {round} score: {sum} Total: {res}", 1);
+                if (Part1 == null)
+                    Part1 = res;
+            }
 
             var lastmanstanding = board.Soldiers.First().Race;
             if (lastmanstanding == RaceEnum.Elf)
+            {
                 Part2 = res;
+                Log(() => $"Elves wins without casualties at {elfAttack} attack points", 1);
+            }
             return lastmanstanding;
 
         }
@@ -164,12 +161,12 @@ namespace adventofcode
             }
 
             s.AppendLine();
-            Log(s.ToString());
+            Log(() => s.ToString(), 2);
         }
 
         private Board ParseBoard(List<string> strboard, int elfattack)
         {
-            var res = new Board(strboard.Count, strboard[0].Length);
+            var res = new Board(strboard.Count, strboard[0].Length, this);
 
             for (int row = 0; row < res.Rows; row++)
                 for (int col = 0; col < res.Cols; col++)
@@ -177,9 +174,9 @@ namespace adventofcode
                     if (strboard[row][col] == '#')
                         res.Walls[row][col] = true;
                     else if (strboard[row][col] == 'G')
-                        res.Soldiers.Add(new Soldier(RaceEnum.Goblin, row, col, res, 3));
+                        res.Soldiers.Add(new Soldier(RaceEnum.Goblin, row, col, res, 3, this));
                     else if (strboard[row][col] == 'E')
-                        res.Soldiers.Add(new Soldier(RaceEnum.Elf, row, col, res, elfattack));
+                        res.Soldiers.Add(new Soldier(RaceEnum.Elf, row, col, res, elfattack, this));
                 }
 
             return res;
@@ -188,15 +185,17 @@ namespace adventofcode
 
     internal class Board
     {
+        private readonly BaseDay _d;
         public int Rows { get; }
         public int Cols { get; }
 
-        public Board(int rows, int cols)
+        public Board(int rows, int cols, BaseDay d)
         {
+            _d = d;
             Rows = rows;
             Cols = cols;
             Soldiers = new List<Soldier>();
-            Walls = BaseDay.EmptyArr<bool>(rows, cols, true);
+            Walls = BaseDay.EmptyArr<bool>(rows, cols);
         }
 
 
@@ -206,22 +205,32 @@ namespace adventofcode
         }
 
         public List<Soldier> Soldiers { get; }
-        public int CompletedRounds { get; set; }
-        public bool[][] Walls { get; private set; }
+        public bool[][] Walls { get; }
 
-        public object ReadingPos(Tuple<int, int> tuple)
+        public object ReadingPos(Coord tuple)
         {
-            return tuple.Item1 * Cols + tuple.Item2;
+            return tuple.Row * Cols + tuple.Col;
         }
     }
 
+    [DebuggerDisplay("{Race} ({Row},{Col}), HP: {HP} (attack: {AttackPower})")]
     internal class Soldier
     {
         private readonly Board _b;
+        private readonly BaseDay _d;
 
-        public Soldier(RaceEnum race, int row, int col, Board b, int attackPower)
+        private Coord[] _dirs = new[]
+        {
+            new Coord(-1, 0),
+            new Coord(0, -1),
+            new Coord(0, +1),
+            new Coord(+1, 0),
+        };
+
+        public Soldier(RaceEnum race, int row, int col, Board b, int attackPower, BaseDay d)
         {
             _b = b;
+            _d = d;
             Race = race;
             Row = row;
             Col = col;
@@ -237,7 +246,9 @@ namespace adventofcode
 
         public bool CanAttack()
         {
-            return _b.Soldiers.Where(s => s.Race != Race).Any(IsAdjacent);
+            var enemies = _b.Soldiers.Where(s => s.Race != Race).ToList();
+            var close = enemies.Where(IsAdjacent).ToList();
+            return close.Any();
         }
 
         private bool IsAdjacent(Soldier soldier)
@@ -245,160 +256,67 @@ namespace adventofcode
             return Math.Abs(soldier.Row - Row) + Math.Abs(soldier.Col - Col) == 1;
         }
 
-        public string Attack()
+        public bool Attack()
         {
             var adjacentEnemies = _b.Soldiers.Where(s => s.Race != Race && IsAdjacent(s)).ToList();
             var target = adjacentEnemies.OrderBy(s => s.HP).ThenBy(s => s.ReadingOrder).First();
-            var res = $"{Race} ({Row},{Col}) attacks on {target.Row},{target.Col}, reducing HP from {target.HP} to {target.HP-AttackPower}";
+            var oldHP = HP;
             target.HP -= AttackPower;
-
+            var dead = "";
+            var res = false;
             if (target.HP <= 0)
             {
                 _b.Soldiers.Remove(target);
-                res += " >> dead!";
+                dead = ">> DEAD!";
+                res = true;
             }
-
+            _d.Log(() => $"{Race} ({Row},{Col}) attacks on {target.Row},{target.Col}, reducing HP from {oldHP} to {target.HP} {dead}", 5);
             return res;
+
         }
 
         public int AttackPower { get; set; }
 
-        public string Move()
+        public bool Move()
         {
-            var start = new Path(Row, Col, new Path[0], _b);
-            var paths = new List<Path> { start };
             var pos = 0;
-            var moreFound = true;
-            var dirs = new Tuple<int, int>[]
-            {
-                new Tuple<int, int>(-1, 0),
-                new Tuple<int, int>(0, -1),
-                new Tuple<int, int>(0, +1),
-                new Tuple<int, int>(+1, 0),
-            };
 
-            var inRange = new List<Tuple<int, int>>();
+            var inRange = new List<Coord>();
             foreach (var enemy in _b.Soldiers.Where(s => !SameRace(s)))
             {
-                foreach (var d in dirs)
-                    inRange.Add(new Tuple<int, int>(enemy.Row + d.Item1, enemy.Col + d.Item2));
+                foreach (var d in _dirs)
+                    inRange.Add(new Coord(enemy.Row + d.Row, enemy.Col + d.Col));
             }
 
-            inRange = inRange.Distinct().Where(r=>!_b.Walls[r.Item1][r.Item2] && !_b.Soldiers.Any(s=>s.Row == r.Item1 && s.Col ==r.Item2)).ToList();
+            inRange = inRange.Distinct().Where(r => !_b.Walls[r.Row][r.Col] && !_b.Soldiers.Any(s => s.Row == r.Row && s.Col == r.Col)).ToList();
 
-            // Search from self
-            int[][] distances = new int[_b.Rows][];
-            {
-                for (int row = 0; row < _b.Rows; row++)
-                {
-                    distances[row] = new int[_b.Cols];
-                    for (int col = 0; col < _b.Cols; col++)
-                        distances[row][col] = int.MaxValue;
-                }
-
-                distances[Row][Col] = 0;
-
-                var dist = 0;
-                while (moreFound)
-                {
-                    moreFound = false;
-                    for (int row = 0; row < _b.Rows; row++)
-                    {
-                        for (int col = 0; col < _b.Cols; col++)
-                            if (distances[row][col] == dist)
-                            {
-                                foreach (var d in dirs)
-                                {
-                                    var newRow = row + d.Item1;
-                                    var newCol = col + d.Item2;
-                                    if (distances[newRow][newCol] <= dist + 1)
-                                        continue; // already found a better path
-                                    if (_b.Walls[newRow][newCol])
-                                    {
-                                        continue; // wall blocking
-                                    }
-
-                                    if (_b.Soldiers.Any(s => s.Col == newCol && s.Row == newRow))
-                                        continue; // soldier blocking
-                                    distances[newRow][newCol] = dist + 1;
-                                    moreFound = true;
-                                }
-
-                            }
-                    }
-                    dist++;
-                }
-
-            }
+            var distances = BaseDay.EmptyArr(_b.Rows, _b.Cols, int.MaxValue);
+            ExpandDistances(distances, new[] { new Coord(Row, Col) });
             if (!inRange.Any())
             {
-                return $"{Race} ({Row},{Col}) No square In Range";
+                _d.Log(() => $"{Race} ({Row},{Col}) No square In Range", 5);
+                return false;
             }
 
-            var reachable = inRange.Where(x => distances[x.Item1][x.Item2] != int.MaxValue).ToList();
+            var reachable = inRange.Where(x => distances[x.Row][x.Col] != int.MaxValue).ToList();
             if (!reachable.Any())
             {
-                return $"{Race} ({Row},{Col}) No reachable squares";
+                _d.Log(() => $"{Race} ({Row},{Col}) No reachable squares", 5);
+                return false;
             }
-            var selectedSquare = reachable.OrderBy(x=>distances[x.Item1][x.Item2]).ThenBy(x => _b.ReadingPos(x)).ToList().FirstOrDefault();
+            var selectedSquare = reachable.OrderBy(x => distances[x.Row][x.Col]).ThenBy(x => _b.ReadingPos(x)).ToList().FirstOrDefault();
 
             // search from target square
 
-            int[][] distances2 = new int[_b.Rows][];
-            {
-                for (int row = 0; row < _b.Rows; row++)
-                {
-                    distances2[row] = new int[_b.Cols];
-                    for (int col = 0; col < _b.Cols; col++)
-                        distances2[row][col] = int.MaxValue;
-                }
+            var distances2 = BaseDay.EmptyArr(_b.Rows, _b.Cols, int.MaxValue);
 
-                //                //          var candidates = new List<Tuple<int, int>>();
-                //                foreach (var enemy in _b.Soldiers.Where(s => !SameRace(s)))
-                //                {
-                distances2[selectedSquare.Item1][selectedSquare.Item2] = 0;
-                //                    //                candidates.Add(new Tuple<int, int>(enemy.Row, col));
-                //                }
+            ExpandDistances(distances2, new[] { new Coord(selectedSquare.Row, selectedSquare.Col) });
 
-                var dist = 0;
-                moreFound = true;
-                while (moreFound)
-                {
-                    moreFound = false;
-                    for (int row = 0; row < _b.Rows; row++)
-                    {
-                        for (int col = 0; col < _b.Cols; col++)
-                            if (distances2[row][col] == dist)
-                            {
-                                foreach (var d in dirs)
-                                {
-                                    var newRow = row + d.Item1;
-                                    var newCol = col + d.Item2;
-                                    if (distances2[newRow][newCol] <= dist + 1)
-                                        continue; // already found a better path
-                                    if (_b.Walls[newRow][newCol])
-                                    {
-                                        continue; // wall blocking
-                                    }
-
-                                    if (_b.Soldiers.Any(s => s.Col == newCol && s.Row == newRow))
-                                        continue; // soldier blocking
-                                    distances2[newRow][newCol] = dist + 1;
-                                    moreFound = true;
-                                }
-
-                            }
-                    }
-
-                    dist++;
-                }
-            }
-
-            var bestDir = new Tuple<int, int>(0, 0);
+            var bestDir = new Coord(0, 0);
             var bestDist = int.MaxValue;
-            foreach (var d in dirs)
+            foreach (var d in _dirs)
             {
-                var tempDist = distances2[Row + d.Item1][Col + d.Item2];
+                var tempDist = distances2[Row + d.Row][Col + d.Col];
                 if (tempDist < bestDist)
                 {
                     bestDir = d;
@@ -408,15 +326,48 @@ namespace adventofcode
 
             if (bestDist != int.MaxValue)
             {
-                string s = $"{Race} ({Row},{Col}) => ";
+                _d.Log(() => $"{Race} ({Row},{Col}) => {Row + bestDir.Row},{Col + bestDir.Col}", 5);
 
-                Row = Row + bestDir.Item1;
-                Col = Col + bestDir.Item2;
-                s += $"{Row},{Col}";
-                return s;
+                Row = Row + bestDir.Row;
+                Col = Col + bestDir.Col;
+                return true;
             }
 
-            return $"{Race} ({Row},{Col}) can't move";
+            _d.Log(() => $"{Race} ({Row},{Col}) can't move", 4);
+            return false;
+        }
+
+        private void ExpandDistances(int[][] distances, IEnumerable<Coord> initCoords)
+        {
+            var dist = 0;
+            var candidates = initCoords.ToList();
+            while (candidates.Any())
+            {
+                var newCandidates = new List<Coord>();
+                foreach (var c in candidates)
+                {
+                    distances[c.Row][c.Col] = dist;
+                    foreach (var d in _dirs)
+                    {
+                        var newRow = c.Row + d.Row;
+                        var newCol = c.Col + d.Col;
+                        if (distances[newRow][newCol] <= dist)
+                            continue; // already found a better or equal path
+                        if (_b.Walls[newRow][newCol])
+                        {
+                            continue; // wall blocking
+                        }
+
+                        if (_b.Soldiers.Any(s => s.Col == newCol && s.Row == newRow))
+                            continue; // soldier blocking
+                        newCandidates.Add(new Coord(newRow, newCol));
+                    }
+                }
+
+                candidates = newCandidates.Distinct().ToList();
+
+                dist++;
+            }
         }
 
         private bool SameRace(Soldier soldier)

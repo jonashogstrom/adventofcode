@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
+using System.Text;
 
 namespace adventofcode
 {
     public abstract class BaseDay
     {
+        protected BaseDay()
+        {
+            _log = new StringBuilder();
+            LogLevel = 10;
+        }
+
         protected bool UseTestData { get; set; }
+        protected int LogLevel { get; set; }
         protected object Part1Solution { get; set; }
         protected object Part2Solution { get; set; }
         protected object Part1TestSolution { get; set; }
@@ -24,7 +31,7 @@ namespace adventofcode
             if (UseTestData)
                 Log("!!!!!! Running with test input !!!!!!!!!!!!!");
 
-//            https://adventofcode.com/2018/day/8/input
+            //            https://adventofcode.com/2018/day/8/input
 
             return File.ReadAllLines(fileName);
         }
@@ -48,6 +55,9 @@ namespace adventofcode
         }
 
         private bool _addLogHeader;
+        private StringBuilder _log;
+        private string _fileNameSuffix = "";
+
         public void Run()
         {
             _addLogHeader = false;
@@ -61,8 +71,10 @@ namespace adventofcode
             LogAndCompareExpected("Part1", Part1, UseTestData ? Part1TestSolution : Part1Solution);
             LogAndCompareExpected("Part2", Part2, UseTestData ? Part2TestSolution : Part2Solution);
             PrintFooter(sw);
+            File.WriteAllText(GetType().Name + "_" + DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + "_" + (UseTestData ? "TEST" : "PROD") + _fileNameSuffix + ".log", _log.ToString());
         }
-        public static T[][] EmptyArr<T>(int rows, int cols, T def)
+
+        public static T[][] EmptyArr<T>(int rows, int cols, T def = default(T))
         {
             var res = new T[rows][];
             for (int row = 0; row < rows; row++)
@@ -85,6 +97,7 @@ namespace adventofcode
                     if (value.Equals(expected))
                     {
                         Log("   " + label + " = " + value + "   OK");
+                        _fileNameSuffix += "[OK]";
                     }
                     else
                     {
@@ -93,19 +106,15 @@ namespace adventofcode
                         Log("   *********************** Expected:" + expected);
                         Log("   *********************** Actual: " + value);
                         Log("   ***********************");
+                        _fileNameSuffix += "[XX]";
                     }
                 }
                 else
                 {
                     Log("   " + label + " = " + value);
-                   // SetClipboard(Part1.ToString());
+                    _fileNameSuffix += "[  ]";
                 }
             }
-        }
-
-        private void SetClipboard(string s)
-        {
-            Clipboard.SetDataObject(s, true, 5, 57);
         }
 
         protected abstract void DoRun(string[] input);
@@ -176,15 +185,26 @@ namespace adventofcode
             return GetInts(s, allowNegative).ToArray();
         }
 
-        protected void Log(string s)
+        public void Log(Func<string> s, int logLevel = 0)
         {
-            if (!_addLogHeader)
+            if (logLevel <= LogLevel)
+                Log(s(), logLevel);
+        }
+
+        protected void Log(string s, int logLevel = 0)
+        {
+            if (logLevel <= LogLevel)
             {
-                _addLogHeader = true;
-                PrintHeader();
+                if (!_addLogHeader)
+                {
+                    _addLogHeader = true;
+                    PrintHeader();
+                }
+
+                Debug.WriteLine(s);
+                _log.AppendLine(s);
             }
-            Console.WriteLine(s);
-            Debug.WriteLine(s);
         }
     }
+
 }

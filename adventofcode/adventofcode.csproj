@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDay.cs" />
+    <Compile Include="Coord.cs" />
     <Compile Include="Day1.cs" />
     <Compile Include="Day10.cs" />
     <Compile Include="Day11.cs" />
