@@ -367,13 +367,18 @@ namespace adventofcode
                 scriptContent.AppendLine(scripts[k].ToString());
 
             html = html.Replace("$(SCRIPT)", scriptContent.ToString());
-            var oldHtml = File.ReadAllText(_htmlFileName, Encoding.UTF8);
+            var identical = false;
+            if (File.Exists(_htmlFileName))
+            {
+                var oldHtml = File.ReadAllText(_htmlFileName, Encoding.UTF8);
+                var length = oldHtml.Length / 2;
+                var oldhtml2 = oldHtml.Substring(0, length);
+                var html2 = html.Substring(0, oldhtml2.Length);
+                identical = oldhtml2 != html2;
+            }
 
-            var length = oldHtml.Length / 2;
-            var oldhtml2 = oldHtml.Substring(0, length);
-            var html2 = html.Substring(0, oldhtml2.Length);
 
-            if (!File.Exists(_htmlFileName) || oldhtml2 != html2)
+            if (!File.Exists(_htmlFileName) || identical)
             {
                 File.WriteAllText(_htmlFileName, html, Encoding.UTF8);
                 return true;
@@ -568,13 +573,15 @@ namespace adventofcode
                 };
                 if (player.Name == null)
                     player.Name = "anonymous " + player.Id;
-                if (!_settings.TryGetValue(player.Id, out var props))
+                var propsKey = player.Id+"_"+_leaderBoardId;
+                if (!_settings.TryGetValue(propsKey, out var props))
                 {
                     File.AppendAllLines("..\\..\\settings.txt", new[]
                     {
                         "// " + player.Name,
-                        player.Id + "=?, ?"
+                        propsKey + "=?, ?"
                     });
+                    player.Props = "";
                 }
                 else
                     player.Props = props;

@@ -71,7 +71,7 @@ namespace adventofcode
             LogAndCompareExpected("Part1", Part1, UseTestData ? Part1TestSolution : Part1Solution);
             LogAndCompareExpected("Part2", Part2, UseTestData ? Part2TestSolution : Part2Solution);
             PrintFooter(sw);
-            File.WriteAllText(GetType().Name + "_" + DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + "_" + (UseTestData ? "TEST" : "PROD") + _fileNameSuffix + ".log", _log.ToString());
+            File.WriteAllText(GetType().Name + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "_" + (UseTestData ? "TEST" : "PROD") + _fileNameSuffix + ".log", _log.ToString());
         }
 
         public static T[][] EmptyArr<T>(int rows, int cols, T def = default(T))

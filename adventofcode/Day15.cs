@@ -166,20 +166,20 @@ namespace adventofcode
 
         private Board ParseBoard(List<string> strboard, int elfattack)
         {
-            var res = new Board(strboard.Count, strboard[0].Length, this);
+            var board = new Board(strboard.Count, strboard[0].Length, this);
 
-            for (int row = 0; row < res.Rows; row++)
-                for (int col = 0; col < res.Cols; col++)
+            for (int row = 0; row < board.Rows; row++)
+                for (int col = 0; col < board.Cols; col++)
                 {
                     if (strboard[row][col] == '#')
-                        res.Walls[row][col] = true;
+                        board.Walls[row][col] = true;
                     else if (strboard[row][col] == 'G')
-                        res.Soldiers.Add(new Soldier(RaceEnum.Goblin, row, col, res, 3, this));
+                        board.Soldiers.Add(new Soldier(RaceEnum.Goblin, row, col, board, 3, this));
                     else if (strboard[row][col] == 'E')
-                        res.Soldiers.Add(new Soldier(RaceEnum.Elf, row, col, res, elfattack, this));
+                        board.Soldiers.Add(new Soldier(RaceEnum.Elf, row, col, board, elfattack, this));
                 }
 
-            return res;
+            return board;
         }
     }
 
@@ -218,9 +218,7 @@ namespace adventofcode
     {
         private readonly Board _b;
         private readonly BaseDay _d;
-
-        private Coord[] _dirs = new[]
-        {
+        private readonly Coord[] _dirs = {
             new Coord(-1, 0),
             new Coord(0, -1),
             new Coord(0, +1),
@@ -281,22 +279,25 @@ namespace adventofcode
         {
             var pos = 0;
 
-            var inRange = new List<Coord>();
+            var inRange = new HashSet<Coord>();
             foreach (var enemy in _b.Soldiers.Where(s => !SameRace(s)))
             {
                 foreach (var d in _dirs)
+                {
                     inRange.Add(new Coord(enemy.Row + d.Row, enemy.Col + d.Col));
+                }
             }
 
-            inRange = inRange.Distinct().Where(r => !_b.Walls[r.Row][r.Col] && !_b.Soldiers.Any(s => s.Row == r.Row && s.Col == r.Col)).ToList();
+            inRange = new HashSet<Coord>(inRange.Where(r => !_b.Walls[r.Row][r.Col] && !_b.Soldiers.Any(s => s.Row == r.Row && s.Col == r.Col)));
 
-            var distances = BaseDay.EmptyArr(_b.Rows, _b.Cols, int.MaxValue);
-            ExpandDistances(distances, new[] { new Coord(Row, Col) });
             if (!inRange.Any())
             {
                 _d.Log(() => $"{Race} ({Row},{Col}) No square In Range", 5);
                 return false;
             }
+
+            var distances = BaseDay.EmptyArr(_b.Rows, _b.Cols, int.MaxValue);
+            ExpandDistances(distances, new[] { new Coord(Row, Col) }, inRange);
 
             var reachable = inRange.Where(x => distances[x.Row][x.Col] != int.MaxValue).ToList();
             if (!reachable.Any())
@@ -309,8 +310,11 @@ namespace adventofcode
             // search from target square
 
             var distances2 = BaseDay.EmptyArr(_b.Rows, _b.Cols, int.MaxValue);
+            var myNeighbours = new HashSet<Coord>();
+            foreach (var d in _dirs)
+                myNeighbours.Add(new Coord(Row + d.Row, Col + d.Col));
 
-            ExpandDistances(distances2, new[] { new Coord(selectedSquare.Row, selectedSquare.Col) });
+            ExpandDistances(distances2, new[] { new Coord(selectedSquare.Row, selectedSquare.Col) }, myNeighbours);
 
             var bestDir = new Coord(0, 0);
             var bestDist = int.MaxValue;
@@ -337,30 +341,39 @@ namespace adventofcode
             return false;
         }
 
-        private void ExpandDistances(int[][] distances, IEnumerable<Coord> initCoords)
+        /// <summary>
+        /// Flood fill distances in a breadth first approach, terminate after a full round when any of the target coordinates have been found
+        /// </summary>
+        private void ExpandDistances(int[][] distances, IEnumerable<Coord> initCoords, HashSet<Coord> targetCoords)
         {
             var dist = 0;
             var candidates = initCoords.ToList();
             while (candidates.Any())
             {
+                var foundTarget = false;
                 var newCandidates = new List<Coord>();
                 foreach (var c in candidates)
                 {
+                    if (targetCoords.Contains(c))
+                        foundTarget = true;
                     distances[c.Row][c.Col] = dist;
-                    foreach (var d in _dirs)
+                    if (!foundTarget)
                     {
-                        var newRow = c.Row + d.Row;
-                        var newCol = c.Col + d.Col;
-                        if (distances[newRow][newCol] <= dist)
-                            continue; // already found a better or equal path
-                        if (_b.Walls[newRow][newCol])
+                        foreach (var d in _dirs)
                         {
-                            continue; // wall blocking
-                        }
+                            var newRow = c.Row + d.Row;
+                            var newCol = c.Col + d.Col;
+                            if (distances[newRow][newCol] <= dist)
+                                continue; // already found a better or equal path
+                            if (_b.Walls[newRow][newCol])
+                            {
+                                continue; // wall blocking
+                            }
 
-                        if (_b.Soldiers.Any(s => s.Col == newCol && s.Row == newRow))
-                            continue; // soldier blocking
-                        newCandidates.Add(new Coord(newRow, newCol));
+                            if (_b.Soldiers.Any(s => s.Col == newCol && s.Row == newRow))
+                                continue; // soldier blocking
+                            newCandidates.Add(new Coord(newRow, newCol));
+                        }
                     }
                 }
 
@@ -372,7 +385,7 @@ namespace adventofcode
 
         private bool SameRace(Soldier soldier)
         {
-            return this.Race == soldier.Race;
+            return Race == soldier.Race;
         }
 
         internal class Path
@@ -397,5 +410,4 @@ namespace adventofcode
         Goblin,
         Elf
     }
-
 }
