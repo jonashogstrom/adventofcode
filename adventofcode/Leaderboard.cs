@@ -14,6 +14,7 @@ namespace adventofcode
             const int dayCount = 25;
             unixCompletionTime = new long[dayCount][];
             TimeToComplete = new TimeSpan?[dayCount][];
+            AccumulatedTimeToComplete = new TimeSpan?[dayCount][];
             OffsetFromWinner = new TimeSpan?[dayCount][];
             TimeToCompleteStar2 = new TimeSpan?[dayCount];
             PositionForStar = new int[dayCount][];
@@ -26,6 +27,7 @@ namespace adventofcode
                 AccumulatedScore[i] = new int[] { -1, -1 };
                 AccumulatedPosition[i] = new int[] { -1, -1 };
                 TimeToComplete[i] = new TimeSpan?[2];
+                AccumulatedTimeToComplete[i] = new TimeSpan?[2];
                 TimeToCompleteStar2[i] = null;
                 OffsetFromWinner[i] = new TimeSpan?[2];
             }
@@ -44,6 +46,7 @@ namespace adventofcode
         public string Id { get; set; }
         public long[][] unixCompletionTime { get; }
         public TimeSpan?[][] TimeToComplete { get; set; }
+        public TimeSpan?[][] AccumulatedTimeToComplete { get; set; }
         public TimeSpan?[][] OffsetFromWinner { get; set; }
         public TimeSpan?[] TimeToCompleteStar2 { get; set; }
         public string Props { get; set; }

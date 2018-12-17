@@ -7,6 +7,11 @@ using System.Text;
 
 namespace adventofcode
 {
+    public enum InputSource
+    {
+        test,
+        prod,
+    }
     public abstract class BaseDay
     {
         protected BaseDay()
@@ -15,7 +20,12 @@ namespace adventofcode
             LogLevel = 10;
         }
 
-        protected bool UseTestData { get; set; }
+        protected InputSource Source { get; set; }
+
+        protected bool UseTestData {
+            get => Source == InputSource.test;
+            set => Source = value ? InputSource.test : InputSource.prod;
+        }
         protected int LogLevel { get; set; }
         protected object Part1Solution { get; set; }
         protected object Part2Solution { get; set; }

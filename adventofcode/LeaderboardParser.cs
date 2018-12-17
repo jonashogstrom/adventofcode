@@ -171,6 +171,7 @@ namespace adventofcode
             var logPositionForStar = InitLog("Position for star", leaderboard.HighestDay);
             var logOffsetFromWinner = InitLog("Offset from winner", leaderboard.HighestDay);
             var logTotalSolveTime = InitLog("Total Solve Time", leaderboard.HighestDay);
+            var logAccumulatedSolveTime = InitLog("AccumulatedSolveTime", leaderboard.HighestDay);
             var logAccumulatedScore = InitLog("Accumulated score", leaderboard.HighestDay);
 
             foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
@@ -180,6 +181,7 @@ namespace adventofcode
                     logPositionForStar.Append(AddStartOfRowAndNameCell(p));
                     logOffsetFromWinner.Append(AddStartOfRowAndNameCell(p));
                     logTotalSolveTime.Append(AddStartOfRowAndNameCell(p));
+                    logAccumulatedSolveTime.Append(AddStartOfRowAndNameCell(p));
                     logAccumulatedScore.Append(AddStartOfRowAndNameCell(p));
 
                     for (int day = 0; day < leaderboard.HighestDay; day++)
@@ -187,6 +189,11 @@ namespace adventofcode
                         {
                             var pos = p.PositionForStar[day][star];
                             var medal = GetMedalClass(pos);
+
+                            if (p.AccumulatedTimeToComplete[day][star].HasValue)
+                                logAccumulatedSolveTime.Append(Cell(p.AccumulatedTimeToComplete[day][star].Value, medal));
+                            else
+                                logAccumulatedSolveTime.Append(EmptyCell());
 
                             if (pos != -1)
                             {
@@ -224,6 +231,7 @@ namespace adventofcode
                     logPositionForStar.AppendLine("</tr>");
                     logOffsetFromWinner.AppendLine("</tr>");
                     logTotalSolveTime.AppendLine("</tr>");
+                    logAccumulatedSolveTime.AppendLine("</tr>");
                     logAccumulatedScore.AppendLine("</tr>");
                 }
             }
@@ -231,11 +239,13 @@ namespace adventofcode
             ExitLog(logPositionForStar);
             ExitLog(logOffsetFromWinner);
             ExitLog(logTotalSolveTime);
+            ExitLog(logAccumulatedSolveTime);
             ExitLog(logAccumulatedScore);
 
             tabs["Daily position"] = logPositionForStar;
             tabs["Offset"] = logOffsetFromWinner;
             tabs["Time"] = logTotalSolveTime;
+            tabs["AccumulatedTime"] = logAccumulatedSolveTime;
             tabs["Local leaderboard (score)"] = logAccumulatedScore;
 
 
@@ -510,6 +520,10 @@ namespace adventofcode
                             var starTime = DateTimeOffset.FromUnixTimeSeconds(unixStarTime).DateTime.ToLocalTime();
                             var timeSpan = starTime - publishTime;
                             player.TimeToComplete[day][star] = timeSpan;
+
+                            var lastTime = day == 0 ? TimeSpan.Zero : player.AccumulatedTimeToComplete[day - 1][1];
+                            if (lastTime.HasValue)
+                                player.AccumulatedTimeToComplete[day][star] = lastTime+timeSpan;
                             if (bestTime[day][star] == TimeSpan.Zero || timeSpan < bestTime[day][star])
                                 bestTime[day][star] = timeSpan;
                         }
@@ -686,6 +700,7 @@ namespace adventofcode
         {
             foreach (var year in years)
                 GenerateReport(leaderboardid, year, years);
+
         }
 
     }
