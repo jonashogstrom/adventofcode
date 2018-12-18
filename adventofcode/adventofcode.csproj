@@ -96,6 +96,8 @@
     <Content Include="Day16_test.txt" />
     <Content Include="Day17.txt" />
     <Content Include="Day17_test.txt" />
+    <Content Include="Day18.txt" />
+    <Content Include="Day18_test.txt" />
     <Content Include="day2.txt" />
     <Content Include="Day3.txt" />
     <Content Include="Day3_test.txt" />

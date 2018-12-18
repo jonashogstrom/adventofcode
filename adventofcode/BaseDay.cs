@@ -27,8 +27,8 @@ namespace adventofcode
             set => Source = value ? InputSource.test : InputSource.prod;
         }
         protected int LogLevel { get; set; }
-        protected object Part1Solution { get; set; }
-        protected object Part2Solution { get; set; }
+        public object Part1Solution { get; set; }
+        public object Part2Solution { get; set; }
         protected object Part1TestSolution { get; set; }
         protected object Part2TestSolution { get; set; }
 

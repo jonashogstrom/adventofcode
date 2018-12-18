@@ -1,11 +1,18 @@
-﻿namespace adventofcode
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+
+namespace adventofcode
 {
     internal class Day18 : BaseDay
     {
         protected override void Setup()
         {
-            UseTestData = false;
-            //          UseTestData = true;
+            Source = InputSource.test;
+            Source = InputSource.prod;
+
             LogLevel = UseTestData ? 5 : 3;
 
             Part1TestSolution = null;

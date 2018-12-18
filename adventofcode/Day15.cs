@@ -77,7 +77,7 @@ namespace adventofcode
                     if (!x.CanAttack())
                     {
                         var moved = x.Move();
-                        if (UseTestData && moved)
+                        if (LogLevel >= 4 && moved)
                         {
                             PrintBoard(board, round);
                         }
@@ -99,7 +99,7 @@ namespace adventofcode
                 if (!battleTerminated)
                 {
                     round++;
-                    if (LogLevel > 3)
+                    if (LogLevel >= 3)
                     {
                         Log("***************************vvvvvvvvvvvvvvvvvv***************************");
                         PrintBoard(board, round);
@@ -277,8 +277,6 @@ namespace adventofcode
 
         public bool Move()
         {
-            var pos = 0;
-
             var inRange = new HashSet<Coord>();
             foreach (var enemy in _b.Soldiers.Where(s => !SameRace(s)))
             {

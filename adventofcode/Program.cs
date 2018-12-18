@@ -29,7 +29,7 @@ namespace adventofcode
                 new Day15(),
                 new Day16(),
                 new Day17(),
-            //    new Day18(),
+                new Day18(),
             };
 
             days.Last().Run();
@@ -37,7 +37,7 @@ namespace adventofcode
 //            foreach(var d in days)
 //                d.Run();
 
-            if (days.Last().Part2 != null )//|| true)
+            if (days.Last().Part2Solution != null )//|| true)
             {
                 new LeaderboardParser().GenerateReport(371692, 2018);
                 new LeaderboardParser().GenerateReport(373164, 2018);
