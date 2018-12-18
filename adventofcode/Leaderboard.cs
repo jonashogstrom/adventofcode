@@ -40,9 +40,9 @@ namespace adventofcode
 
         public string Name { get; set; }
         public long LastStar { get; set; }
-        public long Stars { get; set; }
-        public long LocalScore { get; set; }
-        public long GlobalScore { get; set; }
+        public int Stars { get; set; }
+        public int LocalScore { get; set; }
+        public int GlobalScore { get; set; }
         public string Id { get; set; }
         public long[][] unixCompletionTime { get; }
         public TimeSpan?[][] TimeToComplete { get; set; }
@@ -50,6 +50,7 @@ namespace adventofcode
         public TimeSpan?[][] OffsetFromWinner { get; set; }
         public TimeSpan?[] TimeToCompleteStar2 { get; set; }
         public string Props { get; set; }
+        public int CurrentPosition { get; set; }
     }
 
     public class LeaderBoard

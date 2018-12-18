@@ -46,6 +46,12 @@ namespace adventofcode
 
             _year = year;
             _leaderBoardId = leaderboardid;
+            var fieldName = "fields_" + _leaderBoardId;
+            if (_settings.ContainsKey(fieldName))
+                _metacolumns = _settings["fields_" + _leaderBoardId].Split(',').Select(s => s.Trim()).ToList();
+            else
+                _metacolumns = new List<string>();
+
             _htmlFileName = $"leaderboard_{_leaderBoardId}_{_year}.html";
             _jsonFileName = $"..\\..\\leaderboard_{leaderboardid}_{_year}.json";
             var updatedData = DownloadIfOld(interval);
@@ -103,7 +109,7 @@ namespace adventofcode
                             }
                         }
 
-                    logAccumulatedPosition.AppendLine("</tr>");
+                    logAccumulatedPosition.AppendLine(EndOfRow(p));
                 }
             }
 
@@ -137,7 +143,7 @@ namespace adventofcode
                             }
                         }
 
-                    logScoreDiff.AppendLine("</tr>");
+                    logScoreDiff.AppendLine(EndOfRow(p));
                 }
             }
             ExitLog(logScoreDiff);
@@ -228,11 +234,11 @@ namespace adventofcode
                             }
                         }
 
-                    logPositionForStar.AppendLine("</tr>");
-                    logOffsetFromWinner.AppendLine("</tr>");
-                    logTotalSolveTime.AppendLine("</tr>");
-                    logAccumulatedSolveTime.AppendLine("</tr>");
-                    logAccumulatedScore.AppendLine("</tr>");
+                    logPositionForStar.AppendLine(EndOfRow(p));
+                    logOffsetFromWinner.AppendLine(EndOfRow(p));
+                    logTotalSolveTime.AppendLine(EndOfRow(p));
+                    logAccumulatedSolveTime.AppendLine(EndOfRow(p));
+                    logAccumulatedScore.AppendLine(EndOfRow(p));
                 }
             }
 
@@ -323,7 +329,7 @@ namespace adventofcode
                         }
                     }
 
-                    logTimeStar2.AppendLine("</tr>");
+                    logTimeStar2.AppendLine(EndOfRow(p));
                 }
             }
 
@@ -398,13 +404,21 @@ namespace adventofcode
 
         }
 
-        private static string AddStartOfRowAndNameCell(Player p)
+        private string EndOfRow(Player player)
         {
-            var parts = p.Props.Split(new[] { ',' }, 2);
+            return Cell(player.Name) + "</tr>";
+        }
+
+        private string AddStartOfRowAndNameCell(Player p)
+        {
+            var parts = p.Props.Split(new[] { ',' });
             var res = "<tr class=\"item\">";
-            res += Cell(p.Name);
-            res += Cell(parts.Length > 0 ? parts[0].Trim() : "");
-            res += Cell(parts.Length > 1 ? parts[1].Trim() : "");
+            res += Cell(p.CurrentPosition+". " + p.Name);
+            for (int i = 0; i<_metacolumns.Count; i++)
+                res += Cell(parts.Length > i ? parts[i].Trim() : "");
+            res += Cell(p.LocalScore);
+            res += Cell(p.GlobalScore);
+            res += Cell(p.Stars);
             return res;
         }
 
@@ -523,7 +537,7 @@ namespace adventofcode
 
                             var lastTime = day == 0 ? TimeSpan.Zero : player.AccumulatedTimeToComplete[day - 1][1];
                             if (lastTime.HasValue)
-                                player.AccumulatedTimeToComplete[day][star] = lastTime+timeSpan;
+                                player.AccumulatedTimeToComplete[day][star] = lastTime + timeSpan;
                             if (bestTime[day][star] == TimeSpan.Zero || timeSpan < bestTime[day][star])
                                 bestTime[day][star] = timeSpan;
                         }
@@ -564,6 +578,10 @@ namespace adventofcode
                         player.AccumulatedPosition[day][star] = orderedPlayers.IndexOf(player);
                     }
                 }
+
+                var players = leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar).ToList();
+                for (int i = 0; i < players.Count; i++)
+                    players[i].CurrentPosition = i + 1;
             }
         }
 
@@ -582,12 +600,12 @@ namespace adventofcode
                     GlobalScore = GetInt(jmemberdata, "global_score"),
                     LocalScore = GetInt(jmemberdata, "local_score"),
                     Stars = GetInt(jmemberdata, "stars"),
-                    LastStar = GetInt(jmemberdata, "last_star_ts"),
+                    LastStar = GetLong(jmemberdata, "last_star_ts"),
                     Name = GetStr(jmemberdata, "name")
                 };
                 if (player.Name == null)
                     player.Name = "anonymous " + player.Id;
-                var propsKey = player.Id+"_"+_leaderBoardId;
+                var propsKey = player.Id + "_" + _leaderBoardId;
                 if (!_settings.TryGetValue(propsKey, out var props))
                 {
                     File.AppendAllLines("..\\..\\settings.txt", new[]
@@ -608,7 +626,7 @@ namespace adventofcode
                     foreach (JProperty stardata in daydata.Value)
                     {
                         var starnum = int.Parse(stardata.Name);
-                        var starts = GetInt((JObject)stardata.Value, "get_star_ts");
+                        var starts = GetLong((JObject)stardata.Value, "get_star_ts");
                         player.unixCompletionTime[day - 1][starnum - 1] = starts;
                     }
                 }
@@ -629,7 +647,7 @@ namespace adventofcode
         {
             var sort = 0;
             if (value.Length > 0)
-                sort = (byte) value[0];
+                sort = (byte)value[0];
             return Cell(value, sort);
         }
         private static string Cell(int value, string htmlClass = "")
@@ -646,25 +664,37 @@ namespace adventofcode
         }
 
         private int tableid = 0;
-        private Dictionary<string, string> _settings;
+        private readonly Dictionary<string, string> _settings;
+        private List<string> _metacolumns;
+
+        private string TableHeader(int colPos, int tableid, string header)
+        {
+            return
+                $"<th onclick=\"sortTable({colPos}, 'table_{tableid}')\" align='left' class='sortable'>{header}</th>";
+        }
 
         private StringBuilder InitLog(string name, int highestDay, bool colForStar = true)
         {
             var starCols = colForStar ? 2 : 1;
             //            var randomid = _r.Next();
             tableid++;
+            var colPos = 0;
             var log = new StringBuilder($"<h1>{name}</h1><div style=\"overflow-x:auto;\"> <table id=\"table_{tableid}\"><tr>");
-            log.AppendLine($"<th onclick=\"sortTable(0, 'table_{tableid}')\" align='left' class='sortable'>{name}</th>");
-            log.AppendLine($"<th onclick=\"sortTable(1, 'table_{tableid}')\" align='left' class='sortable'>Prof</th>");
-            log.AppendLine($"<th onclick=\"sortTable(2, 'table_{tableid}')\" align='left' class='sortable'>BU</th>");
+            log.AppendLine(TableHeader(colPos++, tableid, name));
+            foreach(var s in _metacolumns)
+                log.AppendLine(TableHeader(colPos++, tableid, s));
+            log.AppendLine(TableHeader(colPos++, tableid, "L"));
+            log.AppendLine(TableHeader(colPos++, tableid, "G"));
+            log.AppendLine(TableHeader(colPos++, tableid, "S"));
             for (int day = 0; day < highestDay; day++)
                 for (int star = 0; star < starCols; star++)
                 {
-                    var colPos = day * starCols + star + 1;
                     var stars = new string('*', star + 1);
                     var cellContent = $"Day {day + 1}<br>{stars}";
-                    log.AppendLine($"<th onclick=\"sortTable({colPos + 2}, 'table_{tableid}')\" align='right' class='sortable'>{cellContent}</th>");
+                    log.AppendLine($"<th onclick=\"sortTable({colPos++}, 'table_{tableid}')\" align='right' class='sortable'>{cellContent}</th>");
                 }
+
+            log.AppendLine($"<th onclick=\"sortTable({colPos++}, 'table_{tableid}')\" align='left' class='sortable'>Player Name</th>");
             log.AppendLine("</tr>");
             return log;
         }
@@ -681,7 +711,12 @@ namespace adventofcode
         }
 
 
-        private static long GetInt(JObject jmemberdata, string propname)
+        private static int GetInt(JObject jmemberdata, string propname)
+        {
+            return (int)GetLong(jmemberdata, propname);
+        }
+
+        private static long GetLong(JObject jmemberdata, string propname)
         {
             var jToken = jmemberdata.Property(propname).Value;
             var jValue = (JValue)jToken;
@@ -691,6 +726,8 @@ namespace adventofcode
 
             return (long)(jValue.Value);
         }
+
+
         private static string GetStr(JObject jmemberdata, string propname)
         {
             return (string)((JValue)jmemberdata.Property(propname).Value).Value;
