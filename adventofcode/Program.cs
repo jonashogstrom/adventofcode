@@ -31,6 +31,7 @@ namespace adventofcode
                 new Day17(),
                 new Day18(),
                 new Day19(),
+                new Day20(),
             };
 
             days.Last().Run();
@@ -43,7 +44,7 @@ namespace adventofcode
                 new LeaderboardParser().GenerateReport(371692, 2018);
                 new LeaderboardParser().GenerateReport(373164, 2018);
                 new LeaderboardParser().GenerateReport(395782, 2018);
-             //   new LeaderboardParser().GenerateReport(34481, new[] { 2018, 2017, 2016, 2015 });
+                new LeaderboardParser().GenerateReport(34481, new[] { 2018, 2017, 2016, 2015 });
             }
         }
     }

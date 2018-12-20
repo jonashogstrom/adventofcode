@@ -21,10 +21,14 @@ namespace adventofcode
 
         public LeaderboardParser()
         {
-            _settings = File.ReadAllLines("..\\..\\settings.txt")
+            var temp = File.ReadAllLines("..\\..\\settings.txt")
                 .Where(s => !string.IsNullOrEmpty(s.Trim()) && !s.StartsWith("//") && s.Contains("="))
-                .Select(l => l.Split(new[] { '=' }, 2))
-                .ToDictionary(x => x[0].Trim(), x => x[1].Trim());
+                .Select(l => l.Split(new[] { '=' }, 2)).ToList();
+            var groups = temp.GroupBy(y => y[0]).Where(g => g.Count() > 1);
+            foreach (var g in groups)
+                Console.WriteLine("Dupe: " + g.Key);
+
+            _settings = temp.ToDictionary(x => x[0].Trim(), x => x[1].Trim());
         }
 
         public void GenerateReport(int leaderboardid, int year)
@@ -342,6 +346,9 @@ namespace adventofcode
 
             var htmlContent = new StringBuilder();
             var html = File.ReadAllText("..\\..\\Leaderboard.template");
+            if (!_settings.TryGetValue(_leaderBoardId + "_name", out var listName))
+                listName = leaderboard.Players.Single(p => p.Id == _leaderBoardId.ToString()).Name;
+            html = html.Replace("$(TITLE)", listName);
             html = html.Replace("$(GENDATE)", DateTime.Now.ToString());
             html = html.Replace("$(DATADATE)", File.GetLastWriteTime(_jsonFileName).ToString());
 
@@ -413,8 +420,8 @@ namespace adventofcode
         {
             var parts = p.Props.Split(new[] { ',' });
             var res = "<tr class=\"item\">";
-            res += Cell(p.CurrentPosition+". " + p.Name);
-            for (int i = 0; i<_metacolumns.Count; i++)
+            res += Cell(p.CurrentPosition + ". " + p.Name);
+            for (int i = 0; i < _metacolumns.Count; i++)
                 res += Cell(parts.Length > i ? parts[i].Trim() : "");
             res += Cell(p.LocalScore);
             res += Cell(p.GlobalScore);
@@ -613,6 +620,7 @@ namespace adventofcode
                         "// " + player.Name,
                         propsKey + "=?, ?"
                     });
+                    _settings[propsKey] = "?, ?";
                     player.Props = "";
                 }
                 else
@@ -681,7 +689,7 @@ namespace adventofcode
             var colPos = 0;
             var log = new StringBuilder($"<h1>{name}</h1><div style=\"overflow-x:auto;\"> <table id=\"table_{tableid}\"><tr>");
             log.AppendLine(TableHeader(colPos++, tableid, name));
-            foreach(var s in _metacolumns)
+            foreach (var s in _metacolumns)
                 log.AppendLine(TableHeader(colPos++, tableid, s));
             log.AppendLine(TableHeader(colPos++, tableid, "L"));
             log.AppendLine(TableHeader(colPos++, tableid, "G"));

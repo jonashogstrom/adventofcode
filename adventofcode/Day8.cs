@@ -36,55 +36,57 @@ namespace adventofcode
                 res.Addmeta(ints[pos++]);
             return res;
         }
-    }
 
-    internal class Node
-    {
-        public List<int> Meta { get; } = new List<int>();
-        public List<Node> Nodes { get; } = new List<Node>();
-
-        public int SumMeta
+        internal class Node
         {
-            get
-            {
-                return Meta.Sum() + Nodes.Select(n => n.SumMeta).Sum();
-            }
-        }
+            public List<int> Meta { get; } = new List<int>();
+            public List<Node> Nodes { get; } = new List<Node>();
 
-        public int Sum2
-        {
-            get
+            public int SumMeta
             {
-                if (Nodes.Count == 0)
-                    return Meta.Sum();
-                var sum = 0;
-                for (int i = 0; i < Meta.Count; i++)
+                get
                 {
-                    var pos = Meta[i] - 1;
-                    if (pos < Nodes.Count)
-                        sum += Nodes[pos].Sum2;
+                    return Meta.Sum() + Nodes.Select(n => n.SumMeta).Sum();
                 }
+            }
 
-                return sum;
+            public int Sum2
+            {
+                get
+                {
+                    if (Nodes.Count == 0)
+                        return Meta.Sum();
+                    var sum = 0;
+                    for (int i = 0; i < Meta.Count; i++)
+                    {
+                        var pos = Meta[i] - 1;
+                        if (pos < Nodes.Count)
+                            sum += Nodes[pos].Sum2;
+                    }
 
+                    return sum;
+
+                }
+            }
+
+            public Node(int v)
+            {
+                Name = ((char)v + 65).ToString();
+            }
+
+            public string Name { get; }
+
+            public void Addmeta(int i)
+            {
+                Meta.Add(i);
+            }
+
+            public void AddChild(Node n)
+            {
+                Nodes.Add(n);
             }
         }
-
-        public Node(int v)
-        {
-            Name = ((char) v+65).ToString();
-        }
-
-        public string Name { get; }
-
-        public void Addmeta(int i)
-        {
-            Meta.Add(i);
-        }
-
-        public void AddChild(Node n)
-        {
-            Nodes.Add(n);
-        }
     }
+
+
 }
