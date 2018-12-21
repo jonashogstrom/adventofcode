@@ -33,7 +33,6 @@ namespace adventofcode
             var terminators = new HashSet<long>();
 
             long lastTerminator = -1;
-            int round = 0;
             while (true)
             {
                 // 6=>7
@@ -86,10 +85,6 @@ namespace adventofcode
                     Part2 = lastTerminator;
                     return;
                 }
-
-//                round++;
-//                if (round > 20000)
-//                    return;
             }
         }
 

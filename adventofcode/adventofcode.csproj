@@ -70,15 +70,11 @@
     <Compile Include="Day7.cs" />
     <Compile Include="Day8.cs" />
     <Compile Include="Day9.cs" />
-    <Compile Include="Leaderboard.cs" />
-    <Compile Include="LeaderboardParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="leaderboard.json" />
-    <None Include="Leaderboard.template" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -121,7 +117,6 @@
     <Content Include="Day8_test.txt" />
     <Content Include="Day9.txt" />
     <Content Include="Day9_test.txt" />
-    <Content Include="settings.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

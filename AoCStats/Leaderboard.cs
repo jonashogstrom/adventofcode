@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
-namespace adventofcode
+namespace AoCStats
 {
     [DebuggerDisplay("{Name}: {LocalScore}")]
     public class Player

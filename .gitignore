@@ -261,3 +261,5 @@ __pycache__/
 *.pyc
 adventofcode/leaderboard_*.json
 adventofcode/settings.txt
+AoCStats/settings.txt
+*.json

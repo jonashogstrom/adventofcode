@@ -9,7 +9,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace adventofcode
+namespace AoCStats
 {
     public class LeaderboardParser
     {
