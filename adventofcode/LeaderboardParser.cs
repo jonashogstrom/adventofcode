@@ -40,7 +40,7 @@ namespace adventofcode
         {
             _years = years;
 
-            var interval = TimeSpan.FromHours(new Random().Next(2, 5));
+            var interval = TimeSpan.FromHours(24);
             if (year == DateTime.Now.Year)
             {
                 interval = TimeSpan.FromMinutes(15);

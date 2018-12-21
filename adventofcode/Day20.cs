@@ -39,7 +39,6 @@ namespace adventofcode
                 Part1 = res;
                 res = rooms.Count(r => r.Dist >= 1000);
                 Part2 = res;
-
             }
         }
 
