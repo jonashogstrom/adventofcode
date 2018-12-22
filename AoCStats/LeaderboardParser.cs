@@ -61,13 +61,51 @@ namespace AoCStats
             var updatedData = DownloadIfOld(interval);
 
             var leaderboard = ParseJson();
+            for (int d = 1; d <= leaderboard.HighestDay; d++)
+                DownloadGlobalLeaderboard(year, d);
 
             DeriveMoreStats(leaderboard);
+            ParseGlobalBoards(leaderboard, year);
 
             Log($"Generating new html for {_leaderBoardId}/{_year}");
             var modified = GenerateHtml(leaderboard);
             if (updatedData || modified)
                 UploadStatistics();
+        }
+
+        private void ParseGlobalBoards(LeaderBoard leaderboard, int year)
+        {
+            for (int i = 1; i <= leaderboard.HighestDay; i++)
+            {
+                var html = File.ReadAllText($"global_{year}_{i}.html").Split(new string[]{"<div class=\"leaderboard-entry\">"}, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var player in leaderboard.Players)
+                {
+                    var star = 1;
+                    foreach (var r in html)
+                    {
+                        if (r.Contains($"height=\"20\"/></span>{player.Name}"))
+                        {
+                            var marker = "<span class=\"leaderboard-position\">";
+                            var p = r.IndexOf(marker);
+                            var pos = int.Parse(r.Substring(p + marker.Length, 3));
+                            Console.WriteLine($"{player.Name} scored {101-pos} points on day {i} (star {star+1}), year {year}");
+                            player.GlobalScoreForDay[i-1][star] = 101-pos;
+                        }
+                        if (r.Contains("<span class=\"leaderboard-daydesc-first\">"))
+                            star = 0;
+                    }
+                }
+            }
+        }
+
+        private void DownloadGlobalLeaderboard(int year, int day)
+        {
+            var fileName = $"global_{year}_{day}.html";
+            if (!File.Exists(fileName))
+            {
+                var s = DownloadFromURL($"https://adventofcode.com/{year}/leaderboard/day/{day}");
+                File.WriteAllText(fileName, s);
+            }
         }
 
         private void UploadStatistics()
@@ -183,6 +221,7 @@ namespace AoCStats
             var logTotalSolveTime = InitLog("Total Solve Time", leaderboard.HighestDay);
             var logAccumulatedSolveTime = InitLog("AccumulatedSolveTime", leaderboard.HighestDay);
             var logAccumulatedScore = InitLog("Accumulated score", leaderboard.HighestDay);
+            var logGlobalScore = InitLog("Global scores", leaderboard.HighestDay);
 
             foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
             {
@@ -193,6 +232,7 @@ namespace AoCStats
                     logTotalSolveTime.Append(AddStartOfRowAndNameCell(p));
                     logAccumulatedSolveTime.Append(AddStartOfRowAndNameCell(p));
                     logAccumulatedScore.Append(AddStartOfRowAndNameCell(p));
+                    logGlobalScore.Append(AddStartOfRowAndNameCell(p));
 
                     for (int day = 0; day < leaderboard.HighestDay; day++)
                         for (int star = 0; star < 2; star++)
@@ -224,6 +264,13 @@ namespace AoCStats
                                 logTotalSolveTime.Append(EmptyCell());
                             }
 
+                            if (p.GlobalScoreForDay[day][star].HasValue)
+                                logGlobalScore.Append(Cell(p.GlobalScoreForDay[day][star].Value));
+                            else
+                            {
+                                logGlobalScore.Append(EmptyCell());
+                            }
+
 
                             if (p.AccumulatedScore[day][star] != -1)
 
@@ -243,6 +290,7 @@ namespace AoCStats
                     logTotalSolveTime.AppendLine(EndOfRow(p));
                     logAccumulatedSolveTime.AppendLine(EndOfRow(p));
                     logAccumulatedScore.AppendLine(EndOfRow(p));
+                    logGlobalScore.AppendLine(EndOfRow(p));
                 }
             }
 
@@ -251,12 +299,14 @@ namespace AoCStats
             ExitLog(logTotalSolveTime);
             ExitLog(logAccumulatedSolveTime);
             ExitLog(logAccumulatedScore);
+            ExitLog(logGlobalScore);
 
             tabs["Daily position"] = logPositionForStar;
             tabs["Offset"] = logOffsetFromWinner;
             tabs["Time"] = logTotalSolveTime;
             tabs["AccumulatedTime"] = logAccumulatedSolveTime;
             tabs["Local leaderboard (score)"] = logAccumulatedScore;
+            tabs["Global score"] = logGlobalScore;
 
 
             // https://developers.google.com/chart/interactive/docs/gallery/linechart
@@ -455,26 +505,7 @@ namespace AoCStats
             {
                 Log($"Downloading new data for {_leaderBoardId}/{_year}");
                 // Create Target
-                var cookies = new CookieContainer();
-                var destination = $"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}.json";
-
-                // Create a WebRequest object and assign it a cookie container and make them think your Mozilla ;)
-                cookies.Add(new Cookie("session", _settings["cookie_" + _leaderBoardId], "/", ".adventofcode.com"));
-                var webRequest = (HttpWebRequest)WebRequest.Create(destination);
-                webRequest.Method = "GET";
-                webRequest.Accept = "*/*";
-                webRequest.AllowAutoRedirect = false;
-                webRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.0.3705)";
-                webRequest.CookieContainer = cookies;
-                webRequest.ContentType = "text/xml";
-                webRequest.Credentials = null;
-
-                // Grab the response from the server for the current WebRequest
-                var webResponse = (HttpWebResponse)webRequest.GetResponse();
-
-                TextReader tr = new StreamReader(webResponse.GetResponseStream());
-
-                var s = tr.ReadToEnd();
+                var s = DownloadFromURL($"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}.json");
                 if (File.Exists(_jsonFileName) && File.ReadAllText(_jsonFileName) == s)
                     return false;
                 if (!string.IsNullOrEmpty(s))
@@ -483,6 +514,30 @@ namespace AoCStats
             }
 
             return false;
+        }
+
+        private string DownloadFromURL(string url)
+        {
+            var cookies = new CookieContainer();
+
+            // Create a WebRequest object and assign it a cookie container and make them think your Mozilla ;)
+            cookies.Add(new Cookie("session", _settings["cookie_" + _leaderBoardId], "/", ".adventofcode.com"));
+            var webRequest = (HttpWebRequest)WebRequest.Create(url);
+            webRequest.Method = "GET";
+            webRequest.Accept = "*/*";
+            webRequest.AllowAutoRedirect = false;
+            webRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.0.3705)";
+            webRequest.CookieContainer = cookies;
+            //            webRequest.ContentType = "text/xml";
+            webRequest.Credentials = null;
+
+            // Grab the response from the server for the current WebRequest
+            using (var webResponse = webRequest.GetResponse())
+            using (var stream = webResponse.GetResponseStream())
+            using (var tr = new StreamReader(stream))
+            {
+                return tr.ReadToEnd();
+            }
         }
 
         private StringBuilder InitGraphHtml(string graphName)

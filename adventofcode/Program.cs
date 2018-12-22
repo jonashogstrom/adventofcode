@@ -33,6 +33,7 @@ namespace adventofcode
                 new Day19(),
                 new Day20(),
                 new Day21(),
+                new Day22(),
             };
 
             days.Last().Run();

@@ -92,17 +92,17 @@ namespace adventofcode
         {
             x();
             return;
-            var i = 0;
-            do
-            {
-                var registers = new long[6];
-                registers[0] = 17;
-                Log("***********Executing with i=" + i);
-                var terminated = ExecuteProgram(input, registers);
-                if (terminated)
-                    Part1 = i;
-                i++;
-            } while (Part1 == null);
+//            var i = 0;
+//            do
+//            {
+//                var registers = new long[6];
+//                registers[0] = 17;
+//                Log("***********Executing with i=" + i);
+//                var terminated = ExecuteProgram(input, registers);
+//                if (terminated)
+//                    Part1 = i;
+//                i++;
+//            } while (Part1 == null);
         }
 
         private bool ExecuteProgram(string[] input, long[] registers)

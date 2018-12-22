@@ -18,18 +18,22 @@ namespace AoCStats
             PositionForStar = new int[dayCount][];
             AccumulatedScore = new int[dayCount][];
             AccumulatedPosition = new int[dayCount][];
+            GlobalScoreForDay = new int?[dayCount][];
             for (int i = 0; i < dayCount; i++)
             {
                 unixCompletionTime[i] = new long[] { -1, -1 };
-                PositionForStar[i] = new int[] { -1, -1 };
-                AccumulatedScore[i] = new int[] { -1, -1 };
-                AccumulatedPosition[i] = new int[] { -1, -1 };
+                PositionForStar[i] = new[] { -1, -1 };
+                AccumulatedScore[i] = new[] { -1, -1 };
+                AccumulatedPosition[i] = new[] { -1, -1 };
+                GlobalScoreForDay[i] = new int?[] { null, null };
                 TimeToComplete[i] = new TimeSpan?[2];
                 AccumulatedTimeToComplete[i] = new TimeSpan?[2];
                 TimeToCompleteStar2[i] = null;
                 OffsetFromWinner[i] = new TimeSpan?[2];
             }
         }
+
+        public int?[][] GlobalScoreForDay { get; set; }
 
         public int TotalScore { get; set; }
         public int[][] PositionForStar { get; set; }
