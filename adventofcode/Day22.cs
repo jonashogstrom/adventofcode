@@ -57,7 +57,6 @@ namespace adventofcode
             if (LogLevel > 2)
                 PrintGround(ground, 15);
 
-
             ExpandDistances(ground, initRegion, targetCoord, rows, cols);
             if (LogLevel > 2)
                 PrintGround(ground);
@@ -110,12 +109,11 @@ namespace adventofcode
                               " N=" + DistToStr(g, Equip.Neither).PadLeft(4) +
                               "]");
                 }
-
                 sb.AppendLine();
             }
             Log(sb.ToString);
-
         }
+
         private void PrintGround(Region[][] ground, int size)
         {
             var gt = new Dictionary<GroundType, char>()
@@ -132,11 +130,9 @@ namespace adventofcode
                     var g = ground[row][col];
                     sb.Append(gt[g.Type]);
                 }
-
                 sb.AppendLine();
             }
             Log(sb.ToString);
-
         }
 
         private static string DistToStr(Region g, Equip e)
@@ -169,7 +165,6 @@ namespace adventofcode
                 {
                     if (d.Row >= 0 && d.Col >= 0)
                     {
-
                         if (d.Row < rows && d.Col < cols)
                         {
                             var neighbor = regions[d.Row][d.Col];
@@ -183,7 +178,6 @@ namespace adventofcode
                                     candidates);
                             }
                         }
-
                     }
                 }
             }
@@ -200,7 +194,6 @@ namespace adventofcode
                 return new[] { Equip.Neither, Equip.Gear };
             }
             return new[] { Equip.Neither, Equip.Torch };
-
         }
 
         private static Equip GetInvalidEquip(Region r)

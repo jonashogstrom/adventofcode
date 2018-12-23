@@ -98,4 +98,18 @@ namespace adventofcode
             return new Coord(Row + coord.Row, Col + coord.Col);
         }
     }
+
+    public class Coord3d
+    {
+        public Coord3d(int x, int y, int z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        public int x;
+        public int y;
+        public int z;
+    }
 }
