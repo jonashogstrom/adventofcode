@@ -11,6 +11,7 @@ namespace adventofcode
         public static Coord E = new Coord(0, 1);
         public static Coord S = new Coord(1, 0);
         public static Coord W = new Coord(0, -1);
+        public static Coord Origo = new Coord(0, 0);
 
         public static Coord NW = N.Move(W);
         public static Coord NE = N.Move(E);
