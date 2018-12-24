@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 
@@ -43,7 +42,6 @@ namespace adventofcode
             var sb = new StringBuilder();
             for (int i = 0; i < bots.Count; i++)
             {
-                int count = 0;
                 var b1 = bots[i];
                 b1.BotNum = i;
                 if (i >= 1)
@@ -81,24 +79,6 @@ namespace adventofcode
 
         private Coord3d FindBoundingBox(Bot[] bots)
         {
-            //            int smallestoverlap = int.MaxValue;
-            //            Coord3d centerCoord = null;
-            //
-            //            foreach(var b in bots)
-            //            foreach (var b2 in bots)
-            //            {
-            //                if (b != b2)
-            //                {
-            //                    var dist = Dist(b, b2);
-            //                    var overlap = b.Strength + b2.Strength - dist;
-            //                    if (overlap < smallestoverlap)
-            //                    {
-            //                        smallestoverlap = overlap;
-            ////                    centerCoord = new Coord3d(
-            ////                        b.X + (b.X-b2.X));
-            //                    }
-            //                }
-            //            }
             var maxX = int.MaxValue;
             var maxY = int.MaxValue;
             var maxZ = int.MaxValue;
@@ -151,13 +131,14 @@ namespace adventofcode
                         var zDiff = c.z - m.Z;
 
                         
-                        var xmove = (xDiff > 0 ? -1:1)*r.Next(moveStep+1);
-                        var ymove = (yDiff > 0 ? -1:1)*r.Next(moveStep+1);
-                        var zmove = (zDiff > 0 ? -1:1)*r.Next(moveStep+1);
+                        var xmove = (xDiff > 0 ? -1:1)*moveStep;
+                        var ymove = (yDiff > 0 ? -1:1)* moveStep;
+                        var zmove = (zDiff > 0 ? -1:1)* moveStep;
 
-                        var xmove2 = (r.Next(2) == 0 ? xmove  : 0);
-                        var ymove2 = (r.Next(2) == 0 ? ymove  : 0);
-                        var zmove2 = (r.Next(2) == 0 ? zmove  : 0);
+
+                        var xmove2 = !edge.Any() || r.Next(2) == 0 ? xmove  : 0;
+                        var ymove2 = !edge.Any() || r.Next(2) == 0 ? ymove  : 0;
+                        var zmove2 = !edge.Any() || r.Next(2) == 0 ? zmove  : 0;
                         var tempCoord = new Coord3d(
                             c.x + xmove2,
                             c.y + ymove2,
@@ -177,15 +158,17 @@ namespace adventofcode
                             }
                             else
                             {
+                                if (moveStep == 1)
+                                    edge.Add(validate);
                                 moveStep = Math.Max(1, moveStep / 3);
-                                edge.Add(validate);
+                            
                                 //                Log("!!: " + $" {c.x}, {c.y}, {c.z} =>{ tempCoord.x}, { tempCoord.y}, { tempCoord.z} ({xmove2},{ymove2},{zmove2})");
                             }
                         }
-                        else
-                        {
-                            moveStep = Math.Max(1, moveStep / 3);
-                        }
+//                        else
+//                        {
+//                            moveStep = Math.Max(1, moveStep / 3);
+//                        }
                     }
 
                 }
@@ -220,6 +203,9 @@ namespace adventofcode
             return c;
         }
 
+        /// <summary>
+        /// https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm
+        /// </summary>
         public void BronKerbosch1(IEnumerable<Bot> r, Bot[] p, Bot[] x, List<Bot> allBots)
         {
             if (!p.Any() && !x.Any())
@@ -245,8 +231,7 @@ namespace adventofcode
                 x = x.Union(new[] { v }).ToArray();
             }
         }
-
-
+        
         public void BronKerbosch2(IEnumerable<Bot> r, Bot[] p, Bot[] x, List<Bot> allBots)
         {
             if (!p.Any() && !x.Any())
@@ -281,8 +266,7 @@ namespace adventofcode
 
             return Nv;
         }
-
-
+        
         private bool Overlaps(Bot b1, Bot b2)
         {
             return Dist(b1, b2) <= b1.Strength + b2.Strength;
