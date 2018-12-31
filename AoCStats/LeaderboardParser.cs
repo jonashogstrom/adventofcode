@@ -77,7 +77,7 @@ namespace AoCStats
         {
             for (int i = 1; i <= leaderboard.HighestDay; i++)
             {
-                var html = File.ReadAllText($"global_{year}_{i}.html").Split(new string[]{"<div class=\"leaderboard-entry\">"}, StringSplitOptions.RemoveEmptyEntries);
+                var html = File.ReadAllText($"global_{year}_{i}.html").Split(new string[] { "<div class=\"leaderboard-entry\">" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var player in leaderboard.Players)
                 {
                     var star = 1;
@@ -88,8 +88,8 @@ namespace AoCStats
                             var marker = "<span class=\"leaderboard-position\">";
                             var p = r.IndexOf(marker);
                             var pos = int.Parse(r.Substring(p + marker.Length, 3));
-                            Console.WriteLine($"{player.Name} scored {101-pos} points on day {i} (star {star+1}), year {year}");
-                            player.GlobalScoreForDay[i-1][star] = 101-pos;
+//                            Console.WriteLine($"{player.Name} scored {101 - pos} points on day {i} (star {star + 1}), year {year}");
+                            player.GlobalScoreForDay[i - 1][star] = 101 - pos;
                         }
                         if (r.Contains("<span class=\"leaderboard-daydesc-first\">"))
                             star = 0;
@@ -265,7 +265,12 @@ namespace AoCStats
                             }
 
                             if (p.GlobalScoreForDay[day][star].HasValue)
-                                logGlobalScore.Append(Cell(p.GlobalScoreForDay[day][star].Value));
+                                logGlobalScore.Append(Cell(
+                                    p.GlobalScoreForDay[day][star].Value.ToString(),
+                                    -p.GlobalScoreForDay[day][star].Value,
+                                    true,
+                                    "",
+                                    "Position: " + (100 - p.GlobalScoreForDay[day][star].Value+1)));
                             else
                             {
                                 logGlobalScore.Append(EmptyCell());
@@ -281,7 +286,7 @@ namespace AoCStats
                             }
                             else
                             {
-                                logAccumulatedScore.Append(EmptyCell());
+                                logAccumulatedScore.Append(EmptyCell(int.MinValue));
                             }
                         }
 
@@ -444,10 +449,10 @@ namespace AoCStats
             if (File.Exists(_htmlFileName))
             {
                 var oldHtml = File.ReadAllText(_htmlFileName, Encoding.UTF8);
-                var length = oldHtml.Length / 2;
-                var oldhtml2 = oldHtml.Substring(0, length);
-                var html2 = html.Substring(0, oldhtml2.Length);
-                identical = oldhtml2 != html2;
+                var part1 = oldHtml.Split(new[] {"<!-- timestamps -->"}, StringSplitOptions.RemoveEmptyEntries)[0];
+
+                var html2 = html.Substring(0, Math.Min(html.Length, part1.Length));
+                identical = part1 != html2;
             }
 
 
@@ -473,7 +478,7 @@ namespace AoCStats
             res += Cell(p.CurrentPosition + ". " + p.Name);
             for (int i = 0; i < _metacolumns.Count; i++)
                 res += Cell(parts.Length > i ? parts[i].Trim() : "");
-            res += Cell(p.LocalScore);
+            res += CellWithAlt(p.LocalScore, p.PendingPoints == 0 ? "" : ("Max: " + (p.LocalScore + p.PendingPoints)));
             res += Cell(p.GlobalScore);
             res += Cell(p.Stars);
             return res;
@@ -603,6 +608,8 @@ namespace AoCStats
                             if (bestTime[day][star] == TimeSpan.Zero || timeSpan < bestTime[day][star])
                                 bestTime[day][star] = timeSpan;
                         }
+                        else
+                            player.PendingPoints += leaderboard.Players.Count - leaderboard.StarsAwarded[day][star];
                     }
 
                     player.TimeToCompleteStar2[day] = player.TimeToComplete[day][1] - player.TimeToComplete[day][0];
@@ -691,6 +698,7 @@ namespace AoCStats
                         var starnum = int.Parse(stardata.Name);
                         var starts = GetLong((JObject)stardata.Value, "get_star_ts");
                         player.unixCompletionTime[day - 1][starnum - 1] = starts;
+
                     }
                 }
 
@@ -700,11 +708,18 @@ namespace AoCStats
             return new LeaderBoard(players, highestDay);
         }
 
-        private static string Cell(string value, int sort, bool alignRight = false, string htmlClass = "")
+        private static string Cell(string value, int sort, bool alignRight = false, string htmlClass = "", string alt = "")
         {
             var align = alignRight ? " align='right'" : "";
             htmlClass = htmlClass == "" ? "" : " class='" + htmlClass + "'";
-            return $"<td sort='{sort}'{align}{htmlClass}>{value}</td>";
+            var s = $"<td sort='{sort}'{align}{htmlClass}>";
+            if (alt != string.Empty)
+                s += $"<span title=\"{alt}\">";
+            s += $"{value}";
+            if (alt != string.Empty)
+                s += $"</span>";
+            s += "</td>";
+            return s;
         }
         private static string Cell(string value)
         {
@@ -712,6 +727,11 @@ namespace AoCStats
             if (value.Length > 0)
                 sort = (byte)value[0];
             return Cell(value, sort);
+        }
+
+        private static string CellWithAlt(int value, string alt)
+        {
+            return Cell(value.ToString(), value, true, "", alt);
         }
         private static string Cell(int value, string htmlClass = "")
         {
@@ -721,9 +741,9 @@ namespace AoCStats
         {
             return Cell(value.ToString(), (int)value.TotalSeconds, true, htmlClass);
         }
-        private static string EmptyCell()
+        private static string EmptyCell(int sort=int.MaxValue)
         {
-            return Cell("", int.MaxValue);
+            return Cell("", sort);
         }
 
         private int tableid = 0;

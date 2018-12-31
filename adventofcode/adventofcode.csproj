@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,8 +36,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,30 +52,33 @@
   <ItemGroup>
     <Compile Include="BaseDay.cs" />
     <Compile Include="Coord.cs" />
-    <Compile Include="Day1.cs" />
-    <Compile Include="Day10.cs" />
-    <Compile Include="Day11.cs" />
-    <Compile Include="Day12.cs" />
-    <Compile Include="Day13.cs" />
-    <Compile Include="Day14.cs" />
-    <Compile Include="Day15.cs" />
-    <Compile Include="Day16.cs" />
-    <Compile Include="Day17.cs" />
-    <Compile Include="Day18.cs" />
-    <Compile Include="Day19.cs" />
-    <Compile Include="Day2.cs" />
-    <Compile Include="Day20.cs" />
-    <Compile Include="Day21.cs" />
-    <Compile Include="Day22.cs" />
-    <Compile Include="Day23.cs" />
-    <Compile Include="Day24.cs" />
-    <Compile Include="Day3.cs" />
-    <Compile Include="Day4.cs" />
-    <Compile Include="Day5.cs" />
-    <Compile Include="Day6.cs" />
-    <Compile Include="Day7.cs" />
-    <Compile Include="Day8.cs" />
-    <Compile Include="Day9.cs" />
+    <Compile Include="AoC_2018\Day1.cs" />
+    <Compile Include="AoC_2018\Day10.cs" />
+    <Compile Include="AoC_2018\Day11.cs" />
+    <Compile Include="AoC_2018\Day12.cs" />
+    <Compile Include="AoC_2018\Day13.cs" />
+    <Compile Include="AoC_2018\Day14.cs" />
+    <Compile Include="AoC_2018\Day15.cs" />
+    <Compile Include="AoC_2018\Day16.cs" />
+    <Compile Include="AoC_2018\Day17.cs" />
+    <Compile Include="AoC_2018\Day18.cs" />
+    <Compile Include="AoC_2018\Day19.cs" />
+    <Compile Include="AoC_2018\Day2.cs" />
+    <Compile Include="AoC_2018\Day20.cs" />
+    <Compile Include="AoC_2015\Day2015_01.cs" />
+    <Compile Include="AoC_2018\Day21.cs" />
+    <Compile Include="AoC_2018\Day22.cs" />
+    <Compile Include="AoC_2018\Day23.cs" />
+    <Compile Include="AoC_2018\Day24.cs" />
+    <Compile Include="AoC_2018\Day25.cs" />
+    <Compile Include="AoC_2018\Day3.cs" />
+    <Compile Include="AoC_2018\Day4.cs" />
+    <Compile Include="AoC_2018\Day5.cs" />
+    <Compile Include="AoC_2018\Day6.cs" />
+    <Compile Include="AoC_2018\Day7.cs" />
+    <Compile Include="AoC_2018\Day8.cs" />
+    <Compile Include="AoC_2018\Day9.cs" />
+    <Compile Include="Day2016_01.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -81,52 +87,63 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="day1.txt" />
-    <Content Include="Day10.txt" />
-    <Content Include="Day10_test.txt" />
-    <Content Include="Day11.txt" />
-    <Content Include="Day11_test.txt" />
-    <Content Include="Day12.txt" />
-    <Content Include="Day12_test.txt" />
-    <Content Include="Day13.txt" />
-    <Content Include="Day13_test.txt" />
-    <Content Include="Day14.txt" />
-    <Content Include="Day14_test.txt" />
-    <Content Include="Day15.txt" />
-    <Content Include="Day15_test.txt" />
-    <Content Include="Day16.txt" />
-    <Content Include="Day16_test.txt" />
-    <Content Include="Day17.txt" />
-    <Content Include="Day17_test.txt" />
-    <Content Include="Day18.txt" />
-    <Content Include="Day18_test.txt" />
-    <Content Include="Day19.txt" />
-    <Content Include="Day19_test.txt" />
-    <Content Include="day2.txt" />
-    <Content Include="Day20.txt" />
-    <Content Include="Day20_test.txt" />
-    <Content Include="Day21.txt" />
-    <Content Include="Day21_test.txt" />
-    <Content Include="Day22.txt" />
-    <Content Include="Day22_test.txt" />
-    <Content Include="Day23.txt" />
-    <Content Include="Day23_test.txt" />
-    <Content Include="Day24.txt" />
-    <Content Include="Day24_Ian.txt" />
-    <Content Include="Day24_test.txt" />
-    <Content Include="Day3.txt" />
-    <Content Include="Day3_test.txt" />
-    <Content Include="Day4.txt" />
-    <Content Include="Day5.txt" />
-    <Content Include="Day5_test.txt" />
-    <Content Include="Day6.txt" />
-    <Content Include="Day6_test.txt" />
-    <Content Include="Day7.txt" />
-    <Content Include="Day7_test.txt" />
-    <Content Include="Day8.txt" />
-    <Content Include="Day8_test.txt" />
-    <Content Include="Day9.txt" />
-    <Content Include="Day9_test.txt" />
+    <Content Include="AoC_2018\day1.txt" />
+    <Content Include="AoC_2018\Day10.txt" />
+    <Content Include="AoC_2018\Day10_test.txt" />
+    <Content Include="AoC_2018\Day11.txt" />
+    <Content Include="AoC_2018\Day11_test.txt" />
+    <Content Include="AoC_2018\Day12.txt" />
+    <Content Include="AoC_2018\Day12_test.txt" />
+    <Content Include="AoC_2018\Day13.txt" />
+    <Content Include="AoC_2018\Day13_test.txt" />
+    <Content Include="AoC_2018\Day14.txt" />
+    <Content Include="AoC_2018\Day14_test.txt" />
+    <Content Include="AoC_2018\Day15.txt" />
+    <Content Include="AoC_2018\Day15_test.txt" />
+    <Content Include="AoC_2018\Day16.txt" />
+    <Content Include="AoC_2018\Day16_test.txt" />
+    <Content Include="AoC_2018\Day17.txt" />
+    <Content Include="AoC_2018\Day17_test.txt" />
+    <Content Include="AoC_2018\Day18.txt" />
+    <Content Include="AoC_2018\Day18_test.txt" />
+    <Content Include="AoC_2018\Day19.txt" />
+    <Content Include="AoC_2018\Day19_test.txt" />
+    <Content Include="AoC_2018\day2.txt" />
+    <Content Include="AoC_2018\Day20.txt" />
+    <Content Include="AoC_2018\Day20_test.txt" />
+    <Content Include="AoC_2018\Day21.txt" />
+    <Content Include="AoC_2018\Day21_test.txt" />
+    <Content Include="AoC_2018\Day22.txt" />
+    <Content Include="AoC_2018\Day22_test.txt" />
+    <Content Include="AoC_2018\Day23.txt" />
+    <Content Include="AoC_2018\Day23_test.txt" />
+    <Content Include="AoC_2018\Day24.txt" />
+    <Content Include="AoC_2018\Day24_Ian.txt" />
+    <Content Include="AoC_2018\Day24_test.txt" />
+    <Content Include="AoC_2018\Day25.txt" />
+    <Content Include="AoC_2018\Day25_test.txt" />
+    <Content Include="AoC_2018\Day3.txt" />
+    <Content Include="AoC_2018\Day3_test.txt" />
+    <Content Include="AoC_2018\Day4.txt" />
+    <Content Include="AoC_2018\Day5.txt" />
+    <Content Include="AoC_2018\Day5_test.txt" />
+    <Content Include="AoC_2018\Day6.txt" />
+    <Content Include="AoC_2018\Day6_test.txt" />
+    <Content Include="AoC_2018\Day7.txt" />
+    <Content Include="AoC_2018\Day7_test.txt" />
+    <Content Include="AoC_2018\Day8.txt" />
+    <Content Include="AoC_2018\Day8_test.txt" />
+    <Content Include="AoC_2018\Day9.txt" />
+    <Content Include="AoC_2018\Day9_test.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AoC_2016\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.11.0\build\NUnit.props'))" />
+  </Target>
 </Project>

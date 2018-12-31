@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace adventofcode
+namespace adventofcode.AoC_2018
 {
     internal class Day15 : BaseDay
     {

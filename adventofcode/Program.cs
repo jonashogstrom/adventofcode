@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using adventofcode.AoC_2018;
 
 namespace adventofcode
 {
@@ -36,6 +37,9 @@ namespace adventofcode
                 new Day22(),
                 new Day23(),
                 new Day24(),
+                new Day25(),
+                new Day2015_01(),
+                new Day2016_01(),
             };
 
             days.Last().Run();

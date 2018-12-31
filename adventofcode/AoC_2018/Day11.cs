@@ -1,4 +1,4 @@
-﻿namespace adventofcode
+﻿namespace adventofcode.AoC_2018
 {
     internal class Day11 : BaseDay
     {

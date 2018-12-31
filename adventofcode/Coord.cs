@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -18,8 +19,8 @@ namespace adventofcode
         public static Coord SE = S.Move(E);
         public static Coord SW = S.Move(W);
 
-        private static readonly Coord[] Directions4 = {N, E, S, W};
-        private static readonly Coord[] Directions8 = {N, NE, E, SE, S, SW, W, NW};
+        private static readonly Coord[] Directions4 = { N, E, S, W };
+        private static readonly Coord[] Directions8 = { N, NE, E, SE, S, SW, W, NW };
 
         public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
         {
@@ -50,7 +51,7 @@ namespace adventofcode
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Coord) obj);
+            return Equals((Coord)obj);
         }
 
         public override int GetHashCode()
@@ -93,9 +94,14 @@ namespace adventofcode
                 yield return Move(d);
         }
 
-        public Coord Move(Coord coord)
+        public Coord Move(Coord coord, int count = 1)
         {
-            return new Coord(Row + coord.Row, Col + coord.Col);
+            return new Coord(Row + coord.Row * count, Col + coord.Col * count);
+        }
+
+        public int Dist(Coord pos)
+        {
+            return Math.Abs(Row - pos.Row) + Math.Abs(Col - pos.Col); 
         }
     }
 

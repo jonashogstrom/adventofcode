@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
-namespace adventofcode
+namespace adventofcode.AoC_2018
 {
     internal class Day21 : BaseDay
     {

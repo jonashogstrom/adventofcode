@@ -64,9 +64,9 @@ namespace adventofcode
             return GetInput().Select(x => int.Parse(x)).ToArray();
         }
 
-        private bool _addLogHeader;
-        private StringBuilder _log;
-        private string _fileNameSuffix = "";
+        protected bool _addLogHeader;
+        protected StringBuilder _log;
+        protected string _fileNameSuffix = "";
 
         public void Run()
         {
@@ -98,7 +98,7 @@ namespace adventofcode
         }
 
 
-        private void LogAndCompareExpected(string label, object value, object expected)
+        protected bool LogAndCompareExpected(string label, object value, object expected)
         {
             if (value != null)
             {
@@ -108,27 +108,38 @@ namespace adventofcode
                     {
                         Log("   " + label + " = " + value + "   OK");
                         _fileNameSuffix += "[OK]";
+                        return true;
                     }
-                    else
-                    {
-                        Log("   ***********************");
-                        Log("   *********************** Regression error");
-                        Log("   *********************** Expected:" + expected);
-                        Log("   *********************** Actual: " + value);
-                        Log("   ***********************");
-                        _fileNameSuffix += "[XX]";
-                    }
+
+                    Log("   ***********************");
+                    Log("   *********************** Regression error");
+                    Log("   *********************** Expected:" + expected);
+                    Log("   *********************** Actual: " + value);
+                    Log("   ***********************");
+                    _fileNameSuffix += "[XX]";
+                    return false;
                 }
-                else
-                {
-                    Log("   " + label + " = " + value);
-                    _fileNameSuffix += "[  ]";
-                }
+
+                Log("   " + label + " = " + value);
+                _fileNameSuffix += "[  ]";
+                return true;
             }
+
+            if (expected != null)
+            {
+                Log("   *** Not complete: " + label + ". Expected: " + expected);
+                return false;
+            }
+
+            return true;
         }
 
         protected abstract void DoRun(string[] input);
-        protected abstract void Setup();
+
+        protected virtual void Setup()
+        {
+
+        }
 
         protected void PrintHeader()
         {
@@ -212,6 +223,7 @@ namespace adventofcode
                 }
 
                 Debug.WriteLine(s);
+                Console.WriteLine(s);
                 _log.AppendLine(s);
             }
         }

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace adventofcode
+namespace adventofcode.AoC_2018
 {
     class Day3 : BaseDay
     {

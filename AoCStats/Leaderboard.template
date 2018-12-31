@@ -144,6 +144,7 @@ table tr:hover {
 <body>
 $(DATA)
 <small>
+<!-- timestamps -->
 Generated at $(GENDATE)<br>
 Data downloaded at $(DATADATE)
 </body>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace adventofcode
+namespace adventofcode.AoC_2018
 {
     internal class Day17 : BaseDay
     {

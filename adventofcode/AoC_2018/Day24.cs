@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Security.Principal;
-using System.Text;
 
-namespace adventofcode
+namespace adventofcode.AoC_2018
 {
     internal class Day24 : BaseDay
     {
