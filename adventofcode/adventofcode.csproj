@@ -53,6 +53,7 @@
     <Compile Include="AoC_2019\Day1.cs" />
     <Compile Include="AoC_2019\Day2.cs" />
     <Compile Include="AoC_2019\DayTemplate.cs" />
+    <Compile Include="AoC_2019\IntCodeComputer.cs" />
     <Compile Include="BaseDay.cs" />
     <Compile Include="Coord.cs" />
     <Compile Include="AoC_2018\Day1.cs" />
