@@ -31,21 +31,23 @@ namespace AoCStats
             _settings = temp.ToDictionary(x => x[0].Trim(), x => x[1].Trim());
         }
 
-        public void GenerateReport(int leaderboardid, int year)
+        public void GenerateReport(int leaderboardid, int year, bool handleExcludes)
         {
-            GenerateReport(leaderboardid, year, new[] { year });
+            GenerateReport(leaderboardid, year, new[] { year }, handleExcludes);
         }
 
-        private void GenerateReport(int leaderboardid, int year, int[] years)
+        private void GenerateReport(int leaderboardid, int year, int[] years, bool handleExcludes)
         {
             _years = years;
+            _handleExcludes = handleExcludes;
+            _x_suffix = handleExcludes ? "_X" : "";
 
             var interval = TimeSpan.FromHours(24);
             if (year == DateTime.Now.Year)
             {
                 interval = TimeSpan.FromMinutes(15);
                 if (DateTime.Now.Hour == 6 || DateTime.Now.Hour == 7)
-                    interval = TimeSpan.FromMinutes(2);
+                    interval = TimeSpan.FromMinutes(5);
             }
 
             _year = year;
@@ -56,7 +58,7 @@ namespace AoCStats
             else
                 _metacolumns = new List<string>();
 
-            _htmlFileName = $"leaderboard_{_leaderBoardId}_{_year}.html";
+            _htmlFileName = $"leaderboard_{_leaderBoardId}_{_year}{_x_suffix}.html";
             _jsonFileName = $"..\\..\\leaderboard_{leaderboardid}_{_year}.json";
             var updatedData = DownloadIfOld(interval);
 
@@ -421,7 +423,7 @@ namespace AoCStats
             htmlContent.AppendLine("<div align='right'>");
             foreach (var year in _years.OrderBy(y => y))
                 if (year != _year)
-                    htmlContent.Append($"<a href='leaderboard_{_leaderBoardId}_{year}.html'>{year}</a> ");
+                    htmlContent.Append($"<a href='leaderboard_{_leaderBoardId}_{year}{_x_suffix}.html'>{year}</a> ");
             htmlContent.AppendLine("</div>");
 
             htmlContent.AppendLine("</div>");
@@ -510,7 +512,8 @@ namespace AoCStats
             {
                 Log($"Downloading new data for {_leaderBoardId}/{_year}");
                 // Create Target
-                var s = DownloadFromURL($"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}.json");
+                var url = $"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}.json";
+                var s = DownloadFromURL(url);
                 if (File.Exists(_jsonFileName) && File.ReadAllText(_jsonFileName) == s)
                     return false;
                 if (!string.IsNullOrEmpty(s))
@@ -663,14 +666,22 @@ namespace AoCStats
             foreach (JProperty jmember in jmembers)
             {
                 var jmemberdata = ((JObject)jmember.Value);
+                var id = jmember.Name;
+                var name = GetStr(jmemberdata, "name");
+
+                if (_handleExcludes && _settings.ContainsKey($"exclude_{_leaderBoardId}_{id}_{_year}"))
+                {
+                    Console.WriteLine($"Excluded {name} from {_year}");
+                    continue;
+                }
                 var player = new Player
                 {
-                    Id = jmember.Name,
+                    Id = id,
                     GlobalScore = GetInt(jmemberdata, "global_score"),
                     LocalScore = GetInt(jmemberdata, "local_score"),
                     Stars = GetInt(jmemberdata, "stars"),
                     LastStar = GetLong(jmemberdata, "last_star_ts"),
-                    Name = GetStr(jmemberdata, "name")
+                    Name = name
                 };
                 if (player.Name == null)
                     player.Name = "anonymous " + player.Id;
@@ -701,7 +712,6 @@ namespace AoCStats
 
                     }
                 }
-
                 players.Add(player);
             }
 
@@ -749,6 +759,8 @@ namespace AoCStats
         private int tableid = 0;
         private readonly Dictionary<string, string> _settings;
         private List<string> _metacolumns;
+        private bool _handleExcludes;
+        private string _x_suffix;
 
         private string TableHeader(int colPos, int tableid, string header)
         {
@@ -816,10 +828,10 @@ namespace AoCStats
             return (string)((JValue)jmemberdata.Property(propname).Value).Value;
         }
 
-        public void GenerateReport(int leaderboardid, int[] years)
+        public void GenerateReport(int leaderboardid, int[] years, bool handleExcludes)
         {
             foreach (var year in years)
-                GenerateReport(leaderboardid, year, years);
+                GenerateReport(leaderboardid, year, years, handleExcludes);
 
         }
 

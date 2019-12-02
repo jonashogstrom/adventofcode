@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace adventofcode
 {
@@ -22,7 +23,8 @@ namespace adventofcode
 
         protected InputSource Source { get; set; }
 
-        protected bool UseTestData {
+        protected bool UseTestData
+        {
             get => Source == InputSource.test;
             set => Source = value ? InputSource.test : InputSource.prod;
         }
@@ -48,15 +50,20 @@ namespace adventofcode
 
         private void EnsureFiles()
         {
-            if (!File.Exists(GetFileName(true)))
-                File.WriteAllText(GetFileName(true), "");
-            if (!File.Exists(GetFileName(false)))
-                File.WriteAllText(GetFileName(false), "");
+            EnsureFile(GetFileName(false));
+            EnsureFile(GetFileName(true));
+        }
+
+        private void EnsureFile(string fileName)
+        {
+            if (!File.Exists(fileName))
+                File.WriteAllText(fileName, "");
         }
 
         private string GetFileName(bool useTestData)
         {
-            return "../../" + GetType().Name + (useTestData ? "_test" : "") + ".txt";
+            var f = GetType().FullName.Split(new[] { '.' }, 2).Last().Replace('.', '/');
+            return "../../" + f + (useTestData ? "_test" : "") + ".txt";
         }
 
         protected int[] GetIntInput(string[] input)
@@ -78,10 +85,27 @@ namespace adventofcode
             sw.Stop();
             _addLogHeader = true;
             PrintSplitter();
-            LogAndCompareExpected("Part1", Part1, UseTestData ? Part1TestSolution : Part1Solution);
-            LogAndCompareExpected("Part2", Part2, UseTestData ? Part2TestSolution : Part2Solution);
+            var p1 = LogAndCompareExpected("Part1", Part1, UseTestData ? Part1TestSolution : Part1Solution);
+            var p2 = LogAndCompareExpected("Part2", Part2, UseTestData ? Part2TestSolution : Part2Solution);
             PrintFooter(sw);
-            File.WriteAllText(GetType().Name + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "_" + (UseTestData ? "TEST" : "PROD") + _fileNameSuffix + ".log", _log.ToString());
+            if (this.Source == InputSource.test && 
+                (p1 && Part1 != null && Part1TestSolution != null && Part1Solution == null) ||
+                (p2 && Part2 != null && Part2TestSolution != null && Part2Solution == null))
+            {
+                Log(()=>"TEST DATA SEEMS OK, RUNNING WITH PROD DATA TOO!");
+                Source = InputSource.prod;
+                sw = new Stopwatch();
+                sw.Start();
+                DoRun(GetInput());
+                sw.Stop();
+                _addLogHeader = true;
+                PrintSplitter();
+                LogAndCompareExpected("Part1", Part1, UseTestData ? Part1TestSolution : Part1Solution);
+                LogAndCompareExpected("Part2", Part2, UseTestData ? Part2TestSolution : Part2Solution);
+                PrintFooter(sw);
+
+            }
+            File.WriteAllText(GetType().FullName + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "_" + (UseTestData ? "TEST" : "PROD") + _fileNameSuffix + ".log", _log.ToString());
         }
 
         public static T[][] EmptyArr<T>(int rows, int cols, T def = default(T))
@@ -120,7 +144,9 @@ namespace adventofcode
                     return false;
                 }
 
-                Log("   " + label + " = " + value);
+                Log("   " + label + " = " + value+ "   ** "+(Source==InputSource.prod?"Copied to clipboard":""));
+                if (Source == InputSource.prod)
+                    Clipboard.SetText(value.ToString());
                 _fileNameSuffix += "[  ]";
                 return true;
             }

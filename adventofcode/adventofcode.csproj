@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AoC_2019\Day1.cs" />
+    <Compile Include="AoC_2019\Day2.cs" />
+    <Compile Include="AoC_2019\DayTemplate.cs" />
     <Compile Include="BaseDay.cs" />
     <Compile Include="Coord.cs" />
     <Compile Include="AoC_2018\Day1.cs" />
@@ -78,7 +81,7 @@
     <Compile Include="AoC_2018\Day7.cs" />
     <Compile Include="AoC_2018\Day8.cs" />
     <Compile Include="AoC_2018\Day9.cs" />
-    <Compile Include="Day2016_01.cs" />
+    <Compile Include="AoC_2016\Day2016_01.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -135,10 +138,12 @@
     <Content Include="AoC_2018\Day8_test.txt" />
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
+    <Content Include="AoC_2019\Day1.txt" />
+    <Content Include="AoC_2019\Day1_test.txt" />
+    <Content Include="AoC_2019\Day2.txt" />
+    <Content Include="AoC_2019\Day2_test.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AoC_2016\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

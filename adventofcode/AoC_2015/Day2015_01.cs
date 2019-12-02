@@ -1,6 +1,6 @@
-﻿namespace adventofcode
+﻿namespace adventofcode.AoC_2015
 {
-    internal class Day2015_01 : BaseDay
+    internal class Day1 : BaseDay
     {
         protected override void Setup()
         {

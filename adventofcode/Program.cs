@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using adventofcode.AoC_2018;
 
 namespace adventofcode
 {
@@ -11,38 +10,53 @@ namespace adventofcode
         [STAThread]
         static void Main()
         {
-            var days = new List<BaseDay>
+            var Aoc_2018_days = new List<BaseDay>
             {
-                new Day1(),
-                new Day2(),
-                new Day3(),
-                new Day4(),
-                new Day5(),
-                new Day6(),
-                new Day7(),
-                new Day8(),
-                new Day9(),
-                new Day10(),
-//                new Day11(),
-                new Day12(),
-                new Day13(),
-                new Day14(),
-                new Day15(),
-                new Day16(),
-                new Day17(),
-                new Day18(),
-                new Day19(),
-                new Day20(),
-                new Day21(),
-                new Day22(),
-                new Day23(),
-                new Day24(),
-                new Day25(),
-                new Day2015_01(),
-                new Day2016_01(),
+                new AoC_2018.Day1(),
+                new AoC_2018.Day2(),
+                new AoC_2018.Day3(),
+                new AoC_2018.Day4(),
+                new AoC_2018.Day5(),
+                new AoC_2018.Day6(),
+                new AoC_2018.Day7(),
+                new AoC_2018.Day8(),
+                new AoC_2018.Day9(),
+                new AoC_2018.Day10(),
+//                new AoC_2018.Day11(),
+                new AoC_2018.Day12(),
+                new AoC_2018.Day13(),
+                new AoC_2018.Day14(),
+                new AoC_2018.Day15(),
+                new AoC_2018.Day16(),
+                new AoC_2018.Day17(),
+                new AoC_2018.Day18(),
+                new AoC_2018.Day19(),
+                new AoC_2018.Day20(),
+                new AoC_2018.Day21(),
+                new AoC_2018.Day22(),
+                new AoC_2018.Day23(),
+                new AoC_2018.Day24(),
+                new AoC_2018.Day25(),
             };
 
-            days.Last().Run();
+            var AoC_2016_days = new List<BaseDay>
+            {
+                new AoC_2016.Day1(),
+
+            };
+            var AoC_2015_days = new List<BaseDay>
+            {
+                new AoC_2015.Day1(),
+            };
+
+            var Aoc_2019_days = new List<BaseDay>
+            {
+                new AoC_2019.Day1(),
+                new AoC_2019.Day2(),
+            };
+
+
+            Aoc_2019_days.Last().Run();
 
 //            foreach(var d in days)
 //                d.Run();

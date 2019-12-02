@@ -6,10 +6,10 @@ using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Api;
 
-namespace adventofcode
+namespace adventofcode.AoC_2016
 {
     [TestFixture]
-    internal class Day2016_01 : BaseDay
+    internal class Day1 : BaseDay
     {
         [Test]
         [TestCase(InputSource.test, "R2, L3", 5)]
