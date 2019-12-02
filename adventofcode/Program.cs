@@ -53,6 +53,7 @@ namespace adventofcode
             {
                 new AoC_2019.Day1(),
                 new AoC_2019.Day2(),
+                // new AoC_2019.Day3(),
             };
 
 

@@ -20,21 +20,18 @@ namespace adventofcode.AoC_2019
         protected override void DoRun(string[] input)
         {
             var comp = new IntCodeComputer();
-            Part1 = comp.runprogram(input[0], 12, 02);
+            Part1 = comp.RunProgram(input[0], 12, 02);
          
             for (var noun = 0; noun < 100; noun++)
             for (var verb = 0; verb < 100; verb++)
             {
-                var res = comp.runprogram(input[0], noun, verb);
+                var res = comp.RunProgram(input[0], noun, verb);
                 if (res == 19690720)
                 {
                     Part2 = 100 * noun + verb;
                     return;
                 }
             }
-
         }
-
-
     }
 }

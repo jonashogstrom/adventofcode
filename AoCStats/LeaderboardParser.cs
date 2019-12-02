@@ -627,7 +627,7 @@ namespace AoCStats
                         if (player.unixCompletionTime[day][star] != -1)
                         {
                             player.PositionForStar[day][star] = orderedPlayers.IndexOf(player);
-                            if (day != 5) // points day 6 were recalled 
+                            if (!(_year == 2018 && day == 5)) // points day 6 were recalled 
                                 player.TotalScore += leaderboard.Players.Count - player.PositionForStar[day][star];
                             player.OffsetFromWinner[day][star] = player.TimeToComplete[day][star] - bestTime[day][star];
                             lastStar[player] = player.unixCompletionTime[day][star];
@@ -637,6 +637,8 @@ namespace AoCStats
                         if (player.TotalScore > leaderboard.TopScorePerDay[day][star])
                             leaderboard.TopScorePerDay[day][star] = player.TotalScore;
 
+                        if (_handleExcludes)
+                            player.LocalScore = player.TotalScore;
 
                     }
                 }
@@ -684,7 +686,11 @@ namespace AoCStats
                     Name = name
                 };
                 if (player.Name == null)
-                    player.Name = "anonymous " + player.Id;
+                    player.Name = "anon " + player.Id;
+
+                if (_settings.ContainsKey(player.Id + "_realname"))
+                    player.Name = _settings[player.Id + "_realname"] + " (" + player.Name + ")";
+
                 var propsKey = player.Id + "_" + _leaderBoardId;
                 if (!_settings.TryGetValue(propsKey, out var props))
                 {

@@ -6,17 +6,17 @@ namespace adventofcode.AoC_2019
 {
     public class IntCodeComputer
     {
-        public int[] memory;
-        public int pointer;
-        public bool terminated { get; set; }
+        public int[] Memory;
+        public int Pointer;
+        public bool Terminated { get; set; }
 
         private readonly Dictionary<int, IOperation> _ops = new Dictionary<int, IOperation>();
 
         public IntCodeComputer()
         {
-            RegisterOp(new Add());
-            RegisterOp(new Mul());
-            RegisterOp(new Quit());
+            RegisterOp(new GenericIntFunc("Add", 1, (i, j) => i + j));
+            RegisterOp(new GenericIntFunc("Mul", 2, (i, j) => i * j));
+            RegisterOp(new Terminate());
         }
 
         private void RegisterOp(IOperation op)
@@ -24,30 +24,31 @@ namespace adventofcode.AoC_2019
             _ops[op.OpCode] = op;
         }
 
-        public int runprogram(string program, int noun, int verb)
+        public int RunProgram(string program, int noun, int verb)
         {
             // Console.WriteLine($"======================= {noun} {verb}");
-            memory = program.Split(',').Select(int.Parse).ToArray();
-            pointer = 0;
-            memory[1] = noun;
-            memory[2] = verb;
-            terminated = false;
+            Memory = program.Split(',').Select(int.Parse).ToArray();
+            Pointer = 0;
+            Memory[1] = noun;
+            Memory[2] = verb;
+            Terminated = false;
 
-            while (!terminated)
+            while (!Terminated)
             {
-                if (pointer >= memory.Length)
-                    throw new Exception("pointer outside of memory");
-                if (!_ops.ContainsKey(memory[pointer]))
-                    throw new Exception("unknown operation");
-                var op = _ops[memory[pointer]];
+                if (Pointer >= Memory.Length)
+                    throw new Exception($"Pointer outside of memory: {Pointer}");
+                if (!_ops.ContainsKey(Memory[Pointer]))
+                    throw new Exception($"Unknown operation: {Memory[Pointer]}");
+                var op = _ops[Memory[Pointer]];
                 op.Execute(this);
             }
 
-            return memory[0];
+            return Memory[0];
         }
     }
 
-    internal class Add : IntFunc
+/*
+ internal class Add : IntFunc
     {
         public override int OpCode => 1;
 
@@ -56,61 +57,80 @@ namespace adventofcode.AoC_2019
             return arg1 + arg2;
         }
     }
+*/
+
 
     internal abstract class IntFunc : BaseOp, IOperation
     {
-        public abstract int OpCode { get; }
+        protected IntFunc(int opCode)
+        {
+            OpCode = opCode;
+        }
+
+        public int OpCode { get; }
         public int ArgCount => 3;
         public void Execute(IntCodeComputer comp)
         {
             var args = GetArgs(comp, ArgCount);
 
-            int a1 = comp.memory[args[0]];
-            var a2 = comp.memory[args[1]];
+            var a1 = comp.Memory[args[0]];
+            var a2 = comp.Memory[args[1]];
             var res = calc(a1, a2);
-            // Console.WriteLine($"{a1} ({opCode}) {a2} => {res}");
-            comp.memory[args[2]] = res;
-            comp.pointer += ArgCount+1;
+            Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
+            comp.Memory[args[2]] = res;
+            comp.Pointer += ArgCount + 1;
         }
 
         protected abstract int calc(int arg1, int arg2);
     }
 
-    internal class Mul : IntFunc
+    internal class GenericIntFunc : IntFunc
     {
-        public override int OpCode => 2;
+        private readonly Func<int, int, int> _func;
+
+        public override string Name { get; }
+
+        public GenericIntFunc(string name, int opCode, Func<int, int, int> func): base(opCode)
+        {
+            Name = name;
+            _func = func;
+        }
+
         protected override int calc(int arg1, int arg2)
         {
-            return arg1 * arg2;
+            return _func(arg1, arg2);
         }
-    }
+    };
 
     public class BaseOp
     {
+        public virtual string Name => this.GetType().Name;
+
         protected int[] GetArgs(IntCodeComputer comp, int argCount)
         {
             var args = new int[argCount];
             for (int i = 0; i < argCount; i++)
             {
-                args[i] = comp.memory[comp.pointer + i + 1];
+                args[i] = comp.Memory[comp.Pointer + i + 1];
             }
 
             return args;
         }
     }
 
-    internal class Quit : BaseOp, IOperation
+    internal class Terminate : BaseOp, IOperation
     {
         public int OpCode => 99;
         public int ArgCount => 0;
         public void Execute(IntCodeComputer comp)
         {
-            comp.terminated = true;
+            comp.Terminated = true;
         }
     }
 
     interface IOperation
     {
+        string Name { get; }
         int OpCode { get; }
         int ArgCount { get; }
         void Execute(IntCodeComputer comp);

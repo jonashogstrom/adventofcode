@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AoC_2019\Day1.cs" />
     <Compile Include="AoC_2019\Day2.cs" />
+    <Compile Include="AoC_2019\Day3.cs" />
     <Compile Include="AoC_2019\DayTemplate.cs" />
     <Compile Include="AoC_2019\IntCodeComputer.cs" />
     <Compile Include="BaseDay.cs" />
@@ -143,6 +144,8 @@
     <Content Include="AoC_2019\Day1_test.txt" />
     <Content Include="AoC_2019\Day2.txt" />
     <Content Include="AoC_2019\Day2_test.txt" />
+    <Content Include="AoC_2019\Day3.txt" />
+    <Content Include="AoC_2019\Day3_test.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
