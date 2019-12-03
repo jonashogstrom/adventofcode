@@ -47,7 +47,7 @@ namespace AoCStats
             {
                 interval = TimeSpan.FromMinutes(15);
                 if (DateTime.Now.Hour == 6 || DateTime.Now.Hour == 7)
-                    interval = TimeSpan.FromMinutes(5);
+                    interval = TimeSpan.FromMinutes(2);
             }
 
             _year = year;

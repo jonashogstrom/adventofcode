@@ -30,10 +30,14 @@ namespace adventofcode
         {
             {'N', N}, {'S', S}, {'E', E}, {'W', W},
             {'^', N}, {'v', S}, {'>', E}, {'<', W},
+            {'U', N}, {'D', S}, {'R', E}, {'L', W},
         };
 
         public int Row { get; set; }
         public int Col { get; set; }
+
+        public int X => Col;
+        public int Y => Row;
 
         public Coord(int row, int col)
         {
@@ -102,6 +106,11 @@ namespace adventofcode
         public int Dist(Coord pos)
         {
             return Math.Abs(Row - pos.Row) + Math.Abs(Col - pos.Col); 
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Row)}: {Row}, {nameof(Col)}: {Col}";
         }
     }
 

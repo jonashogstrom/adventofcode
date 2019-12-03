@@ -76,7 +76,7 @@ namespace adventofcode.AoC_2019
             var a1 = comp.Memory[args[0]];
             var a2 = comp.Memory[args[1]];
             var res = calc(a1, a2);
-            Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
+           // Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
             comp.Memory[args[2]] = res;
             comp.Pointer += ArgCount + 1;
         }

@@ -53,7 +53,7 @@ namespace adventofcode
             {
                 new AoC_2019.Day1(),
                 new AoC_2019.Day2(),
-                // new AoC_2019.Day3(),
+                new AoC_2019.Day3(),
             };
 
 
@@ -61,8 +61,6 @@ namespace adventofcode
 
 //            foreach(var d in days)
 //                d.Run();
-
-           
         }
     }
 }
