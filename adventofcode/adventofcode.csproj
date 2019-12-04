@@ -54,7 +54,9 @@
     <Compile Include="AoC_2019\Day1.cs" />
     <Compile Include="AoC_2019\Day2.cs" />
     <Compile Include="AoC_2019\Day3.cs" />
+    <Compile Include="AoC_2019\Day4.cs" />
     <Compile Include="AoC_2019\DayTemplate.cs" />
+    <Compile Include="EnumerableExt.cs" />
     <Compile Include="AoC_2019\IntCodeComputer.cs" />
     <Compile Include="SparseBuffer.cs" />
     <Compile Include="BaseDay.cs" />
@@ -148,6 +150,8 @@
     <Content Include="AoC_2019\Day2_test.txt" />
     <Content Include="AoC_2019\Day3.txt" />
     <Content Include="AoC_2019\Day3_test.txt" />
+    <Content Include="AoC_2019\Day4.txt" />
+    <Content Include="AoC_2019\Day4_test.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
