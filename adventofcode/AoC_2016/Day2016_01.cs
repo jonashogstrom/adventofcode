@@ -6,7 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Api;
 
-namespace adventofcode.AoC_2016
+namespace AdventofCode.AoC_2016
 {
     [TestFixture]
     internal class Day1 : BaseDay

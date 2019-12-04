@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Windows.Forms;
 
-namespace adventofcode.AoC_2019
+namespace AdventofCode.AoC_2019
 {
     class Day3 : BaseDay
     {
@@ -31,7 +32,13 @@ namespace adventofcode.AoC_2019
 
             var board = new SparseBuffer<int>();
 
-            ExecutePath(start, input[0].Split(','), board, (pos, dist) => board[pos] = dist);
+            Log(input[0]);
+            ExecutePath(start, input[0].Split(','), board, (pos, dist) =>
+            {
+                board[pos] = dist;
+                //Log($"X: {pos.X} Y: {pos.Y}");
+                //Log(board.ToString(c => c != 0 ? "X" : " "));
+            });
 
             var closestManhattan = int.MaxValue;
             var closestSignal = int.MaxValue;
@@ -42,7 +49,13 @@ namespace adventofcode.AoC_2019
                     closestManhattan = Math.Min(closestManhattan, start.Dist(pos));
                     closestSignal = Math.Min(closestSignal, dist + board[pos]);
                 }
+                else
+                {
+                    board[pos] = -dist;
+                }
             });
+
+//            File.WriteAllText("Day3-2019.txt", board.ToString(c => c > 0 ? "X" : (c < 0? "Y": " ")));
 
             Part1 = closestManhattan;
             Part2 = closestSignal;

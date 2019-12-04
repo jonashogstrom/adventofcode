@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace adventofcode.AoC_2019
+namespace AdventofCode.AoC_2019
 {
     public class IntCodeComputer
     {

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace adventofcode.AoC_2018
+namespace AdventofCode.AoC_2018
 {
     public class Day2 : BaseDay
     {

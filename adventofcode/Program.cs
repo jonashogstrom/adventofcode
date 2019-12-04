@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace adventofcode
+namespace AdventofCode
 {
     class Program
     {
@@ -54,6 +54,7 @@ namespace adventofcode
                 new AoC_2019.Day1(),
                 new AoC_2019.Day2(),
                 new AoC_2019.Day3(),
+                new AoC_2019.Day4(),
             };
 
 

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace adventofcode
+namespace AdventofCode
 {
     public enum InputSource
     {

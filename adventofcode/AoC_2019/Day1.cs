@@ -6,7 +6,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace adventofcode.AoC_2019
+namespace AdventofCode.AoC_2019
 {
     class Day1: BaseDay
     {

@@ -1,4 +1,4 @@
-﻿namespace adventofcode.AoC_2015
+﻿namespace AdventofCode.AoC_2015
 {
     internal class Day1 : BaseDay
     {

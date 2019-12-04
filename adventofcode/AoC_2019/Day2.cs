@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace adventofcode.AoC_2019
+namespace AdventofCode.AoC_2019
 {
     class Day2 : BaseDay
     {

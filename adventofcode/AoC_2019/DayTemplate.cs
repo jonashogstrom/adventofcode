@@ -1,4 +1,4 @@
-﻿namespace adventofcode.AoC_2019
+﻿namespace AdventofCode.AoC_2019
 {
     class DayTemplate : BaseDay
     {
@@ -21,8 +21,6 @@
             foreach (var i in GetIntInput(input))
             {
             }
-
-
         }
     }
 }

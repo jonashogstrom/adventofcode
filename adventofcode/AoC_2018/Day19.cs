@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace adventofcode.AoC_2018
+namespace AdventofCode.AoC_2018
 {
     internal class Day19 : BaseDay
     {

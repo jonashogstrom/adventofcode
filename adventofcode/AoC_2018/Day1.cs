@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace adventofcode.AoC_2018
+namespace AdventofCode.AoC_2018
 {
     public class Day1 : BaseDay
     {

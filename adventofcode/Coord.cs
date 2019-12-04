@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace adventofcode
+namespace AdventofCode
 {
     [DebuggerDisplay("({Row},{Col})")]
     internal class Coord
