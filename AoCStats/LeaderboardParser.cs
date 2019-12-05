@@ -250,7 +250,8 @@ namespace AoCStats
                             if (pos != -1)
                             {
                                 logPositionForStar.Append(Cell(pos + 1, medal));
-                                logTotalSolveTime.Append(Cell(p.TimeToComplete[day][star].Value, medal));
+                                var time = p.TimeToComplete[day][star].Value;
+                                logTotalSolveTime.Append(Cell(time, medal, time.TotalSeconds.ToString()));
                                 if (pos == 0)
                                     logOffsetFromWinner.Append(Cell("Winner", 0, true, medal));
                                 else
@@ -416,7 +417,7 @@ namespace AoCStats
             {
                 var red = first ? " w3-red" : "";
                 htmlContent.AppendLine(
-                    $"    <button class=\"w3-bar-item w3-button tablink{red}\" onclick=\"openTab(event,'{k}')\">{k}</button>");
+                    $"    <button id=\"{k}_btn\" class=\"w3-bar-item w3-button tablink{red}\" onclick=\"openTab(event.currentTarget,'{k}')\">{k}</button>");
                 first = false;
             }
 
@@ -585,6 +586,9 @@ namespace AoCStats
         {
             var bestTime = new TimeSpan[leaderboard.HighestDay][];
             var lastStar = new Dictionary<Player, long>();
+            var playerCount = leaderboard.Players.Count;
+            if (_settings.ContainsKey($"{_leaderBoardId}_{_year}_exclude0"))
+                playerCount = leaderboard.Players.Count(p => p.Stars > 0);
             foreach (var player in leaderboard.Players)
             {
                 lastStar[player] = -1;
@@ -612,7 +616,7 @@ namespace AoCStats
                                 bestTime[day][star] = timeSpan;
                         }
                         else
-                            player.PendingPoints += leaderboard.Players.Count - leaderboard.StarsAwarded[day][star];
+                            player.PendingPoints += playerCount - leaderboard.StarsAwarded[day][star];
                     }
 
                     player.TimeToCompleteStar2[day] = player.TimeToComplete[day][1] - player.TimeToComplete[day][0];
@@ -628,7 +632,7 @@ namespace AoCStats
                         {
                             player.PositionForStar[day][star] = orderedPlayers.IndexOf(player);
                             if (!(_year == 2018 && day == 5)) // points day 6 were recalled 
-                                player.TotalScore += leaderboard.Players.Count - player.PositionForStar[day][star];
+                                player.TotalScore += playerCount - player.PositionForStar[day][star];
                             player.OffsetFromWinner[day][star] = player.TimeToComplete[day][star] - bestTime[day][star];
                             lastStar[player] = player.unixCompletionTime[day][star];
                         }
@@ -637,8 +641,7 @@ namespace AoCStats
                         if (player.TotalScore > leaderboard.TopScorePerDay[day][star])
                             leaderboard.TopScorePerDay[day][star] = player.TotalScore;
 
-                        if (_handleExcludes)
-                            player.LocalScore = player.TotalScore;
+                        player.LocalScore = player.TotalScore;
 
                     }
                 }
@@ -671,6 +674,13 @@ namespace AoCStats
                 var id = jmember.Name;
                 var name = GetStr(jmemberdata, "name");
 
+                if (name == null)
+                    name = "anon " + id;
+
+                if (_settings.ContainsKey(id + "_realname"))
+                    name = _settings[id + "_realname"] + " (" + name + ")";
+
+
                 if (_handleExcludes && _settings.ContainsKey($"exclude_{_leaderBoardId}_{id}_{_year}"))
                 {
                     Console.WriteLine($"Excluded {name} from {_year}");
@@ -685,11 +695,6 @@ namespace AoCStats
                     LastStar = GetLong(jmemberdata, "last_star_ts"),
                     Name = name
                 };
-                if (player.Name == null)
-                    player.Name = "anon " + player.Id;
-
-                if (_settings.ContainsKey(player.Id + "_realname"))
-                    player.Name = _settings[player.Id + "_realname"] + " (" + player.Name + ")";
 
                 var propsKey = player.Id + "_" + _leaderBoardId;
                 if (!_settings.TryGetValue(propsKey, out var props))
@@ -753,9 +758,9 @@ namespace AoCStats
         {
             return Cell(value.ToString(), value, true, htmlClass);
         }
-        private static string Cell(TimeSpan value, string htmlClass)
+        private static string Cell(TimeSpan value, string htmlClass, string alt="")
         {
-            return Cell(value.ToString(), (int)value.TotalSeconds, true, htmlClass);
+            return Cell(value.ToString(), (int)value.TotalSeconds, true, htmlClass, alt);
         }
         private static string EmptyCell(int sort=int.MaxValue)
         {

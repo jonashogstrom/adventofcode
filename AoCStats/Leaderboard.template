@@ -68,7 +68,18 @@ function sortTable(n, divName) {
   }
 }
 
-function openTab(evt, tabName) {
+window.onload = function restoreTab() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tab = urlParams.get('tab');
+  if (tab) {
+	const button =  document.getElementById(tab+"_btn");
+	if (button) {
+		openTab(button, tab)
+	}
+  }
+}
+
+function openTab(target, tabName) {
   var i, x, tablinks;
   x = document.getElementsByClassName("tab");
   for (i = 0; i < x.length; i++) {
@@ -79,7 +90,9 @@ function openTab(evt, tabName) {
       tablinks[i].className = tablinks[i].className.replace(" w3-red", "");
   }
   document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " w3-red";
+  target.className += " w3-red";
+
+  window.history.pushState({},"", document.location.origin + document.location.pathname + "?tab="+tabName);
 }
 
 $(SCRIPT)
