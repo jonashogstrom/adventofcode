@@ -12,7 +12,7 @@ namespace AdventofCode.AoC_2019
         protected override void Setup()
         {
             Source = InputSource.test;
-            Source = InputSource.prod;
+            //Source = InputSource.prod;
 
             LogLevel = UseTestData ? 5 : 0;
 

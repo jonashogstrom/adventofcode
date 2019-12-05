@@ -10,6 +10,15 @@ namespace AdventofCode
         [STAThread]
         static void Main()
         {
+            var AoC_2015_days = new List<BaseDay>
+            {
+                new AoC_2015.Day1(),
+            };
+            var AoC_2016_days = new List<BaseDay>
+            {
+                new AoC_2016.Day1(),
+
+            };
             var Aoc_2018_days = new List<BaseDay>
             {
                 new AoC_2018.Day1(),
@@ -38,30 +47,21 @@ namespace AdventofCode
                 new AoC_2018.Day24(),
                 new AoC_2018.Day25(),
             };
-
-            var AoC_2016_days = new List<BaseDay>
-            {
-                new AoC_2016.Day1(),
-
-            };
-            var AoC_2015_days = new List<BaseDay>
-            {
-                new AoC_2015.Day1(),
-            };
-
             var Aoc_2019_days = new List<BaseDay>
             {
-                new AoC_2019.Day1(),
-                new AoC_2019.Day2(),
-                new AoC_2019.Day3(),
-                new AoC_2019.Day4(),
+                new AoC_2019.Day1(), // Fuel calculations for take off, recursive
+                new AoC_2019.Day2(), // IntCodeComputer, only Add and Mul (and terminate)
+                new AoC_2019.Day3(), // Cables intersecting on a grid (manhattan)
+                new AoC_2019.Day4(), // 6 digit passwords with rules, sequences of numbers.
+                new AoC_2019.Day5(), // IntCodeComputer, parameter modes, input/output, jumps and comparisons
+                new AoC_2019.Day6(), // 
             };
 
 
             Aoc_2019_days.Last().Run();
 
-//            foreach(var d in days)
-//                d.Run();
+            foreach(var d in Aoc_2019_days)
+                d.Run();
         }
     }
 }

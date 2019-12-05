@@ -1,22 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Remoting;
+using System.Security.Policy;
 
 namespace AdventofCode.AoC_2019
 {
     public class IntCodeComputer
     {
+        private readonly int _systemId;
         public int[] Memory;
         public int Pointer;
         public bool Terminated { get; set; }
 
         private readonly Dictionary<int, IOperation> _ops = new Dictionary<int, IOperation>();
+        private string _output;
 
-        public IntCodeComputer()
+        public IntCodeComputer(int systemId)
         {
+            _systemId = systemId;
             RegisterOp(new GenericIntFunc("Add", 1, (i, j) => i + j));
             RegisterOp(new GenericIntFunc("Mul", 2, (i, j) => i * j));
+            RegisterOp(new GenericIntFunc("LessThan", 7, (i, j) => i < j ? 1 : 0));
+            RegisterOp(new GenericIntFunc("Equal", 8, (i, j) => i == j ? 1 : 0));
             RegisterOp(new Terminate());
+            RegisterOp(new jumpIfFalse());
+            RegisterOp(new jumpIfTrue());
+            RegisterOp(new ReadInput());
+            RegisterOp(new WriteOutput());
         }
 
         private void RegisterOp(IOperation op)
@@ -24,40 +36,133 @@ namespace AdventofCode.AoC_2019
             _ops[op.OpCode] = op;
         }
 
-        public int RunProgram(string program, int noun, int verb)
+        public void RunProgram(string program, int noun, int verb)
         {
             // Console.WriteLine($"======================= {noun} {verb}");
             Memory = program.Split(',').Select(int.Parse).ToArray();
             Pointer = 0;
-            Memory[1] = noun;
-            Memory[2] = verb;
+            if (noun != -1)
+                Memory[1] = noun;
+            if (verb != -1)
+                Memory[2] = verb;
             Terminated = false;
 
             while (!Terminated)
             {
                 if (Pointer >= Memory.Length)
                     throw new Exception($"Pointer outside of memory: {Pointer}");
-                if (!_ops.ContainsKey(Memory[Pointer]))
+                var opCode = Memory[Pointer];
+                var op2Code = opCode % 100;
+
+                if (!_ops.ContainsKey(op2Code))
                     throw new Exception($"Unknown operation: {Memory[Pointer]}");
-                var op = _ops[Memory[Pointer]];
-                op.Execute(this);
+                var op = _ops[op2Code];
+
+                var modesString = opCode.ToString();
+                var modes = new ParameterMode[op.ArgCount];
+                var mPos = 0;
+                for (var i = modesString.Length - 3; i >= 0; i--)
+                {
+                    if (modesString[i] == '1')
+                        modes[mPos] = ParameterMode.immediate;
+                    else if (modesString[i] == '0')
+                        modes[mPos] = ParameterMode.position;
+                    else
+                    {
+                        throw new Exception("unknown parameter mode");
+                    }
+
+                    mPos++;
+                }
+                op.Execute(this, modes);
             }
-
-            return Memory[0];
         }
-    }
 
-/*
- internal class Add : IntFunc
-    {
-        public override int OpCode => 1;
-
-        protected override int calc(int arg1, int arg2)
+        public int GetNextInput()
         {
-            return arg1 + arg2;
+            return _systemId;
+        }
+
+        public void WriteOutput(int parameter)
+        {
+            _output += parameter.ToString() + ", ";
+            Console.WriteLine("Current output: " + _output);
+            LastOutput = parameter;
+        }
+
+        public int LastOutput { get; private set; }
+    }
+
+    internal class ReadInput : BaseOp, IOperation
+    {
+        public int OpCode => 3;
+        public int ArgCount => 1;
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        {
+            var value = comp.GetNextInput();
+            var args = GetArgs(comp, ArgCount);
+
+            // Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
+            comp.Memory[args[0]] = value;
+            comp.Pointer += ArgCount + 1;
         }
     }
-*/
+
+    internal class WriteOutput : BaseOp, IOperation
+    {
+        public int OpCode => 4;
+        public int ArgCount => 1;
+
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        {
+            var parameters = GetParams(comp, ArgCount, modes);
+
+            // Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
+            comp.WriteOutput(parameters[0]);
+            comp.Pointer += ArgCount + 1;
+        }
+    }
+
+    internal class jumpIfTrue : BaseOp, IOperation
+    {
+        public int OpCode => 5;
+        public int ArgCount => 2;
+
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        {
+            var parameters = GetParams(comp, ArgCount, modes);
+
+            if (parameters[0] != 0)
+                comp.Pointer = parameters[1];
+            else
+                comp.Pointer += ArgCount + 1;
+        }
+    }
+
+
+
+    internal class jumpIfFalse : BaseOp, IOperation
+    {
+        public int OpCode => 6;
+        public int ArgCount => 2;
+
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        {
+            var parameters = GetParams(comp, ArgCount, modes);
+
+            if (parameters[0] == 0)
+                comp.Pointer = parameters[1];
+            else
+                comp.Pointer += ArgCount + 1;
+        }
+    }
+
+
+    public enum ParameterMode
+    {
+        position,
+        immediate
+    }
 
 
     internal abstract class IntFunc : BaseOp, IOperation
@@ -69,14 +174,15 @@ namespace AdventofCode.AoC_2019
 
         public int OpCode { get; }
         public int ArgCount => 3;
-        public void Execute(IntCodeComputer comp)
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
         {
             var args = GetArgs(comp, ArgCount);
+            var parameters = GetParams(comp, ArgCount, modes);
 
-            var a1 = comp.Memory[args[0]];
-            var a2 = comp.Memory[args[1]];
+            var a1 = parameters[0];
+            var a2 = parameters[1];
             var res = calc(a1, a2);
-           // Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
+            // Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
             comp.Memory[args[2]] = res;
             comp.Pointer += ArgCount + 1;
         }
@@ -90,7 +196,7 @@ namespace AdventofCode.AoC_2019
 
         public override string Name { get; }
 
-        public GenericIntFunc(string name, int opCode, Func<int, int, int> func): base(opCode)
+        public GenericIntFunc(string name, int opCode, Func<int, int, int> func) : base(opCode)
         {
             Name = name;
             _func = func;
@@ -116,13 +222,32 @@ namespace AdventofCode.AoC_2019
 
             return args;
         }
+
+        protected int[] GetParams(IntCodeComputer comp, int argCount, ParameterMode[] modes)
+        {
+            var args = GetArgs(comp, argCount);
+            var res = new int[argCount];
+            for (var i = 0; i < argCount; i++)
+            {
+                if (modes.Length - 1 < i)
+                    res[i] = comp.Memory[args[i]]; // implicit position mode
+                else if (modes[i] == ParameterMode.immediate)
+                    res[i] = args[i];
+                else if (modes[i] == ParameterMode.position)
+                    res[i] = comp.Memory[args[i]];
+            }
+
+            return res;
+        }
+
+
     }
 
     internal class Terminate : BaseOp, IOperation
     {
         public int OpCode => 99;
         public int ArgCount => 0;
-        public void Execute(IntCodeComputer comp)
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
         {
             comp.Terminated = true;
         }
@@ -133,6 +258,6 @@ namespace AdventofCode.AoC_2019
         string Name { get; }
         int OpCode { get; }
         int ArgCount { get; }
-        void Execute(IntCodeComputer comp);
+        void Execute(IntCodeComputer comp, ParameterMode[] modes);
     }
 }
