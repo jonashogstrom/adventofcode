@@ -57,11 +57,10 @@ namespace AdventofCode
                 new AoC_2019.Day6(), // 
             };
 
-
             Aoc_2019_days.Last().Run();
 
-            foreach(var d in Aoc_2019_days)
-                d.Run();
+//            foreach(var d in Aoc_2019_days)
+//                d.Run();
         }
     }
 }
