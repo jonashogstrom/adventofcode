@@ -1,4 +1,6 @@
-﻿namespace AdventofCode.AoC_2019
+﻿using System.Collections.Generic;
+
+namespace AdventofCode.AoC_2019
 {
     class Day5 : BaseDay
     {
@@ -17,12 +19,12 @@
 
         protected override void DoRun(string[] input)
         {
-            var comp = new IntCodeComputer(1);
-            comp.RunProgram(input[0], -1, -1);
+            var comp = new IntCodeComputer(new List<int> { 1 }, input[0], -1, -1);
+            comp.RunProgram();
             Part1 = comp.LastOutput;
 
-            comp = new IntCodeComputer(5);
-            comp.RunProgram(input[0], -1, -1);
+            comp = new IntCodeComputer(new List<int> { 5 }, input[0], -1, -1);
+            comp.RunProgram();
             Part2 = comp.LastOutput;
 
         }

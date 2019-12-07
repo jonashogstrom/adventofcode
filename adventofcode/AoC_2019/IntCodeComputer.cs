@@ -9,17 +9,20 @@ namespace AdventofCode.AoC_2019
 {
     public class IntCodeComputer
     {
-        private readonly int _systemId;
+        private List<int> _input;
         public int[] Memory;
         public int Pointer;
         public bool Terminated { get; set; }
 
         private readonly Dictionary<int, IOperation> _ops = new Dictionary<int, IOperation>();
-        private string _output;
+        private List<int> _output =new List<int>();
+        private bool _interrupt;
+        private IntCodeComputer _target;
+        public List<int> Output => _output;
 
-        public IntCodeComputer(int systemId)
+        public IntCodeComputer(List<int> input, string program, int noun, int verb)
         {
-            _systemId = systemId;
+            _input = input;
             RegisterOp(new GenericIntFunc("Add", 1, (i, j) => i + j));
             RegisterOp(new GenericIntFunc("Mul", 2, (i, j) => i * j));
             RegisterOp(new GenericIntFunc("LessThan", 7, (i, j) => i < j ? 1 : 0));
@@ -29,16 +32,6 @@ namespace AdventofCode.AoC_2019
             RegisterOp(new jumpIfTrue());
             RegisterOp(new ReadInput());
             RegisterOp(new WriteOutput());
-        }
-
-        private void RegisterOp(IOperation op)
-        {
-            _ops[op.OpCode] = op;
-        }
-
-        public void RunProgram(string program, int noun, int verb)
-        {
-            // Console.WriteLine($"======================= {noun} {verb}");
             Memory = program.Split(',').Select(int.Parse).ToArray();
             Pointer = 0;
             if (noun != -1)
@@ -46,8 +39,36 @@ namespace AdventofCode.AoC_2019
             if (verb != -1)
                 Memory[2] = verb;
             Terminated = false;
+        }
 
-            while (!Terminated)
+        private void RegisterOp(IOperation op)
+        {
+            _ops[op.OpCode] = op;
+        }
+
+        public void ConnectInpOutp(IntCodeComputer target)
+        {
+            _target = target;
+        }
+
+        public void RunProgram()
+        {
+            // Console.WriteLine($"======================= {noun} {verb}");
+       
+
+            Execute();
+        }
+
+        public void AddInput(int value)
+        {
+            _input.Add(value);
+            //Execute();
+        }
+
+        public void Execute()
+        {
+            _interrupt = false;
+            while (!Terminated && !_interrupt)
             {
                 if (Pointer >= Memory.Length)
                     throw new Exception($"Pointer outside of memory: {Pointer}");
@@ -74,20 +95,31 @@ namespace AdventofCode.AoC_2019
 
                     mPos++;
                 }
+
                 op.Execute(this, modes);
             }
         }
 
-        public int GetNextInput()
+        public int? GetNextInput()
         {
-            return _systemId;
+            if (_input.Any())
+            {
+                var res = _input.First();
+                _input.RemoveAt(0);
+                return res;
+            }
+
+            _interrupt = true;
+            return null;
+//            throw new Exception("no input available");
         }
 
-        public void WriteOutput(int parameter)
+        public void WriteOutput(int value)
         {
-            _output += parameter.ToString() + ", ";
-            Console.WriteLine("Current output: " + _output);
-            LastOutput = parameter;
+            _output.Add(value);
+            //Console.WriteLine("Current output: " + _output);
+            LastOutput = value;
+            _target?.AddInput(value);
         }
 
         public int LastOutput { get; private set; }
@@ -100,10 +132,12 @@ namespace AdventofCode.AoC_2019
         public void Execute(IntCodeComputer comp, ParameterMode[] modes)
         {
             var value = comp.GetNextInput();
+            if (!value.HasValue)
+                return;
             var args = GetArgs(comp, ArgCount);
 
             // Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
-            comp.Memory[args[0]] = value;
+            comp.Memory[args[0]] = value.Value;
             comp.Pointer += ArgCount + 1;
         }
     }
