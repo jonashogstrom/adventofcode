@@ -23,7 +23,6 @@ namespace AdventofCode.AoC_2019
 
         private class orbit
         {
-
             private string source;
         }
 
@@ -62,7 +61,6 @@ namespace AdventofCode.AoC_2019
             while (x[temp] == y[temp])
                 temp++;
             Part2 = (x.Count - 1 - (temp)) + (y.Count - 1 - (temp));
-
         }
 
         private List<string> CollectPath(string start, Dictionary<string, string> parents)
@@ -73,8 +71,8 @@ namespace AdventofCode.AoC_2019
                 x.Add(start);
                 return x;
             }
-            return new List<string>() { start };
 
+            return new List<string>() {start};
         }
 
         private int FindDepth(string s, Dictionary<string, string> parents, int depth)

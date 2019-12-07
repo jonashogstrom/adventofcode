@@ -54,7 +54,8 @@ namespace AdventofCode
                 new AoC_2019.Day3(), // Cables intersecting on a grid (manhattan)
                 new AoC_2019.Day4(), // 6 digit passwords with rules, sequences of numbers.
                 new AoC_2019.Day5(), // IntCodeComputer, parameter modes, input/output, jumps and comparisons
-                new AoC_2019.Day6(), // 
+                new AoC_2019.Day6(), // Orbital maps, dist YOU => SAN
+                new AoC_2019.Day7(), // 
             };
 
             Aoc_2019_days.Last().Run();
