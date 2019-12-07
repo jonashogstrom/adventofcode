@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Security.Policy;
+using System.Text;
 
 namespace AdventofCode.AoC_2019
 {
@@ -22,14 +23,16 @@ namespace AdventofCode.AoC_2019
         private bool _interrupt;
         private IntCodeComputer _outputTarget;
         public List<int> Output => _output;
+        public List<string> Log = new List<string>();
+        private string _name;
 
         public IntCodeComputer(List<int> input, string program, int noun = -1, int verb = -1)
         {
             _input = input;
-            RegisterOp(new GenericIntFunc("+", 1, (i, j) => i + j));
-            RegisterOp(new GenericIntFunc("*", 2, (i, j) => i * j));
-            RegisterOp(new GenericIntFunc("<", 7, (i, j) => i < j ? 1 : 0));
-            RegisterOp(new GenericIntFunc("=", 8, (i, j) => i == j ? 1 : 0));
+            RegisterOp(new GenericIntFunc("ADD", 1, (i, j) => i + j));
+            RegisterOp(new GenericIntFunc("MUL", 2, (i, j) => i * j));
+            RegisterOp(new GenericIntFunc("LT", 7, (i, j) => i < j ? 1 : 0));
+            RegisterOp(new GenericIntFunc("EQ", 8, (i, j) => i == j ? 1 : 0));
             RegisterOp(new Terminate());
             RegisterOp(new JumpIfFalse());
             RegisterOp(new JumpIfTrue());
@@ -43,6 +46,7 @@ namespace AdventofCode.AoC_2019
                 _memory[2] = verb;
             Terminated = false;
             Name = "IntCodeComputer";
+            Log.Add("============= Starting IntCodeComputer ==============");
         }
 
         private void RegisterOp(IOperation op)
@@ -92,8 +96,57 @@ namespace AdventofCode.AoC_2019
                     mPos++;
                 }
 
-                op.Execute(this, modes);
+                var args = GetArgs(op.ArgCount);
+                var parameters = GetParams(args, modes);
+                var sb = new StringBuilder();
+                sb.Append($"{Pointer} {op.Name}: ");
+                for (int i = 0; i < op.ArgCount; i++)
+                {
+                    if (modes[i] == ParameterMode.immediate)
+                        sb.Append($"Arg{i}: {args[i]} ");
+                    else
+                    {
+                        sb.Append($"Arg{i}: {args[i]} [{parameters[i]}] ");
+                    }
+                }
+                op.Execute(this, modes, args, parameters);
+                if (!_interrupt)
+                    Log.Add(sb.ToString());
+
             }
+        }
+
+
+        protected int[] GetArgs(int argCount)
+        {
+            var args = new int[argCount];
+            for (int i = 0; i < argCount; i++)
+            {
+                args[i] = ReadMemory(Pointer + i + 1, ReadOp.arg);
+            }
+
+            return args;
+        }
+
+        //        protected int[] GetParams(IntCodeComputer comp, ParameterMode[] modes)
+        //        {
+        //            return GetParams(comp, GetArgs(comp, ArgCount), modes);
+        //        }
+
+        protected int[] GetParams(int[] args, ParameterMode[] modes)
+        {
+            var res = new int[args.Length];
+            for (var i = 0; i < args.Length; i++)
+            {
+                if (modes.Length - 1 < i)
+                    res[i] = ReadMemory(args[i], ReadOp.data); // implicit position mode
+                else if (modes[i] == ParameterMode.immediate)
+                    res[i] = args[i];
+                else if (modes[i] == ParameterMode.position)
+                    res[i] = ReadMemory(args[i], ReadOp.data);
+            }
+
+            return res;
         }
 
         public int? GetNextInput()
@@ -119,7 +172,18 @@ namespace AdventofCode.AoC_2019
         }
 
         public int LastOutput { get; private set; }
-        public string Name { get; set; }
+
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                Log.Add("Computer name: " + value);
+            }
+        }
+
+        public bool Debug { get; set; }
 
         public int ReadMemory(int pos, ReadOp readOp)
         {
@@ -146,6 +210,7 @@ namespace AdventofCode.AoC_2019
             if (_paramAdresses.Contains(addr))
                 Console.WriteLine("Warning, writing to a param-address");
             _memory[addr] = value;
+            Log.Add($"Write {value} to addr {addr}");
         }
     }
 
@@ -155,12 +220,11 @@ namespace AdventofCode.AoC_2019
 
         public int OpCode => 3;
         public override int ArgCount => 1;
-        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes, int[] args, int[] parameters)
         {
             var value = comp.GetNextInput();
             if (!value.HasValue)
                 return;
-            var args = GetArgs(comp, ArgCount);
 
             // Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
             comp.WriteMemory(args[0], value.Value);
@@ -174,10 +238,8 @@ namespace AdventofCode.AoC_2019
         public int OpCode => 4;
         public override int ArgCount => 1;
 
-        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes, int[] args, int[] parameters)
         {
-            var parameters = GetParams(comp, modes);
-
             // Console.WriteLine($"{a1} ({Name}) {a2} => {res}");
             comp.WriteOutput(parameters[0]);
             comp.Pointer += ArgCount + 1;
@@ -186,34 +248,29 @@ namespace AdventofCode.AoC_2019
 
     internal class JumpIfTrue : BaseOp, IOperation
     {
-        public override string Name => "JMP";
+        public override string Name => "JMP1";
         public int OpCode => 5;
         public override int ArgCount => 2;
 
-        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes, int[] args, int[] parameters)
         {
-            var parameters = GetParams(comp, modes);
-
             if (parameters[0] != 0)
                 comp.Pointer = parameters[1];
             else
                 comp.Pointer += ArgCount + 1;
         }
     }
-
-
+    
 
     internal class JumpIfFalse : BaseOp, IOperation
     {
-        public override string Name => "JM!";
+        public override string Name => "JMP0";
 
         public int OpCode => 6;
         public override int ArgCount => 2;
 
-        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes, int[] args, int[] parameters)
         {
-            var parameters = GetParams(comp, modes);
-
             if (parameters[0] == 0)
                 comp.Pointer = parameters[1];
             else
@@ -228,7 +285,6 @@ namespace AdventofCode.AoC_2019
         immediate
     }
 
-
     internal abstract class IntFunc : BaseOp, IOperation
     {
         protected IntFunc(int opCode)
@@ -238,11 +294,8 @@ namespace AdventofCode.AoC_2019
 
         public int OpCode { get; }
         public override int ArgCount => 3;
-        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes, int[] args, int[] parameters)
         {
-            var args = GetArgs(comp, ArgCount);
-            var parameters = GetParams(comp, args, modes);
-
             var a1 = parameters[0];
             var a2 = parameters[1];
             var res = calc(a1, a2);
@@ -276,40 +329,6 @@ namespace AdventofCode.AoC_2019
     {
         public abstract int ArgCount { get; }
         public virtual string Name => this.GetType().Name;
-
-        protected int[] GetArgs(IntCodeComputer comp, int argCount)
-        {
-            var args = new int[argCount];
-            for (int i = 0; i < argCount; i++)
-            {
-                args[i] = comp.ReadMemory(comp.Pointer + i + 1, ReadOp.arg);
-            }
-
-            return args;
-        }
-
-        protected int[] GetParams(IntCodeComputer comp, ParameterMode[] modes)
-        {
-            return GetParams(comp, GetArgs(comp, ArgCount), modes);
-        }
-
-        protected int[] GetParams(IntCodeComputer comp, int[] args, ParameterMode[] modes)
-        {
-            var res = new int[args.Length];
-            for (var i = 0; i < args.Length; i++)
-            {
-                if (modes.Length - 1 < i)
-                    res[i] = comp.ReadMemory(args[i], ReadOp.data); // implicit position mode
-                else if (modes[i] == ParameterMode.immediate)
-                    res[i] = args[i];
-                else if (modes[i] == ParameterMode.position)
-                    res[i] = comp.ReadMemory(args[i], ReadOp.data);
-            }
-
-            return res;
-        }
-
-
     }
 
     public enum ReadOp
@@ -319,10 +338,10 @@ namespace AdventofCode.AoC_2019
 
     internal class Terminate : BaseOp, IOperation
     {
-        public override string Name => "X";
+        public override string Name => "XIT";
         public int OpCode => 99;
         public override int ArgCount => 0;
-        public void Execute(IntCodeComputer comp, ParameterMode[] modes)
+        public void Execute(IntCodeComputer comp, ParameterMode[] modes, int[] args, int[] parameters)
         {
             comp.Terminated = true;
         }
@@ -333,6 +352,6 @@ namespace AdventofCode.AoC_2019
         string Name { get; }
         int OpCode { get; }
         int ArgCount { get; }
-        void Execute(IntCodeComputer comp, ParameterMode[] modes);
+        void Execute(IntCodeComputer comp, ParameterMode[] modes, int[] args, int[] parameters);
     }
 }

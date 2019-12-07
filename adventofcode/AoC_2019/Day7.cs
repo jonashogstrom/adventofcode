@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -38,6 +39,7 @@ namespace AdventofCode.AoC_2019
             res = Compute2(input[0], s2Phases, true);
 
             Part2 = res.Item1;
+            Console.ReadLine();
 
         }
 
@@ -55,6 +57,7 @@ namespace AdventofCode.AoC_2019
         {
             var maxThrusterSignal = int.MinValue;
             int[] bestPhaseSetting = null;
+            List<string> log = null;
 
             var computerCount = 5;
             var p = Permutations(phases).Select(x => x.ToArray()).ToArray();
@@ -83,9 +86,14 @@ namespace AdventofCode.AoC_2019
                 {
                     maxThrusterSignal = computers.Last().LastOutput;
                     bestPhaseSetting = phaseSequence;
+                    log = computers.Last().Log;
                 }
             }
 
+            foreach (var s in log)
+            {
+                Console.WriteLine(s);
+            }
             return (maxThrusterSignal, bestPhaseSetting);
         }
 
