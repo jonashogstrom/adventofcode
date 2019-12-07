@@ -20,11 +20,11 @@ namespace AdventofCode.AoC_2019
         protected override void DoRun(string[] input)
         {
             var comp = new IntCodeComputer(new List<int> { 1 }, input[0], -1, -1);
-            comp.RunProgram();
+            comp.Execute();
             Part1 = comp.LastOutput;
 
             comp = new IntCodeComputer(new List<int> { 5 }, input[0], -1, -1);
-            comp.RunProgram();
+            comp.Execute();
             Part2 = comp.LastOutput;
 
         }

@@ -21,16 +21,16 @@ namespace AdventofCode.AoC_2019
         protected override void DoRun(string[] input)
         {
             var comp = new IntCodeComputer(new List<int>(0) { 0 }, input[0], 12, 02);
-            comp.RunProgram();
-            Part1 = comp.Memory[0];
+            comp.Execute();
+            Part1 = comp.ReadMemory(0, ReadOp.data);
 
 
             for (var noun = 0; noun < 100; noun++)
                 for (var verb = 0; verb < 100; verb++)
                 {
                     comp = new IntCodeComputer(new List<int>(0) { 0 }, input[0], noun, verb);
-                    comp.RunProgram();
-                    if (comp.Memory[0] == 19690720)
+                    comp.Execute();
+                    if (comp.ReadMemory(0, ReadOp.data) == 19690720)
                     {
                         Part2 = 100 * noun + verb;
                         return;
