@@ -33,10 +33,10 @@ namespace AoCStats
 
         public void GenerateReport(int leaderboardid, int year, bool handleExcludes)
         {
-            GenerateReport(leaderboardid, year, new[] { year }, handleExcludes);
+            GenerateReport(leaderboardid, year, new[] { year }, handleExcludes, false);
         }
 
-        private void GenerateReport(int leaderboardid, int year, int[] years, bool handleExcludes)
+        private void GenerateReport(int leaderboardid, int year, int[] years, bool handleExcludes, bool forceLoad)
         {
             _years = years;
             _handleExcludes = handleExcludes;
@@ -60,7 +60,7 @@ namespace AoCStats
 
             _htmlFileName = $"leaderboard_{_leaderBoardId}_{_year}{_x_suffix}.html";
             _jsonFileName = $"..\\..\\leaderboard_{leaderboardid}_{_year}.json";
-            var updatedData = DownloadIfOld(interval);
+            var updatedData = DownloadIfOld(interval, forceLoad);
 
             var leaderboard = ParseJson();
             for (int d = 1; d <= leaderboard.HighestDay; d++)
@@ -506,10 +506,10 @@ namespace AoCStats
             return medal;
         }
 
-        private bool DownloadIfOld(TimeSpan interval)
+        private bool DownloadIfOld(TimeSpan interval, bool forceLoad)
         {
 
-            if (File.GetLastWriteTime(_jsonFileName) + interval < DateTime.Now)
+            if (File.GetLastWriteTime(_jsonFileName) + interval < DateTime.Now || forceLoad)
             {
                 Log($"Downloading new data for {_leaderBoardId}/{_year}");
                 // Create Target
@@ -839,10 +839,10 @@ namespace AoCStats
             return (string)((JValue)jmemberdata.Property(propname).Value).Value;
         }
 
-        public void GenerateReport(int leaderboardid, int[] years, bool handleExcludes)
+        public void GenerateReport(int leaderboardid, int[] years, bool handleExcludes, bool forceLoad)
         {
             foreach (var year in years)
-                GenerateReport(leaderboardid, year, years, handleExcludes);
+                GenerateReport(leaderboardid, year, years, handleExcludes, forceLoad);
 
         }
 
