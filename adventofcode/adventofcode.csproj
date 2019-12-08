@@ -58,6 +58,7 @@
     <Compile Include="AoC_2019\Day5.cs" />
     <Compile Include="AoC_2019\Day6.cs" />
     <Compile Include="AoC_2019\Day7.cs" />
+    <Compile Include="AoC_2019\Day8.cs" />
     <Compile Include="AoC_2019\DayTemplate.cs" />
     <Compile Include="EnumerableExt.cs" />
     <Compile Include="AoC_2019\IntCodeComputer.cs" />
@@ -161,6 +162,8 @@
     <Content Include="AoC_2019\Day6_test.txt" />
     <Content Include="AoC_2019\Day7.txt" />
     <Content Include="AoC_2019\Day7_test.txt" />
+    <Content Include="AoC_2019\Day8.txt" />
+    <Content Include="AoC_2019\Day8_test.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
