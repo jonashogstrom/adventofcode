@@ -69,7 +69,7 @@ namespace AoCStats
             DeriveMoreStats(leaderboard);
             ParseGlobalBoards(leaderboard, year);
 
-            Log($"Generating new html for {_leaderBoardId}/{_year}");
+            Log($"Generating new html for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId})");
             var modified = GenerateHtml(leaderboard);
             if (updatedData || modified)
                 UploadStatistics();
@@ -112,7 +112,7 @@ namespace AoCStats
 
         private void UploadStatistics()
         {
-            Log($"Uploading html for {_leaderBoardId}/{_year}");
+            Log($"Uploading html for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId})");
             using (WebClient client = new WebClient())
             {
                 client.Credentials = new NetworkCredential(_settings["ftpuser"], _settings["ftppwd"]);
@@ -508,10 +508,11 @@ namespace AoCStats
 
         private bool DownloadIfOld(TimeSpan interval, bool forceLoad)
         {
-
-            if (File.GetLastWriteTime(_jsonFileName) + interval < DateTime.Now || forceLoad)
+            var timestamp = File.GetLastWriteTime(_jsonFileName);
+            var age = DateTime.Now - timestamp;
+            if (age > interval || forceLoad)
             {
-                Log($"Downloading new data for {_leaderBoardId}/{_year}");
+                Log($"Downloading new data for {_settings[_leaderBoardId+"_name"]}/{_year} ({_leaderBoardId})");
                 // Create Target
                 var url = $"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}.json";
                 var s = DownloadFromURL(url);
