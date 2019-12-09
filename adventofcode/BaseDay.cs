@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 
@@ -66,6 +67,36 @@ namespace AdventofCode
             return "../../" + f + (useTestData ? "_test" : "") + ".txt";
         }
 
+        protected string[] GetTestInput(string suffix="")
+        {
+            var fName = GetFileName(suffix);
+            return File.ReadAllLines(fName);
+        }
+
+        protected string[] GetResource(string suffix)
+        {
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var f = GetType().FullName;
+            var resourceName = f+suffix+".txt";
+
+            var resourceNames = assembly.GetManifestResourceNames();
+            resourceName = resourceNames.Single(str => str.EndsWith(resourceName));
+
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd().Split(new[]{Environment.NewLine}, StringSplitOptions.None);
+            }
+        }
+
+
+        protected string GetFileName(string suffix)
+        {
+            var f = GetType().FullName.Split(new[] { '.' }, 2).Last().Replace('.', '/');
+            return "../../" + f + suffix + ".txt";
+        }
+
         protected int[] GetIntInput(string[] input)
         {
             return GetInput().Select(x => int.Parse(x)).ToArray();
@@ -88,11 +119,11 @@ namespace AdventofCode
             var p1 = LogAndCompareExpected("Part1", Part1, UseTestData ? Part1TestSolution : Part1Solution);
             var p2 = LogAndCompareExpected("Part2", Part2, UseTestData ? Part2TestSolution : Part2Solution);
             PrintFooter(sw);
-            if (this.Source == InputSource.test && 
+            if (this.Source == InputSource.test &&
                 (p1 && Part1 != null && Part1TestSolution != null && Part1Solution == null) ||
                 (p2 && Part2 != null && Part2TestSolution != null && Part2Solution == null))
             {
-                Log(()=>"TEST DATA SEEMS OK, RUNNING WITH PROD DATA TOO!");
+                Log(() => "TEST DATA SEEMS OK, RUNNING WITH PROD DATA TOO!");
                 Source = InputSource.prod;
                 sw = new Stopwatch();
                 sw.Start();
@@ -144,7 +175,7 @@ namespace AdventofCode
                     return false;
                 }
 
-                Log("   " + label + " = " + value+ "   ** "+(Source==InputSource.prod?"Copied to clipboard":""));
+                Log("   " + label + " = " + value + "   ** " + (Source == InputSource.prod ? "Copied to clipboard" : ""));
                 if (Source == InputSource.prod)
                     Clipboard.SetText(value.ToString());
                 _fileNameSuffix += "[  ]";

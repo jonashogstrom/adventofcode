@@ -53,9 +53,9 @@ namespace AdventofCode.AoC_2019
         }
 
 
-        private (int, IEnumerable<int>) Compute2(string program, IEnumerable<int> phases, bool feedback)
+        private (long, IEnumerable<int>) Compute2(string program, IEnumerable<int> phases, bool feedback)
         {
-            var maxThrusterSignal = int.MinValue;
+            var maxThrusterSignal = long.MinValue;
             int[] bestPhaseSetting = null;
             List<string> log = null;
 
@@ -66,7 +66,7 @@ namespace AdventofCode.AoC_2019
                 var computers = new IntCodeComputer[computerCount];
                 for (int i = 0; i < computerCount; i++)
                 {
-                    computers[i] = new IntCodeComputer(new List<int> { phaseSequence[i] }, program);
+                    computers[i] = new IntCodeComputer(new List<long> { phaseSequence[i] }, program);
                     computers[i].Name = "Amp" + (char)(i + 65);
                 }
                 computers.First().AddInput(0);

@@ -20,7 +20,7 @@ namespace AdventofCode.AoC_2019
 
         protected override void DoRun(string[] input)
         {
-            var comp = new IntCodeComputer(new List<int>(0) { 0 }, input[0], 12, 02);
+            var comp = new IntCodeComputer(new List<long>(0) { 0 }, input[0], 12, 02);
             comp.Execute();
             Part1 = comp.ReadMemory(0, ReadOp.data);
 
@@ -28,7 +28,7 @@ namespace AdventofCode.AoC_2019
             for (var noun = 0; noun < 100; noun++)
                 for (var verb = 0; verb < 100; verb++)
                 {
-                    comp = new IntCodeComputer(new List<int>(0) { 0 }, input[0], noun, verb);
+                    comp = new IntCodeComputer(new List<long>(0) { 0 }, input[0], noun, verb);
                     comp.Execute();
                     if (comp.ReadMemory(0, ReadOp.data) == 19690720)
                     {

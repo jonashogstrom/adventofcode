@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2019
 {
+    [TestFixture]
     class Day8 : BaseDay
     {
         protected override void Setup()
@@ -18,7 +17,7 @@ namespace AdventofCode.AoC_2019
 
             Part1TestSolution = null;
             Part2TestSolution = null;
-            Part1Solution = null;
+            Part1Solution = 1485;
             Part2Solution = null;
         }
 
@@ -26,14 +25,25 @@ namespace AdventofCode.AoC_2019
         {
             //var layer = new SparseBuffer<int>();
 
-
-            ParseImage(input, 25, 6);
+            Part1 = ParseImage(input[0], 25, 6);
         }
 
-        private void ParseImage(string[] input, int width, int height)
+        [Test]
+        [TestCase("_test2", 2, 3, 1)]
+        [TestCase("", 25, 6, 1485)]
+        public void test1(string suffix, int width, int height, int exp)
         {
-            var layerSize = width*height;
-            var layerCount = input[0].Length / layerSize;
+            var input = GetResource(suffix)[0];
+
+            var res = ParseImage(input, width, height);
+            Assert.That(res.Item1, Is.EqualTo(exp));
+        }
+
+
+        private (int, SparseBuffer<char>) ParseImage(string input, int width, int height)
+        {
+            var layerSize = width * height;
+            var layerCount = input.Length / layerSize;
             var min0 = int.MaxValue;
             var factor = 0;
 
@@ -42,8 +52,12 @@ namespace AdventofCode.AoC_2019
 
             for (int l = 0; l < layerCount; l++)
             {
-                var layer = input[0].Substring(l * layerSize, layerSize);
+                var layer = input.Substring(l * layerSize, layerSize);
                 var freq = new Dictionary<char, int>();
+                freq['0'] = 0;
+                freq['1'] = 0;
+                freq['2'] = 0;
+
                 foreach (var c in layer)
                 {
                     if (!freq.ContainsKey(c))
@@ -60,20 +74,20 @@ namespace AdventofCode.AoC_2019
                 }
 
                 for (int y = 0; y < height; y++)
-                for (int x = 0; x < width; x++)
-                {
-                    var coord = new Coord(y, x);
-                    var c = layer[x + y * width];
-                    if (c != '2' && resLayer[coord] == '2')
-                        resLayer[coord] = c;
-                }
+                    for (int x = 0; x < width; x++)
+                    {
+                        var coord = new Coord(y, x);
+                        var c = layer[x + y * width];
+                        if (c != '2' && resLayer[coord] == '2')
+                            resLayer[coord] = c;
+                    }
 
                 PrintLayer(width, height, resLayer);
             }
 
             PrintLayer(width, height, resLayer);
 
-            Part1 = factor;
+            return (factor, resLayer);
         }
 
         private void PrintLayer(int width, int height, SparseBuffer<char> resLayer)
@@ -94,8 +108,9 @@ namespace AdventofCode.AoC_2019
 
                 sb.AppendLine();
             }
-
+            Log(new string('=', width));
             Log(sb.ToString());
+            Log(new string('=', width));
         }
     }
 }

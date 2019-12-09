@@ -56,7 +56,8 @@ namespace AdventofCode
                 new AoC_2019.Day5(), // IntCodeComputer, parameter modes, input/output, jumps and comparisons
                 new AoC_2019.Day6(), // Orbital maps, dist YOU => SAN
                 new AoC_2019.Day7(), // more IntCode, serial and parallel execution with input loops
-                new AoC_2019.Day8(), // 
+                new AoC_2019.Day8(), // Space image format, checksums and transparent pixels.
+                new AoC_2019.Day9(), // Space image format, checksums and transparent pixels.
             };
 
             Aoc_2019_days.Last().Run();
