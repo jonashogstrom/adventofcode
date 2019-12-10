@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2019
@@ -29,8 +28,8 @@ namespace AdventofCode.AoC_2019
         }
 
         [Test]
-        [TestCase("_test2", 2, 3, 1)]
-        [TestCase("", 25, 6, 1485)]
+        [TestCase("Day8_test2.txt", 2, 3, 1)]
+        [TestCase("Day8.txt", 25, 6, 1485)]
         public void test1(string suffix, int width, int height, int exp)
         {
             var input = GetResource(suffix)[0];

@@ -45,6 +45,10 @@ namespace AdventofCode
             Col = col;
         }
 
+        public static Coord FromXY(int x, int y)
+        {
+            return new Coord(y, x);
+        }
         protected bool Equals(Coord other)
         {
             return Row == other.Row && Col == other.Col;

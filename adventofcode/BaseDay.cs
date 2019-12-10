@@ -6,20 +6,164 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using NUnit.Framework;
 
 namespace AdventofCode
 {
-    public enum InputSource
+    public class BaseBaseDay
     {
-        test,
-        prod,
-    }
-    public abstract class BaseDay
-    {
-        protected BaseDay()
+
+        protected bool _addLogHeader;
+        protected StringBuilder _log;
+
+        protected BaseBaseDay()
         {
             _log = new StringBuilder();
             LogLevel = 10;
+        }
+        protected int LogLevel { get; set; }
+
+        protected string[] GetResource(string nameOrValue)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var f = GetType().Namespace;
+            var fullName = f + "." + nameOrValue;
+
+            var resourceNames = assembly.GetManifestResourceNames();
+            var resourceName = resourceNames.FirstOrDefault(str => str.EndsWith(fullName));
+            if (resourceName == null)
+            {
+                Log("Resource not found, using value literal: " + nameOrValue);
+                return new[] { nameOrValue };
+            }
+
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            }
+        }
+
+        #region logging
+        protected void Log(string s, int logLevel = 0)
+        {
+            if (logLevel <= LogLevel)
+            {
+                if (!_addLogHeader)
+                {
+                    _addLogHeader = true;
+                    PrintHeader();
+                }
+
+                Debug.WriteLine(s);
+                Console.WriteLine(s);
+                _log.AppendLine(s);
+            }
+        }
+
+        public void Log(Func<string> s, int logLevel = 0)
+        {
+            if (logLevel <= LogLevel)
+                Log(s(), logLevel);
+        }
+
+        protected void PrintHeader()
+        {
+            Log("==== " + GetType().Name + " Log ==== ");
+        }
+
+        protected void PrintSplitter()
+        {
+            Log("==== " + GetType().Name + " Summary ==== ");
+        }
+
+        protected void PrintFooter(Stopwatch sw)
+        {
+            Log("==== " + GetType().Name + " Done ==== " + sw.ElapsedMilliseconds + "ms");
+            Log("");
+        }
+        #endregion
+
+        #region input parsing
+        protected int[] GetIntInput(string[] input)
+        {
+            return input.Select(x => int.Parse(x)).ToArray();
+        }
+
+        protected IEnumerable<int> GetInts(string s, bool allowNegative = false)
+        {
+            var temp = "";
+            foreach (var c in s)
+            {
+                if (c >= '0' && c <= '9' || allowNegative && c == '-')
+                {
+                    temp += c;
+                }
+                else if (temp != "")
+                {
+                    yield return int.Parse(temp);
+                    temp = "";
+                }
+            }
+
+            if (temp != "")
+            {
+                yield return int.Parse(temp);
+            }
+        }
+
+        protected IEnumerable<float> GetFloats(string s)
+        {
+            var temp = "";
+            foreach (var c in s)
+            {
+                if (c >= '0' && c <= '9' || c == '.' || c == '-')
+                {
+                    temp += c;
+                }
+                else if (temp != "")
+                {
+                    yield return float.Parse(temp);
+                    temp = "";
+                }
+            }
+
+            if (temp != "")
+            {
+                yield return int.Parse(temp);
+            }
+        }
+
+        protected int[] GetIntArr(string s, bool allowNegative = false)
+        {
+            return GetInts(s, allowNegative).ToArray();
+        }
+        #endregion
+    }
+
+    class TestBaseClass<T, S> : BaseBaseDay where S : struct
+    {
+
+        protected void DoAsserts((T part1, S part2) actual, T exp1, S? exp2)
+        {
+            Assert.That(actual.part1, Is.EqualTo(exp1));
+            Log("Part1: " + actual.part1);
+
+            if (exp2.HasValue)
+            {
+                Assert.That(actual.part2, Is.EqualTo(exp2.Value));
+                Log("Part2: " + actual.part2);
+            }
+        }
+    }
+
+
+    public abstract class BaseDay : BaseBaseDay
+    {
+        public enum InputSource
+        {
+            test,
+            prod,
         }
 
         protected InputSource Source { get; set; }
@@ -29,7 +173,6 @@ namespace AdventofCode
             get => Source == InputSource.test;
             set => Source = value ? InputSource.test : InputSource.prod;
         }
-        protected int LogLevel { get; set; }
         public object Part1Solution { get; set; }
         public object Part2Solution { get; set; }
         protected object Part1TestSolution { get; set; }
@@ -43,8 +186,6 @@ namespace AdventofCode
             var fileName = GetFileName(UseTestData);
             if (UseTestData)
                 Log("!!!!!! Running with test input !!!!!!!!!!!!!");
-
-            //            https://adventofcode.com/2018/day/8/input
 
             return File.ReadAllLines(fileName);
         }
@@ -73,27 +214,6 @@ namespace AdventofCode
             return File.ReadAllLines(fName);
         }
 
-        protected string[] GetResource(string suffix)
-        {
-            if (suffix != "" && !suffix.StartsWith("_"))
-                return new[] { suffix };
-
-            var assembly = Assembly.GetExecutingAssembly();
-            var f = GetType().FullName;
-            var fullName = f + suffix + ".txt";
-
-            var resourceNames = assembly.GetManifestResourceNames();
-            var resourceName = resourceNames.FirstOrDefault(str => str.EndsWith(fullName));
-            if (resourceName == null)
-                throw new Exception("No resource called [" + fullName+"]");
-
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
-            using (var reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            }
-        }
-
 
         protected string GetFileName(string suffix)
         {
@@ -101,13 +221,6 @@ namespace AdventofCode
             return "../../" + f + suffix + ".txt";
         }
 
-        protected int[] GetIntInput(string[] input)
-        {
-            return GetInput().Select(x => int.Parse(x)).ToArray();
-        }
-
-        protected bool _addLogHeader;
-        protected StringBuilder _log;
         protected string _fileNameSuffix = "";
 
         public void Run()
@@ -202,92 +315,7 @@ namespace AdventofCode
 
         }
 
-        protected void PrintHeader()
-        {
-            Log("==== " + GetType().Name + " Log ==== ");
-        }
 
-        protected void PrintSplitter()
-        {
-            Log("==== " + GetType().Name + " Summary ==== ");
-        }
-
-        protected void PrintFooter(Stopwatch sw)
-        {
-            Log("==== " + GetType().Name + " Done ==== " + sw.ElapsedMilliseconds + "ms");
-            Log("");
-        }
-
-        protected IEnumerable<int> GetInts(string s, bool allowNegative = false)
-        {
-            var temp = "";
-            foreach (var c in s)
-            {
-                if (c >= '0' && c <= '9' || allowNegative && c == '-')
-                {
-                    temp += c;
-                }
-                else if (temp != "")
-                {
-                    yield return int.Parse(temp);
-                    temp = "";
-                }
-            }
-
-            if (temp != "")
-            {
-                yield return int.Parse(temp);
-            }
-        }
-
-        protected IEnumerable<float> GetFloats(string s)
-        {
-            var temp = "";
-            foreach (var c in s)
-            {
-                if (c >= '0' && c <= '9' || c == '.' || c == '-')
-                {
-                    temp += c;
-                }
-                else if (temp != "")
-                {
-                    yield return float.Parse(temp);
-                    temp = "";
-                }
-            }
-
-            if (temp != "")
-            {
-                yield return int.Parse(temp);
-            }
-        }
-
-        protected int[] GetIntArr(string s, bool allowNegative = false)
-        {
-            return GetInts(s, allowNegative).ToArray();
-        }
-
-        public void Log(Func<string> s, int logLevel = 0)
-        {
-            if (logLevel <= LogLevel)
-                Log(s(), logLevel);
-        }
-
-        protected void Log(string s, int logLevel = 0)
-        {
-            if (logLevel <= LogLevel)
-            {
-                if (!_addLogHeader)
-                {
-                    _addLogHeader = true;
-                    PrintHeader();
-                }
-
-                Debug.WriteLine(s);
-                Console.WriteLine(s);
-                _log.AppendLine(s);
-            }
-        }
     }
 
 }

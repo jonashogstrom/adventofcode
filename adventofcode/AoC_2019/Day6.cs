@@ -21,10 +21,6 @@ namespace AdventofCode.AoC_2019
             Part2Solution = null;
         }
 
-        private class orbit
-        {
-            private string source;
-        }
 
         protected override void DoRun(string[] input)
         {

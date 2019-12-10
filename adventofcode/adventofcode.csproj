@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="AoC_2019\Day1.cs" />
     <Compile Include="AoC_2019\Day10.cs" />
+    <Compile Include="AoC_2019\Day11.cs" />
     <Compile Include="AoC_2019\Day2.cs" />
     <Compile Include="AoC_2019\Day3.cs" />
     <Compile Include="AoC_2019\Day4.cs" />
@@ -154,6 +155,8 @@
     <Content Include="AoC_2019\Day1.txt" />
     <EmbeddedResource Include="AoC_2019\Day10_test.txt" />
     <EmbeddedResource Include="AoC_2019\Day10_test2.txt" />
+    <EmbeddedResource Include="AoC_2019\Day11.txt" />
+    <EmbeddedResource Include="AoC_2019\Day11_test.txt" />
     <Content Include="AoC_2019\Day1_test.txt" />
     <Content Include="AoC_2019\Day2.txt" />
     <Content Include="AoC_2019\Day2_test.txt" />

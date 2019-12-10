@@ -1,53 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Windows.Forms;
-using AdventofCode.AoC_2018;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2019
 {
-    class Day10 : BaseDay
+    using Part1Type = Int32;
+    using Part2Type = Int32;
+
+    class Day10 : TestBaseClass<Part1Type, Part2Type>
     {
         [Test]
-        [TestCase(3, 4, 8, null, "_test")]
-        [TestCase(11, 13, 210, 802,"_test2")]
-        [TestCase(26, 28, 267, 1309, "")]
-        public void Test1(int expX, int expY, int expPart1, int? expPart2, string suffix)
+        [TestCase(8, null, "Day10_test.txt")] // Coord.FromXY(3, 4)
+        [TestCase(210, 802,"Day10_test2.txt")] // 11, 13, 
+        [TestCase(267, 1309, "Day10.txt")] //26, 28
+        public void Test1(Part1Type exp1, Part2Type? exp2, string suffix)
         {
             var source = GetResource(suffix);
             var res = Compute(source);
-
-            Assert.That(res.Part1.X, Is.EqualTo(expX));
-            Assert.That(res.Part1.Y, Is.EqualTo(expY));
-            Log("Part1: " + res.Part1.X + ", "+res.Part1.Y);
-
-            if (expPart2.HasValue)
-            {
-                Assert.That(res.Part2, Is.EqualTo(expPart2.Value));
-                Log("Part2: " + res.Part2);
-            }
+            DoAsserts(res, exp1, exp2);
         }
 
-        private static int GCD(int a, int b)
+        private (Part1Type Part1, Part2Type Part2) Compute(string[] source)
         {
-            while (a != 0 && b != 0)
-            {
-                if (a > b)
-                    a %= b;
-                else
-                    b %= a;
-            }
-
-            return a == 0 ? b : a;
-        }
-        private (Coord Part1, int Part2) Compute(string[] source)
-        {
-            var bestRow = -1;
-            var bestCol = -1;
-
-            var board = new SparseBuffer<bool>();
             var asteroids = new HashSet<Coord>();
             for (var row = 0; row < source.Length; row++)
             {
@@ -115,18 +90,16 @@ namespace AdventofCode.AoC_2019
                 }
             }
 
+            Log($"Part1: Best location is {bestLocation.X},{bestLocation.Y} with visible: {maxVisible}");
+
             var visible2 = new HashSet<Coord>(asteroids);
             visible2.Remove(bestLocation);
             var targetangle = bestangles.Values.Min();
             var counter = 0;
 
-            Log($"Location: {bestLocation.X},{bestLocation.Y}");
-
             var p2 = -1;
             while (visible2.Any())
             {
-                Coord next = null;
-                double? nearestAngle = null;
                 var targets = visible2.Where(x => bestangles[x] == targetangle).ToArray();
 
                 var nearestTarget = targets.OrderBy(t => t.Dist(bestLocation)).First();
@@ -136,8 +109,10 @@ namespace AdventofCode.AoC_2019
                 counter++;
                 Log($"{counter} Destroying {nearestTarget.X},{nearestTarget.Y}");
                 if (counter == 200)
+                {
                     p2 = nearestTarget.X * 100 + nearestTarget.Y;
-
+                    Log($"Part2: asteroid #200 is {nearestTarget.X}, {nearestTarget.Y}: "+ p2);
+                }
 
                 double smallestDiff = 360;
                 double nextTargetAngle = targetangle; // just in case we have to loop 360 degrees
@@ -153,37 +128,25 @@ namespace AdventofCode.AoC_2019
                             smallestDiff = angleDiff;
                             nextTargetAngle = bestangles[x];
                         }
-
                     }
                 }
-
                 targetangle = nextTargetAngle;
             }
 
-            var angle = 0;
-
-            return (bestLocation, p2);
+            return (maxVisible, p2);
         }
 
-        protected override void Setup()
+        private static int GCD(int a, int b)
         {
-            //            Source = InputSource.test;
-            //            //Source = InputSource.prod;
-            //
-            //            LogLevel = UseTestData ? 5 : 0;
-            //
-            //            Part1TestSolution = null;
-            //            Part2TestSolution = null;
-            //            Part1Solution = null;
-            //            Part2Solution = null;
-        }
+            while (a != 0 && b != 0)
+            {
+                if (a > b)
+                    a %= b;
+                else
+                    b %= a;
+            }
 
-        protected override void DoRun(string[] input)
-        {
-            //            var res = Compute(input);
-            //            Part1 = res.Part1;
-            //
-            //            Part2 = res.Part2;
+            return a == 0 ? b : a;
         }
     }
 }

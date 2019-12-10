@@ -5,28 +5,28 @@ using NUnit.Framework;
 
 namespace AdventofCode.AoC_2019
 {
-    class Day9 : BaseDay
+    class Day9 : BaseBaseDay
     {
         [Test]
         [TestCase(
             new long[] { 109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99 },
             null,
-            "_test", new long[0])]
+            "Day9_test.txt", new long[0])]
         [TestCase(
-            new long[] {1219070632396864},
+            new long[] { 1219070632396864 },
             null,
-            "_test2", new long[0])]
+            "Day9_test2.txt", new long[0])]
         [TestCase(
             new long[] { 1125899906842624 },
             null,
-            "_test3", new long[0])]
-        [TestCase(new long[] { 2494485073 }, null, "", new long[]{ 1 })]
-        [TestCase(new long[] { 44997 }, null, "", new long[]{ 2 })]
-        [TestCase(new long[] { 3013554615 }, null, "_jesper", new long[]{ 1 })]
-        public void Test1(IEnumerable<long> exp1, int? exp2, string suffix, IEnumerable<long> input)
+            "Day9_test3.txt", new long[0])]
+        [TestCase(new long[] { 2494485073 }, null, "Day9.txt", new long[] { 1 })]
+        [TestCase(new long[] { 44997 }, null, "Day9.txt", new long[] { 2 })]
+        [TestCase(new long[] { 3013554615 }, null, "Day9_jesper.txt", new long[] { 1 })]
+        public void Test1(IEnumerable<long> exp1, int? exp2, string inp, IEnumerable<long> intCodeInput)
         {
-            var source = GetResource(suffix);
-            var res = Compute(source[0], input);
+            var source = GetResource(inp);
+            var res = Compute(source[0], intCodeInput);
 
             Assert.That(res.Part1, Is.EqualTo(exp1));
             if (exp2.HasValue)
@@ -40,27 +40,6 @@ namespace AdventofCode.AoC_2019
             var computer = new IntCodeComputer(input.ToList(), prog);
             computer.Execute();
             return (computer.Output, 0);
-        }
-
-        protected override void Setup()
-        {
-            Source = InputSource.test;
-            //Source = InputSource.prod;
-
-            LogLevel = UseTestData ? 5 : 0;
-
-            Part1TestSolution = null;
-            Part2TestSolution = null;
-            Part1Solution = null;
-            Part2Solution = null;
-        }
-
-        protected override void DoRun(string[] input)
-        {
-            //            var res = Compute(input);
-            //            Part1 = res.Part1;
-            //
-            //            Part2 = res.Part2;
         }
     }
 }
