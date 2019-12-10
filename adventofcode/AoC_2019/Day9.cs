@@ -21,7 +21,8 @@ namespace AdventofCode.AoC_2019
             null,
             "_test3", new long[0])]
         [TestCase(new long[] { 2494485073 }, null, "", new long[]{ 1 })]
-        [TestCase(new long[] { 0 }, null, "", new long[]{ 2 })]
+        [TestCase(new long[] { 44997 }, null, "", new long[]{ 2 })]
+        [TestCase(new long[] { 3013554615 }, null, "_jesper", new long[]{ 1 })]
         public void Test1(IEnumerable<long> exp1, int? exp2, string suffix, IEnumerable<long> input)
         {
             var source = GetResource(suffix);

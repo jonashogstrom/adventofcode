@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AoC_2019\Day1.cs" />
+    <Compile Include="AoC_2019\Day10.cs" />
     <Compile Include="AoC_2019\Day2.cs" />
     <Compile Include="AoC_2019\Day3.cs" />
     <Compile Include="AoC_2019\Day4.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="AoC_2019\Day8.cs" />
     <Compile Include="AoC_2019\Day9.cs" />
     <Compile Include="AoC_2019\DayTemplate.cs" />
+    <Compile Include="AoC_2019\DayTemplate2.cs" />
     <Compile Include="EnumerableExt.cs" />
     <Compile Include="AoC_2019\IntCodeComputer.cs" />
     <Compile Include="SparseBuffer.cs" />
@@ -150,6 +152,8 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2019\Day10_test.txt" />
+    <EmbeddedResource Include="AoC_2019\Day10_test2.txt" />
     <Content Include="AoC_2019\Day1_test.txt" />
     <Content Include="AoC_2019\Day2.txt" />
     <Content Include="AoC_2019\Day2_test.txt" />
@@ -163,6 +167,8 @@
     <Content Include="AoC_2019\Day6_test.txt" />
     <Content Include="AoC_2019\Day7.txt" />
     <Content Include="AoC_2019\Day7_test.txt" />
+    <EmbeddedResource Include="AoC_2019\Day10.txt" />
+    <EmbeddedResource Include="AoC_2019\Day9_jesper.txt" />
     <EmbeddedResource Include="AoC_2019\Day9_test3.txt" />
     <EmbeddedResource Include="AoC_2019\Day9_test2.txt" />
     <EmbeddedResource Include="AoC_2019\Day8_test2.txt" />

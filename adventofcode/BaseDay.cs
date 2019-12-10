@@ -67,7 +67,7 @@ namespace AdventofCode
             return "../../" + f + (useTestData ? "_test" : "") + ".txt";
         }
 
-        protected string[] GetTestInput(string suffix="")
+        protected string[] GetTestInput(string suffix = "")
         {
             var fName = GetFileName(suffix);
             return File.ReadAllLines(fName);
@@ -75,18 +75,22 @@ namespace AdventofCode
 
         protected string[] GetResource(string suffix)
         {
+            if (suffix != "" && !suffix.StartsWith("_"))
+                return new[] { suffix };
 
             var assembly = Assembly.GetExecutingAssembly();
             var f = GetType().FullName;
-            var resourceName = f+suffix+".txt";
+            var fullName = f + suffix + ".txt";
 
             var resourceNames = assembly.GetManifestResourceNames();
-            resourceName = resourceNames.Single(str => str.EndsWith(resourceName));
+            var resourceName = resourceNames.FirstOrDefault(str => str.EndsWith(fullName));
+            if (resourceName == null)
+                throw new Exception("No resource called [" + fullName+"]");
 
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             using (var reader = new StreamReader(stream))
             {
-                return reader.ReadToEnd().Split(new[]{Environment.NewLine}, StringSplitOptions.None);
+                return reader.ReadToEnd().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             }
         }
 

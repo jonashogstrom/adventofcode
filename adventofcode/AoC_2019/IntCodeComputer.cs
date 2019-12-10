@@ -18,6 +18,9 @@ namespace AdventofCode.AoC_2019
         private int endOfMemory;
         public int Pointer;
         public int RelativeBase;
+        public int OpCounter;
+        public int MemWriteCounter;
+
         public bool Terminated { get; set; }
         private readonly HashSet<int> _opAdresses = new HashSet<int>();
         private readonly HashSet<int> _paramAdresses = new HashSet<int>();
@@ -126,7 +129,10 @@ namespace AdventofCode.AoC_2019
                 }
                 op.Execute(this, modes, args, parameters);
                 if (!_interrupt)
+                {
                     Log.Add(sb.ToString());
+                    OpCounter++;
+                }
 
             }
         }
@@ -231,6 +237,7 @@ namespace AdventofCode.AoC_2019
             _memory[addr] = value;
             Log.Add($"Write {value} to addr {addr}");
             endOfMemory = Math.Max(endOfMemory, addr);
+            MemWriteCounter++;
         }
     }
 
