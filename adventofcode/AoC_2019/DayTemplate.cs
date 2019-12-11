@@ -6,6 +6,7 @@ namespace AdventofCode.AoC_2019
     using Part1Type = Int32;
     using Part2Type = Int32;
 
+    [TestFixture]
     class DayTemplate : TestBaseClass<Part1Type, Part2Type>
     {
         [Test]

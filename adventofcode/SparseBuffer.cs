@@ -40,25 +40,35 @@ namespace AdventofCode
                 bottomRight = new Coord(Math.Max(bottomRight.Y, y), Math.Max(bottomRight.X, x));
         }
 
-
-        public string ToString(Func<T, string> func)
+        public string ToString(Func<T, Coord, string> func)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Top: {topLeft.Y} Bottom: {bottomRight.Y} Left: {topLeft.X} Right: {bottomRight.X}");
+            sb.AppendLine("+" + new string('-', Width) + '+');
             for (int y = topLeft.Y; y <= bottomRight.Y; y++)
             {
                 sb.Append('*');
                 for (int x = topLeft.X; x <= bottomRight.X; x++)
                 {
-                    sb.Append(func(this.Get(x, y)));
+                    sb.Append(func(this.Get(x, y), Coord.FromXY(x, y)));
                 }
 
-                sb.Append('*');
+                sb.Append('|');
                 sb.AppendLine();
             }
+            sb.AppendLine("+" + new string('-', Width) + '+');
 
             return sb.ToString();
         }
+
+        public int Width => bottomRight.X - topLeft.X + 1;
+        public int Height => bottomRight.Y - topLeft.Y + 1;
+
+        public string ToString(Func<T, string> func)
+        {
+            return ToString((v, c) => func(v));
+        }
+
         private Coord Reuse(Coord coord, int x, int y)
         {
             if (coord.X == x && coord.Y == y)

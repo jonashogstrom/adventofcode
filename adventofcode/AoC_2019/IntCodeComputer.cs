@@ -28,11 +28,15 @@ namespace AdventofCode.AoC_2019
 
         private readonly Dictionary<int, IOperation> _ops = new Dictionary<int, IOperation>();
         private readonly List<DataType> _output = new List<DataType>();
+        private readonly Queue<DataType> _outputQ = new Queue<DataType>();
         private bool _interrupt;
         private IntCodeComputer _outputTarget;
         public List<DataType> Output => _output;
+        public Queue<DataType> OutputQ => _outputQ;
         public List<string> Log = new List<string>();
         private string _name;
+        private bool _paramModifierWarningWritten;
+        private bool _opModifierWarningWritten;
 
         public IntCodeComputer(List<DataType> input, string program, int noun = -1, int verb = -1)
         {
@@ -189,6 +193,7 @@ namespace AdventofCode.AoC_2019
         public void WriteOutput(DataType value)
         {
             _output.Add(value);
+            _outputQ.Enqueue(value);
             //Console.WriteLine("Current output: " + _output);
             LastOutput = value;
             _outputTarget?.AddInput(value);
@@ -230,10 +235,17 @@ namespace AdventofCode.AoC_2019
         public void WriteMemory(int addr, DataType value)
         {
             _dataAdresses.Add(addr);
-            if (_opAdresses.Contains(addr))
+            if (_opAdresses.Contains(addr) && !_paramModifierWarningWritten)
+            {
                 Console.WriteLine("Warning, writing to an op-address");
-            if (_paramAdresses.Contains(addr))
+                _paramModifierWarningWritten = true;
+            }
+
+            if (_paramAdresses.Contains(addr) && !_opModifierWarningWritten)
+            {
                 Console.WriteLine("Warning, writing to a param-address");
+                _opModifierWarningWritten = true;
+            }
             _memory[addr] = value;
             Log.Add($"Write {value} to addr {addr}");
             endOfMemory = Math.Max(endOfMemory, addr);
