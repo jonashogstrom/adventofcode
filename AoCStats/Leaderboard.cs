@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace AoCStats
 {
@@ -78,6 +79,8 @@ namespace AoCStats
         }
 
         public List<Player> Players { get; }
+
+        public IEnumerable<Player> OrderedPlayers => Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar).ThenBy(p => p.Id);
         public int HighestDay { get; }
         public int[][] TopScorePerDay { get; }
         public int[][] StarsAwarded { get; set; }

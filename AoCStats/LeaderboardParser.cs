@@ -40,7 +40,7 @@ namespace AoCStats
         {
             _years = years;
             _handleExcludes = handleExcludes;
-            _x_suffix = handleExcludes ? "_X" : "";
+            _x_suffix = (handleExcludes ? "_X" : "") + (_excludeZero ? "" : "_0");
 
             var interval = TimeSpan.FromHours(24);
             if (year == DateTime.Now.Year)
@@ -90,7 +90,7 @@ namespace AoCStats
                             var marker = "<span class=\"leaderboard-position\">";
                             var p = r.IndexOf(marker);
                             var pos = int.Parse(r.Substring(p + marker.Length, 3));
-//                            Console.WriteLine($"{player.Name} scored {101 - pos} points on day {i} (star {star + 1}), year {year}");
+                            //                            Console.WriteLine($"{player.Name} scored {101 - pos} points on day {i} (star {star + 1}), year {year}");
                             player.GlobalScoreForDay[i - 1][star] = 101 - pos;
                         }
                         if (r.Contains("<span class=\"leaderboard-daydesc-first\">"))
@@ -131,9 +131,9 @@ namespace AoCStats
 
             var logAccumulatedPosition = InitLog("AccumulatedPosition", leaderboard.HighestDay);
 
-            foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
+            foreach (var p in leaderboard.OrderedPlayers)
             {
-                if (p.TotalScore > 0)
+                if (!_excludeZero || p.TotalScore > 0)
                 {
                     logAccumulatedPosition.Append(AddStartOfRowAndNameCell(p));
 
@@ -158,14 +158,14 @@ namespace AoCStats
             }
 
             ExitLog(logAccumulatedPosition);
-            tabs["Local leaderboard (Pos)"] = logAccumulatedPosition;
+            tabs["00-Leaderboard (Pos)"] = logAccumulatedPosition;
 
             //==
             var logScoreDiff = InitLog("Points behind the leader", leaderboard.HighestDay);
 
-            foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
+            foreach (var p in leaderboard.OrderedPlayers)
             {
-                if (p.TotalScore > 0)
+                if (!_excludeZero || p.TotalScore > 0)
                 {
                     logScoreDiff.Append(AddStartOfRowAndNameCell(p));
 
@@ -191,7 +191,7 @@ namespace AoCStats
                 }
             }
             ExitLog(logScoreDiff);
-            tabs["ScoreDiff"] = logScoreDiff;
+            tabs["10-ScoreDiff"] = logScoreDiff;
 
             var logScoreDiffGraphHtml = InitGraphHtml("PointsBehindTheLeader");
             var logScoreDiffGraphScript = InitLineChartScript(leaderboard, "PointsBehindTheLeader");
@@ -200,7 +200,7 @@ namespace AoCStats
                 for (int star = 0; star < 2; star++)
                 {
                     logScoreDiffGraphScript.Append("    [" + ((day * 2 + star + 1) / 2.0).ToString(CultureInfo.InvariantCulture) + ",");
-                    foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
+                    foreach (var p in leaderboard.OrderedPlayers)
                     {
                         if (p.TotalScore > 0)
                         {
@@ -213,21 +213,21 @@ namespace AoCStats
             }
 
             ExitLineChartScript(logScoreDiffGraphScript, "PointsBehindTheLeader", "Points behind the leader", true);
-            tabs["ScoreDiff chart"] = logScoreDiffGraphHtml;
+            tabs["11-ScoreDiff chart"] = logScoreDiffGraphHtml;
             scripts["ScoreDiff chart"] = logScoreDiffGraphScript;
             //==
 
 
             var logPositionForStar = InitLog("Position for star", leaderboard.HighestDay);
             var logOffsetFromWinner = InitLog("Offset from winner", leaderboard.HighestDay);
-            var logTotalSolveTime = InitLog("Total Solve Time", leaderboard.HighestDay);
-            var logAccumulatedSolveTime = InitLog("AccumulatedSolveTime", leaderboard.HighestDay);
+            var logTotalSolveTime = InitLog("Total time to solve since the problem was published", leaderboard.HighestDay);
+            var logAccumulatedSolveTime = InitLog("Accumulated time to solve", leaderboard.HighestDay);
             var logAccumulatedScore = InitLog("Accumulated score", leaderboard.HighestDay);
             var logGlobalScore = InitLog("Global scores", leaderboard.HighestDay);
 
-            foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
+            foreach (var p in leaderboard.OrderedPlayers)
             {
-                if (p.TotalScore > 0)
+                if (!_excludeZero || p.TotalScore > 0)
                 {
                     logPositionForStar.Append(AddStartOfRowAndNameCell(p));
                     logOffsetFromWinner.Append(AddStartOfRowAndNameCell(p));
@@ -273,7 +273,7 @@ namespace AoCStats
                                     -p.GlobalScoreForDay[day][star].Value,
                                     true,
                                     "",
-                                    "Position: " + (100 - p.GlobalScoreForDay[day][star].Value+1)));
+                                    "Position: " + (100 - p.GlobalScoreForDay[day][star].Value + 1)));
                             else
                             {
                                 logGlobalScore.Append(EmptyCell());
@@ -309,13 +309,12 @@ namespace AoCStats
             ExitLog(logAccumulatedScore);
             ExitLog(logGlobalScore);
 
-            tabs["Daily position"] = logPositionForStar;
-            tabs["Offset"] = logOffsetFromWinner;
-            tabs["Time"] = logTotalSolveTime;
-            tabs["AccumulatedTime"] = logAccumulatedSolveTime;
-            tabs["Local leaderboard (score)"] = logAccumulatedScore;
-            tabs["Global score"] = logGlobalScore;
-
+            tabs["02-Leaderboard (score)"] = logAccumulatedScore;
+            tabs["06-Time"] = logTotalSolveTime;
+            tabs["07-Offset"] = logOffsetFromWinner;
+            tabs["08-Accumulated"] = logAccumulatedSolveTime;
+            tabs["20-Global score"] = logGlobalScore;
+            tabs["25-Daily position"] = logPositionForStar;
 
             // https://developers.google.com/chart/interactive/docs/gallery/linechart
             var logPosGraphHtml = InitGraphHtml("AccumulatedPosition");
@@ -326,7 +325,7 @@ namespace AoCStats
                 for (int star = 0; star < 2; star++)
                 {
                     logPosGraphScript.Append("    [" + ((day * 2 + star + 1) / 2.0).ToString(CultureInfo.InvariantCulture) + ",");
-                    foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
+                    foreach (var p in leaderboard.OrderedPlayers)
                     {
                         if (p.TotalScore > 0)
                         {
@@ -340,7 +339,7 @@ namespace AoCStats
             }
 
             ExitLineChartScript(logPosGraphScript, "AccumulatedPosition", "Position");
-            tabs["Position chart"] = logPosGraphHtml;
+            tabs["01-Position chart"] = logPosGraphHtml;
             scripts["Position chart"] = logPosGraphScript;
 
             // https://developers.google.com/chart/interactive/docs/gallery/linechart
@@ -353,7 +352,7 @@ namespace AoCStats
                 {
                     logDailyPosGraphScript.Append(
                         "    [" + ((day * 2 + star + 1) / 2.0).ToString(CultureInfo.InvariantCulture) + ",");
-                    foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
+                    foreach (var p in leaderboard.OrderedPlayers)
                     {
                         if (p.TotalScore > 0)
                         {
@@ -367,15 +366,15 @@ namespace AoCStats
             }
 
             ExitLineChartScript(logDailyPosGraphScript, "DailyPosition", "Daily Position");
-            tabs["Daily Position chart"] = logDailyPosGraphHtml;
+            tabs["44-Daily Position chart"] = logDailyPosGraphHtml;
             scripts["Daily Position chart"] = logDailyPosGraphScript;
 
 
             var logTimeStar2 = InitLog("Time to complete second star", leaderboard.HighestDay, false);
 
-            foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
+            foreach (var p in leaderboard.OrderedPlayers)
             {
-                if (p.TotalScore > 0)
+                if (!_excludeZero || p.TotalScore > 0)
                 {
                     logTimeStar2.Append(AddStartOfRowAndNameCell(p));
                     for (int day = 0; day < leaderboard.HighestDay; day++)
@@ -397,7 +396,7 @@ namespace AoCStats
 
             ExitLog(logTimeStar2);
 
-            tabs["Star2"] = logTimeStar2;
+            tabs["09-Time *2"] = logTimeStar2;
 
 
             //==
@@ -413,11 +412,19 @@ namespace AoCStats
             htmlContent.AppendLine("<div class=\"w3-container\">");
             htmlContent.AppendLine("<div id=\"tabmenu\" class=\"w3-bar w3-black\">");
             var first = true;
-            foreach (var k in tabs.Keys)
+            htmlContent.Append("<div>Leaderboard for " + listName);
+            if (_excludeZero)
+                htmlContent.Append(", inactive players removed (<a href=\""+_htmlFileName.Replace(".html", "_0.html")+"\">add them</a>)");
+            else
+                htmlContent.Append($", <a href=\"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}\">AoC-style</a> (<a href=\"{_htmlFileName.Replace("_0.html", ".html")}\">remove inactive players</a>)");
+            htmlContent.Append("</div>");
+
+            foreach (var k in tabs.Keys.OrderBy(x=>x))
             {
+                var tabName = k.Split(new[] { '-' }, 2).Last();
                 var red = first ? " w3-red" : "";
                 htmlContent.AppendLine(
-                    $"    <button id=\"{k}_btn\" class=\"w3-bar-item w3-button tablink{red}\" onclick=\"openTab(event.currentTarget,'{k}')\">{k}</button>");
+                    $"    <button id=\"{k}_btn\" class=\"w3-bar-item w3-button tablink{red}\" onclick=\"openTab(event.currentTarget,'{k}')\">{tabName}</button>");
                 first = false;
             }
 
@@ -452,7 +459,7 @@ namespace AoCStats
             if (File.Exists(_htmlFileName))
             {
                 var oldHtml = File.ReadAllText(_htmlFileName, Encoding.UTF8);
-                var part1 = oldHtml.Split(new[] {"<!-- timestamps -->"}, StringSplitOptions.RemoveEmptyEntries)[0];
+                var part1 = oldHtml.Split(new[] { "<!-- timestamps -->" }, StringSplitOptions.RemoveEmptyEntries)[0];
 
                 var html2 = html.Substring(0, Math.Min(html.Length, part1.Length));
                 identical = part1 != html2;
@@ -512,7 +519,7 @@ namespace AoCStats
             var age = DateTime.Now - timestamp;
             if (age > interval || forceLoad)
             {
-                Log($"Downloading new data for {_settings[_leaderBoardId+"_name"]}/{_year} ({_leaderBoardId})");
+                Log($"Downloading new data for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId})");
                 // Create Target
                 var url = $"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}.json";
                 var s = DownloadFromURL(url);
@@ -575,7 +582,7 @@ namespace AoCStats
             chartScript.AppendLine($"function draw{chartName}Chart() {{");
             chartScript.AppendLine("  var data = new google.visualization.DataTable();");
             chartScript.AppendLine("  data.addColumn('number', 'X');");
-            foreach (var p in leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar))
+            foreach (var p in leaderboard.OrderedPlayers)
                 if (p.TotalScore > 0)
                     chartScript.AppendLine($"  data.addColumn('number', '{p.Name}');");
 
@@ -588,7 +595,7 @@ namespace AoCStats
             var bestTime = new TimeSpan[leaderboard.HighestDay][];
             var lastStar = new Dictionary<Player, long>();
             var playerCount = leaderboard.Players.Count;
-            if (_settings.ContainsKey($"{_leaderBoardId}_{_year}_exclude0"))
+            if (_excludeZero)
                 playerCount = leaderboard.Players.Count(p => p.Stars > 0);
             foreach (var player in leaderboard.Players)
             {
@@ -631,7 +638,13 @@ namespace AoCStats
                     {
                         if (player.unixCompletionTime[day][star] != -1)
                         {
-                            player.PositionForStar[day][star] = orderedPlayers.IndexOf(player);
+                            var index = orderedPlayers.IndexOf(player);
+                            // handle ties
+                            if (index > 0 && player.unixCompletionTime[day][star] == orderedPlayers[index - 1].unixCompletionTime[day][star])
+                                player.PositionForStar[day][star] = orderedPlayers[index - 1].PositionForStar[day][star];
+                            else
+                                player.PositionForStar[day][star] = index;
+
                             if (!(_year == 2018 && day == 5)) // points day 6 were recalled 
                                 player.TotalScore += playerCount - player.PositionForStar[day][star];
                             player.OffsetFromWinner[day][star] = player.TimeToComplete[day][star] - bestTime[day][star];
@@ -653,11 +666,16 @@ namespace AoCStats
                         .OrderByDescending(p => p.AccumulatedScore[day][star]).ToList();
                     foreach (var player in leaderboard.Players)
                     {
-                        player.AccumulatedPosition[day][star] = orderedPlayers.IndexOf(player);
+                        var index = orderedPlayers.IndexOf(player);
+                        // handle ties
+                        if (index > 0 && player.AccumulatedScore[day][star] == orderedPlayers[index - 1].AccumulatedScore[day][star])
+                            player.AccumulatedPosition[day][star] = orderedPlayers[index - 1].AccumulatedPosition[day][star];
+                        else
+                            player.AccumulatedPosition[day][star] = index;
                     }
                 }
 
-                var players = leaderboard.Players.OrderByDescending(p => p.LocalScore).ThenBy(p => p.LastStar).ToList();
+                var players = leaderboard.OrderedPlayers.ToList();
                 for (int i = 0; i < players.Count; i++)
                     players[i].CurrentPosition = i + 1;
             }
@@ -759,11 +777,11 @@ namespace AoCStats
         {
             return Cell(value.ToString(), value, true, htmlClass);
         }
-        private static string Cell(TimeSpan value, string htmlClass, string alt="")
+        private static string Cell(TimeSpan value, string htmlClass, string alt = "")
         {
             return Cell(value.ToString(), (int)value.TotalSeconds, true, htmlClass, alt);
         }
-        private static string EmptyCell(int sort=int.MaxValue)
+        private static string EmptyCell(int sort = int.MaxValue)
         {
             return Cell("", sort);
         }
@@ -773,6 +791,7 @@ namespace AoCStats
         private List<string> _metacolumns;
         private bool _handleExcludes;
         private string _x_suffix;
+        private bool _excludeZero;
 
         private string TableHeader(int colPos, int tableid, string header)
         {
@@ -842,8 +861,14 @@ namespace AoCStats
 
         public void GenerateReport(int leaderboardid, int[] years, bool handleExcludes, bool forceLoad)
         {
+
             foreach (var year in years)
+            {
+                _excludeZero = true;
                 GenerateReport(leaderboardid, year, years, handleExcludes, forceLoad);
+                _excludeZero = false;
+                GenerateReport(leaderboardid, year, years, handleExcludes, forceLoad);
+            }
 
         }
 
