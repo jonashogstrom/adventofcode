@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -11,7 +12,7 @@ namespace AdventofCode
         private Coord topLeft = new Coord(0,0);
         private Coord bottomRight = new Coord(0,0);
         private readonly T _def;
-        private readonly Dictionary<int, Dictionary<int, T>> _board = new Dictionary<int, Dictionary<int, T>>();
+        private readonly Dictionary<Coord,T> _board = new Dictionary<Coord, T>();
 
         public SparseBuffer(T def = default)
         {
@@ -20,24 +21,28 @@ namespace AdventofCode
 
         public T this[Coord coord]
         {
-            get => Get(coord.X, coord.Y);
-            set => Set(coord.X, coord.Y, value);
+            get
+            {
+                if (!_board.TryGetValue(coord, out var res))
+                    return _def;
+                return res;
+            }
+            set
+            {
+                _board[coord] = value;
+                if (coord.X < topLeft.X || coord.Y < topLeft.Y)
+                    topLeft = Coord.FromXY(Math.Min(topLeft.X, coord.X), Math.Min(topLeft.Y, coord.Y));
+                if (coord.X > bottomRight.X || coord.Y > bottomRight.Y)
+                    bottomRight = Coord.FromXY(Math.Max(bottomRight.X, coord.X), Math.Max(bottomRight.Y, coord.Y));
+
+            }
         }
-        
+
         public void Set(int x, int y, T value)
         {
-            if (!_board.TryGetValue(x, out var col))
-            {
-                col = new Dictionary<int, T>();
-                _board[x] = col;
-            }
+            var c = Coord.FromXY(x, y);
+            this[c] = value;
 
-            col[y] = value;
-
-            if (x < topLeft.X || y < topLeft.Y)
-                topLeft = new Coord(Math.Min(topLeft.Y, y), Math.Min(topLeft.X, x));
-            if (x > bottomRight.X || y > bottomRight.Y)
-                bottomRight = new Coord(Math.Max(bottomRight.Y, y), Math.Max(bottomRight.X, x));
         }
 
         public string ToString(Func<T, Coord, string> func)
@@ -50,7 +55,7 @@ namespace AdventofCode
                 sb.Append('*');
                 for (int x = topLeft.X; x <= bottomRight.X; x++)
                 {
-                    sb.Append(func(this.Get(x, y), Coord.FromXY(x, y)));
+                    sb.Append(func(Get(x, y), Coord.FromXY(x, y)));
                 }
 
                 sb.Append('|');
@@ -63,6 +68,8 @@ namespace AdventofCode
 
         public int Width => bottomRight.X - topLeft.X + 1;
         public int Height => bottomRight.Y - topLeft.Y + 1;
+
+        public IEnumerable<Coord> Keys => _board.Keys;
 
         public string ToString(Func<T, string> func)
         {
@@ -78,11 +85,7 @@ namespace AdventofCode
 
         public T Get(int x, int y)
         {
-            if (!_board.TryGetValue(x, out var col))
-                return _def;
-            if (!col.TryGetValue(y, out var res))
-                return _def;
-            return res;
+            return this[Coord.FromXY(x, y)];
         }
     }
 }

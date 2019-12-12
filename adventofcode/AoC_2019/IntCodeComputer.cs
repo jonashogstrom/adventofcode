@@ -38,6 +38,10 @@ namespace AdventofCode.AoC_2019
         private bool _paramModifierWarningWritten;
         private bool _opModifierWarningWritten;
 
+        public IntCodeComputer(string program): this(new List<long>(), program)
+        {
+        }
+
         public IntCodeComputer(List<DataType> input, string program, int noun = -1, int verb = -1)
         {
             _input = input;
@@ -91,6 +95,10 @@ namespace AdventofCode.AoC_2019
                     throw new Exception($"Pointer outside of memory: {Pointer}");
                 var opCode = (int)_memory[Pointer];
                 _opAdresses.Add(Pointer);
+                if (_dataAdresses.Contains(Pointer))
+                {
+                    Log.Add("Reading op from a data address: "+Pointer);
+                }
                 var op2Code = opCode % 100;
 
                 if (!_ops.ContainsKey(op2Code))
@@ -147,7 +155,13 @@ namespace AdventofCode.AoC_2019
             var args = new DataType[argCount];
             for (int i = 0; i < argCount; i++)
             {
-                args[i] = ReadMemory(Pointer + i + 1, ReadOp.arg);
+                var addr = Pointer + i + 1;
+                args[i] = ReadMemory(addr, ReadOp.arg);
+                if (_dataAdresses.Contains(addr))
+                {
+                    Log.Add("Reading arg from a data address: " + addr);
+                }
+
             }
 
             return args;
@@ -243,8 +257,8 @@ namespace AdventofCode.AoC_2019
 
             if (_paramAdresses.Contains(addr) && !_opModifierWarningWritten)
             {
-                Console.WriteLine("Warning, writing to a param-address");
-                _opModifierWarningWritten = true;
+                Console.WriteLine("Warning, writing to a param-address: "+addr);
+                //_opModifierWarningWritten = true;
             }
             _memory[addr] = value;
             Log.Add($"Write {value} to addr {addr}");

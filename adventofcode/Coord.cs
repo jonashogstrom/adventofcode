@@ -12,7 +12,7 @@ namespace AdventofCode
         public static Coord E = new Coord(0, 1);
         public static Coord S = new Coord(1, 0);
         public static Coord W = new Coord(0, -1);
-        public static Coord Origo = new Coord(0, 0);
+        public static Coord Origin = new Coord(0, 0);
 
         public static Coord NW = N.Move(W);
         public static Coord NE = N.Move(E);
@@ -25,6 +25,10 @@ namespace AdventofCode
         public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
         {
             {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'},
+        };
+        public static readonly Dictionary<Coord, char> trans2Arrow = new Dictionary<Coord, char>()
+        {
+            {N, 'v'}, {S, '^'}, {E, '>'}, {W, '<'},
         };
         public static readonly Dictionary<char, Coord> trans2Coord = new Dictionary<char, Coord>()
         {
@@ -127,8 +131,52 @@ namespace AdventofCode
             this.z = z;
         }
 
+        protected bool Equals(Coord3d other)
+        {
+            return x == other.x && y == other.y && z == other.z;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Coord3d) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = x;
+                hashCode = (hashCode * 397) ^ y;
+                hashCode = (hashCode * 397) ^ z;
+                return hashCode;
+            }
+        }
+
         public int x;
         public int y;
         public int z;
+
+        public Coord3d Clone()
+        {
+            return new Coord3d(x, y, z);
+        }
+
+        public Coord3d Move(int x, int y, int z)
+        {
+            return new Coord3d(this.x + x, this.y+y, this.z+z);
+        }
+
+        public Coord3d Move(Coord3d v)
+        {
+            return Move(v.x, v.y, v.z);
+        }
+
+        public int absValue()
+        {
+            return Math.Abs(x) + Math.Abs(y) + Math.Abs(z);
+        }
     }
 }

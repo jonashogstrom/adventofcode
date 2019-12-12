@@ -63,7 +63,7 @@ namespace AdventofCode.AoC_2016
         protected override void DoRun(string[] input)
         {
             //Part2, 310 TOO HIGH
-            var pos = Coord.Origo;
+            var pos = Coord.Origin;
             var p = input[0].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
             var dir = Coord.N;
             var i = 0;
@@ -81,7 +81,7 @@ namespace AdventofCode.AoC_2016
                     if (Part2 == null && places.Contains(pos))
                     {
                         Log($"{i}: REPEAT", 1);
-                        Part2 = Coord.Origo.Dist(pos);
+                        Part2 = Coord.Origin.Dist(pos);
                     }
 
                     places.Add(pos);
@@ -90,7 +90,7 @@ namespace AdventofCode.AoC_2016
                 i++;
             }
 
-            Part1 = Coord.Origo.Dist(pos);
+            Part1 = Coord.Origin.Dist(pos);
         }
     }
 }

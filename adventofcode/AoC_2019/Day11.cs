@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms.VisualStyles;
 using AdventofCode.AoC_2018;
 using NUnit.Framework;
 
@@ -12,7 +14,6 @@ namespace AdventofCode.AoC_2019
     class Day11 : TestBaseClass<Part1Type, Part2Type>
     {
         [Test]
-        //[TestCase(-1, null, "Day11_test.txt")]
         [TestCase(2392, null, "Day11.txt")]
         public void Test1(Part1Type exp1, Part2Type? exp2, string resourceName)
         {
@@ -23,46 +24,48 @@ namespace AdventofCode.AoC_2019
 
         private (Part1Type Part1, Part2Type Part2) Compute(string[] source)
         {
+            Log($"============== Part1 ================");
+            var hull1 = RunRobot(source, 0);
+            Log($"============== Part2 ================");
+            var hull2 = RunRobot(source, 1);
 
-            runRobot(source, out var paintedCoords1, out var hull1, 0);
-            runRobot(source, out var paintedCoords2, out var hull2, 1);
+            Log($"Answer, part 2 (painted cells: {hull2.Keys.Count()}");
+            PrintHull(hull2);
 
-            Log("Answer, part 2");
-            Log(hull2.ToString(x =>
-            {
-                if (x == 0) return " ";
-                if (x == 1) return "#";
-                return "?";
-            }));
-            return (paintedCoords1.Count, 0);
+            return (hull1.Keys.Count(), 0);
         }
 
-        private static Coord runRobot(string[] source, out HashSet<Coord> paintedCoords, out SparseBuffer<int> hull,
-            int initialColor)
+        private SparseBuffer<int> RunRobot(string[] source, int initialColor)
         {
-            var brain = new IntCodeComputer(new List<long>(), source[0]);
-            var robot = new Coord(0, 0);
-            var robotdir = Coord.N;
-            paintedCoords = new HashSet<Coord>();
-            hull = new SparseBuffer<int>();
-            hull[robot] = initialColor;
+            var brain = new IntCodeComputer(source[0]);
+            var robot = Coord.Origin;
+            var robotDir = Coord.N;
+            var hull = new SparseBuffer<int> { [robot] = initialColor };
             while (!brain.Terminated)
             {
-                var currentColor = hull[robot];
-                brain.AddInput(currentColor);
+                brain.AddInput(hull[robot]);
                 brain.Execute();
-                var newColor = brain.OutputQ.Dequeue();
-                var newDir = brain.OutputQ.Dequeue();
-                hull[robot] = (int) newColor;
-                paintedCoords.Add(robot);
-                if (newDir == 0)
-                    robotdir = robotdir.RotateCCW90();
-                else if (newDir == 1)
-                    robotdir = robotdir.RotateCW90();
-                robot = robot.Move(robotdir);
+                hull[robot] = (int)brain.OutputQ.Dequeue();
+                robotDir = brain.OutputQ.Dequeue() == 0 ? robotDir.RotateCCW90() : robotDir.RotateCW90();
+                robot = robot.Move(robotDir);
+                PrintHull(hull, robot, robotDir);
             }
 
-            return robot;
+            Log("Executed operations: " + brain.OpCounter);
+
+            PrintHull(hull, robot, robotDir);
+
+            return hull;
+        }
+
+        private void PrintHull(SparseBuffer<int> hull, Coord robot=null, Coord robotDir=null)
+        {
+            Log(hull.ToString((value, coord) =>
+            {
+                if (robot != null && coord.Equals(robot))
+                    return Coord.trans2Arrow[robotDir].ToString();
+                return value == 0 ? " " : "█";
+            }));
         }
     }
 }
