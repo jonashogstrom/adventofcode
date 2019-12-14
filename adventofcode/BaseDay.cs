@@ -141,18 +141,23 @@ namespace AdventofCode
         #endregion
     }
 
-    class TestBaseClass<T, S> : BaseBaseDay where S : struct
+    class TestBaseClass<T, S> : BaseBaseDay
+            where S : struct
+            where T : struct
     {
 
-        protected void DoAsserts((T part1, S part2) actual, T exp1, S? exp2)
+        protected void DoAsserts((T part1, S? part2) actual, T? exp1, S? exp2)
         {
-            Assert.That(actual.part1, Is.EqualTo(exp1));
-            Log("Part1: " + actual.part1);
+            var (actual1, actual2) = actual;
+            Log("Calculated Part1: " + actual1);
+            if (exp1.HasValue)
+                Assert.That(actual1, Is.EqualTo(exp1));
 
-            if (exp2.HasValue)
+            if (actual2.HasValue)
             {
-                Assert.That(actual.part2, Is.EqualTo(exp2.Value));
-                Log("Part2: " + actual.part2);
+                Log("Calculated Part2: " + actual2);
+                if (exp2.HasValue)
+                    Assert.That(actual2, Is.EqualTo(exp2.Value));
             }
         }
     }

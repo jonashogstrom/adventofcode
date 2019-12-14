@@ -16,6 +16,9 @@ namespace AoCStats
                 new LeaderboardParser().GenerateReport(371692, new[] { 2019, 2018 }, true, forceLoad);
                 new LeaderboardParser().GenerateReport(371692, new[] { 2019, 2018 }, false, false);
 
+                new LeaderboardParser().GenerateReport(139489, new[] { 2019, 2018 }, true, forceLoad);
+                new LeaderboardParser().GenerateReport(139489, new[] { 2019, 2018 }, false, false);
+
                 // Leica
                  new LeaderboardParser().GenerateReport(373164, new[] { 2019, 2018 }, true, forceLoad);
                  new LeaderboardParser().GenerateReport(373164, new[] { 2019, 2018 }, false, false);

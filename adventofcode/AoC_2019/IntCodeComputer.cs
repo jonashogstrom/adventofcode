@@ -95,7 +95,7 @@ namespace AdventofCode.AoC_2019
                     throw new Exception($"Pointer outside of memory: {Pointer}");
                 var opCode = (int)_memory[Pointer];
                 _opAdresses.Add(Pointer);
-                if (_dataAdresses.Contains(Pointer))
+                if (Debug && _dataAdresses.Contains(Pointer))
                 {
                     Log.Add("Reading op from a data address: "+Pointer);
                 }
@@ -126,23 +126,28 @@ namespace AdventofCode.AoC_2019
 
                 var args = GetArgs(op.ArgCount);
                 var parameters = GetParams(args, modes);
-                var sb = new StringBuilder();
-                sb.Append($"{Pointer} {op.Name}: ");
-                for (int i = 0; i < op.ArgCount; i++)
+                if (Debug)
                 {
-                    if (modes[i] == ParameterMode.immediate)
-                        sb.Append($"Arg{i} I: {args[i]} ");
-                    else if (modes[i] == ParameterMode.relative)
-                        sb.Append($"Arg{i} R: {args[i]} [{parameters[i]}]");
-                    else
+                    var sb = new StringBuilder();
+
+                    sb.Append($"{Pointer} {op.Name}: ");
+                    for (int i = 0; i < op.ArgCount; i++)
                     {
-                        sb.Append($"Arg{i} P: {args[i]} [{parameters[i]}] ");
+                        if (modes[i] == ParameterMode.immediate)
+                            sb.Append($"Arg{i} I: {args[i]} ");
+                        else if (modes[i] == ParameterMode.relative)
+                            sb.Append($"Arg{i} R: {args[i]} [{parameters[i]}]");
+                        else
+                        {
+                            sb.Append($"Arg{i} P: {args[i]} [{parameters[i]}] ");
+                        }
                     }
                 }
+
                 op.Execute(this, modes, args, parameters);
                 if (!_interrupt)
                 {
-                    Log.Add(sb.ToString());
+                 //   Log.Add(sb.ToString());
                     OpCounter++;
                 }
 
@@ -157,7 +162,7 @@ namespace AdventofCode.AoC_2019
             {
                 var addr = Pointer + i + 1;
                 args[i] = ReadMemory(addr, ReadOp.arg);
-                if (_dataAdresses.Contains(addr))
+                if (Debug && _dataAdresses.Contains(addr))
                 {
                     Log.Add("Reading arg from a data address: " + addr);
                 }
@@ -258,10 +263,11 @@ namespace AdventofCode.AoC_2019
             if (_paramAdresses.Contains(addr) && !_opModifierWarningWritten)
             {
                 Console.WriteLine("Warning, writing to a param-address: "+addr);
-                //_opModifierWarningWritten = true;
+                _opModifierWarningWritten = true;
             }
             _memory[addr] = value;
-            Log.Add($"Write {value} to addr {addr}");
+            if (Debug)
+                Log.Add($"Write {value} to addr {addr}");
             endOfMemory = Math.Max(endOfMemory, addr);
             MemWriteCounter++;
         }

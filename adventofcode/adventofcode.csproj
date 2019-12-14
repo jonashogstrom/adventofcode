@@ -51,10 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AoC_2019\Day14.cs" />
     <Compile Include="AoC_2019\Day1.cs" />
     <Compile Include="AoC_2019\Day10.cs" />
     <Compile Include="AoC_2019\Day11.cs" />
     <Compile Include="AoC_2019\Day13.cs" />
+    <Compile Include="AoC_2019\Day15.cs" />
     <Compile Include="AoC_2019\Day2.cs" />
     <Compile Include="AoC_2019\Day3.cs" />
     <Compile Include="AoC_2019\Day4.cs" />
@@ -161,8 +163,16 @@
     <EmbeddedResource Include="AoC_2019\Day12.txt" />
     <EmbeddedResource Include="AoC_2019\Day12_test.txt" />
     <EmbeddedResource Include="AoC_2019\Day12_test2.txt" />
-    <EmbeddedResource Include="AoC_2019\Day13_test.txt" />
+    <EmbeddedResource Include="AoC_2019\Day14_test.txt" />
     <EmbeddedResource Include="AoC_2019\Day13.txt" />
+    <EmbeddedResource Include="AoC_2019\Day14.txt" />
+    <EmbeddedResource Include="AoC_2019\Day14_testlast.txt" />
+    <EmbeddedResource Include="AoC_2019\Day14_testbig1.txt" />
+    <EmbeddedResource Include="AoC_2019\Day14_testbig3.txt" />
+    <EmbeddedResource Include="AoC_2019\Day14_testbig2.txt" />
+    <EmbeddedResource Include="AoC_2019\Day14_test2.txt" />
+    <EmbeddedResource Include="AoC_2019\Day15_test.txt" />
+    <EmbeddedResource Include="AoC_2019\Day15.txt" />
     <Content Include="AoC_2019\Day1_test.txt" />
     <Content Include="AoC_2019\Day2.txt" />
     <Content Include="AoC_2019\Day2_test.txt" />
