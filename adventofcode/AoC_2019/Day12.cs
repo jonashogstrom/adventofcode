@@ -116,7 +116,6 @@ namespace AdventofCode.AoC_2019
             {
                 stepCounter++;
                 moons = IterateVelocities(moons, stepCounter);
-                var ok = true;
                 var okx = true;
                 var oky = true;
                 var okz = true;
