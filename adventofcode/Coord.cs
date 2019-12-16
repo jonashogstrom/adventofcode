@@ -13,6 +13,7 @@ namespace AdventofCode
         public static Coord S = new Coord(1, 0);
         public static Coord W = new Coord(0, -1);
         public static Coord Origin = new Coord(0, 0);
+        public static Coord[] NSWE = new[]{N, S, W, E};
 
         public static Coord NW = N.Move(W);
         public static Coord NE = N.Move(E);

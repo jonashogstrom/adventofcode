@@ -9,10 +9,10 @@ namespace AdventofCode
 {
     internal class SparseBuffer<T>
     {
-        private Coord topLeft = new Coord(0,0);
-        private Coord bottomRight = new Coord(0,0);
+        private Coord topLeft = new Coord(0, 0);
+        private Coord bottomRight = new Coord(0, 0);
         private readonly T _def;
-        private readonly Dictionary<Coord,T> _board = new Dictionary<Coord, T>();
+        private readonly Dictionary<Coord, T> _board = new Dictionary<Coord, T>();
 
         public SparseBuffer(T def = default)
         {
@@ -45,23 +45,30 @@ namespace AdventofCode
 
         }
 
-        public string ToString(Func<T, Coord, string> func)
+        public string ToString(Func<T, Coord, string> func, int cellWidth = 1)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Top: {topLeft.Y} Bottom: {bottomRight.Y} Left: {topLeft.X} Right: {bottomRight.X}");
-            sb.AppendLine("+" + new string('-', Width) + '+');
+            sb.Append("      ");
+            var padding = (cellWidth - 1) / 2;
+            for (int x = topLeft.X; x <= bottomRight.X; x++)
+            {
+                sb.Append((Math.Abs(x) % 10).ToString().PadLeft(1 + padding).PadRight(cellWidth));
+            }
+            sb.AppendLine();
+            sb.AppendLine("     ╔" + new string('═', Width * cellWidth) + '╗');
             for (int y = topLeft.Y; y <= bottomRight.Y; y++)
             {
-                sb.Append('*');
+                sb.Append($"{Math.Abs(y):D4} ║");
                 for (int x = topLeft.X; x <= bottomRight.X; x++)
                 {
                     sb.Append(func(Get(x, y), Coord.FromXY(x, y)));
                 }
 
-                sb.Append('|');
+                sb.Append('║');
                 sb.AppendLine();
             }
-            sb.AppendLine("+" + new string('-', Width) + '+');
+            sb.AppendLine("     ╚" + new string('═', Width*cellWidth) + '╝');
 
             return sb.ToString();
         }

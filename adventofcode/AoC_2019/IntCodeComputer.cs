@@ -38,7 +38,7 @@ namespace AdventofCode.AoC_2019
         private bool _paramModifierWarningWritten;
         private bool _opModifierWarningWritten;
 
-        public IntCodeComputer(string program): this(new List<long>(), program)
+        public IntCodeComputer(string program) : this(new List<long>(), program)
         {
         }
 
@@ -55,7 +55,7 @@ namespace AdventofCode.AoC_2019
             RegisterOp(new ReadInput());
             RegisterOp(new WriteOutput());
             RegisterOp(new AdjustRelBase());
-            var prog = program.Split(',').Select(long.Parse).ToArray();
+            var prog = program.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
             for (int i = 0; i < prog.Length; i++)
                 _memory[i] = prog[i];
             endOfMemory = prog.Length - 1;
@@ -97,7 +97,7 @@ namespace AdventofCode.AoC_2019
                 _opAdresses.Add(Pointer);
                 if (Debug && _dataAdresses.Contains(Pointer))
                 {
-                    Log.Add("Reading op from a data address: "+Pointer);
+                    Log.Add("Reading op from a data address: " + Pointer);
                 }
                 var op2Code = opCode % 100;
 
@@ -147,7 +147,7 @@ namespace AdventofCode.AoC_2019
                 op.Execute(this, modes, args, parameters);
                 if (!_interrupt)
                 {
-                 //   Log.Add(sb.ToString());
+                    //   Log.Add(sb.ToString());
                     OpCounter++;
                 }
 
@@ -262,7 +262,7 @@ namespace AdventofCode.AoC_2019
 
             if (_paramAdresses.Contains(addr) && !_opModifierWarningWritten)
             {
-                Console.WriteLine("Warning, writing to a param-address: "+addr);
+                Console.WriteLine("Warning, writing to a param-address: " + addr);
                 _opModifierWarningWritten = true;
             }
             _memory[addr] = value;

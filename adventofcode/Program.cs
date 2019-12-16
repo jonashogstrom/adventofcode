@@ -59,6 +59,10 @@ namespace AdventofCode
                 new AoC_2019.Day8(), // Space image format, checksums and transparent pixels.
                 //new AoC_2019.Day9(), // IntCodeComputer with relative mode parameters and bignum support
                 //new AoC_2019.Day10(), // Asteroid fields, hidden asteroids and lasers (and some trigonometry)
+                // Day 11 Painting the registration code on the hull using IntCode brains
+                // Day 12 4 moon problems, Manhattan gravity and cycles detection
+                // Day 13 Break out on an int computer
+                // Day 14 ORE => Fuel, recepies and recursion
 
             };
 

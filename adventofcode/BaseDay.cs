@@ -151,13 +151,13 @@ namespace AdventofCode
             var (actual1, actual2) = actual;
             Log("Calculated Part1: " + actual1);
             if (exp1.HasValue)
-                Assert.That(actual1, Is.EqualTo(exp1));
+                Assert.That(actual1, Is.EqualTo(exp1), "Incorrect value for Part 1");
 
             if (actual2.HasValue)
             {
                 Log("Calculated Part2: " + actual2);
                 if (exp2.HasValue)
-                    Assert.That(actual2, Is.EqualTo(exp2.Value));
+                    Assert.That(actual2, Is.EqualTo(exp2.Value), "Incorrect value for Part 2");
             }
         }
     }
