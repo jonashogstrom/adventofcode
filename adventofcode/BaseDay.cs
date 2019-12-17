@@ -146,12 +146,15 @@ namespace AdventofCode
             where T : struct
     {
 
-        protected void DoAsserts((T part1, S? part2) actual, T? exp1, S? exp2)
+        protected void DoAsserts((T? part1, S? part2) actual, T? exp1, S? exp2)
         {
             var (actual1, actual2) = actual;
-            Log("Calculated Part1: " + actual1);
-            if (exp1.HasValue)
-                Assert.That(actual1, Is.EqualTo(exp1), "Incorrect value for Part 1");
+            if (actual1.HasValue)
+            {
+                Log("Calculated Part1: " + actual1);
+                if (exp1.HasValue)
+                    Assert.That(actual1, Is.EqualTo(exp1), "Incorrect value for Part 1");
+            }
 
             if (actual2.HasValue)
             {

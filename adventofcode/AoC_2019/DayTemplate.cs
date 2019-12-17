@@ -9,6 +9,8 @@ namespace AdventofCode.AoC_2019
     [TestFixture]
     class DayTemplate : TestBaseClass<Part1Type, Part2Type>
     {
+        public bool Debug { get; set; }
+
         [Test]
         [TestCase(-1, null, "DayX_test.txt")]
         [TestCase(-1, null, "DayX.txt")]
