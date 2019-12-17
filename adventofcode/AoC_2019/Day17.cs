@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Windows.Forms;
 using AdventofCode.AoC_2018;
@@ -85,17 +86,18 @@ namespace AdventofCode.AoC_2019
             }
             Log(sb.ToString());
 
+            var routines = SolvePartitioning(sb.ToString());
 
-            var main = "A,B,A,B,C,A,B,C,A,C";
-            var A = "R,6,L,10,R,8";
-            var B = "R,8,R,12,L,8,L,8";
-            var C = "L,10,R,6,R,6,L,8";
+//            var main = "A,B,A,B,C,A,B,C,A,C";
+//            var A = "R,6,L,10,R,8";
+//            var B = "R,8,R,12,L,8,L,8";
+//            var C = "L,10,R,6,R,6,L,8";
             var input = new List<long>();
-            input.AddRange(FormatInput(main));
-            input.AddRange(FormatInput(A));
-            input.AddRange(FormatInput(B));
-            input.AddRange(FormatInput(C));
-            input.AddRange(FormatInput("y"));
+            input.AddRange(FormatInput(routines.main));
+            input.AddRange(FormatInput(routines.sub[0]));
+            input.AddRange(FormatInput(routines.sub[1]));
+            input.AddRange(FormatInput(routines.sub[2]));
+            input.AddRange(FormatInput("n"));
             foreach (var i in input)
                 c2.AddInput(i);
             c2.Execute();
@@ -140,7 +142,9 @@ namespace AdventofCode.AoC_2019
 
         private static IEnumerable<Coord> FindIntersections(SparseBuffer<char> world)
         {
-            return world.Keys.Where(coord => world[coord] == '#' && coord.GenAdjacent4().All(adj => world[adj] == '#'));
+            return world.Keys.Where(coord =>
+                world[coord] == '#' &&
+                coord.GenAdjacent4().All(adj => world[adj] == '#'));
         }
 
         private (Coord pos, Coord dir) ParseOutputAsWorld(IntCodeComputer c, SparseBuffer<char> world)
@@ -174,6 +178,90 @@ namespace AdventofCode.AoC_2019
             }
 
             return (botPos, botDir);
+        }
+
+        [Test]
+        public void Partition()
+        {
+            var davids = "R8L4R4R10R8R8L4R4R10R8L12L12R8R8R10R4R4L12L12R8R8R10R4R4L12L12R8R8R10R4R4R10R4R4R8L4R4R10R8";
+            var jonas = "RfLjRhRhRlLhLhRfLjRhRhRlLhLhLjRfRfLhRfLjRhRhRlLhLhLjRfRfLhRfLjRhLjRfRfLh";
+
+            var program = davids;
+            SolvePartitioning(program);
+        }
+
+        private (string main, string[] sub) SolvePartitioning(string program)
+        {
+            // replace all numbers with a single character representation (lower case letters, a-z)
+            for (int i = 27; i > 0; i--)
+                program = program.Replace(i.ToString(), ((char) ((byte) 'a' + i)).ToString());
+            program = program.Replace(",", "");
+
+            var res = DoPartition(program, 3, 10, new string[0]);
+
+            var main = "";
+            foreach (var c in res.main)
+                main += c + ",";
+
+            main = main.Trim(',');
+            Log("Main: "+main);
+            var subs = new List<string>();
+            foreach (var s in res.sub)
+            {
+                var temp = s;
+                // restore the numbers for easier readability
+
+                for (int i = 27; i > 0; i--)
+                    temp = temp.Replace(((char) ((byte) 'a' + i)).ToString(), i.ToString());
+                temp = temp.Replace("L", ",L,");
+                temp = temp.Replace("R", ",R,");
+                temp = temp.Trim(',');
+                subs.Add(temp);
+                Log(temp);
+            }
+
+            return (main, subs.ToArray());
+        }
+
+        private (string main, string[] sub) DoPartition(string program, int available, int maxLength, string[] subroutines)
+        {
+            if (available == 0)
+            {
+                // check if the result is complete
+                foreach (var c in program)
+                    if (!IsSub(c))
+                        return (null, null);
+                return (program, subroutines);
+            }
+
+            var start = 0;
+            // find first substitutable part of program
+            while (IsSub(program[start])) start++;
+
+            var subName = ((char)(65 + subroutines.Length)).ToString();
+
+            for (int i = 0; i < maxLength; i++)
+            {
+                // stop if we hit an instruction that is already substituted
+                if (IsSub(program[start + i]))
+                    break;
+                var sub = program.Substring(start, i + 1);
+                var substProgam = program.Replace(sub, subName);
+                var newSubroutines = new List<string>(subroutines);
+                newSubroutines.Add(sub);
+                // recurse
+                var res = DoPartition(substProgam, available - 1, maxLength, newSubroutines.ToArray());
+                // check if we found it and terminate the loop
+                if (res.main != null)
+                    return res;
+            }
+            // no luck
+            return (null, null);
+        }
+
+        private bool IsSub(char c)
+        {
+            return c == 'A' || c == 'B' || c == 'C';
         }
     }
 }
