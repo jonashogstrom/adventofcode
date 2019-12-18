@@ -76,9 +76,9 @@ namespace AdventofCode.AoC_2019
             return (bestDist, 0);
         }
 
-        private int Recurse(Dictionary<char, Coord> coordDic, 
+        private int Recurse(Dictionary<char, Coord> coordDic,
             int sumDist, string path,
-            HashSet<char> reachableKeys, HashSet<char> unlockedDoors, 
+            HashSet<char> reachableKeys, HashSet<char> unlockedDoors,
             Dictionary<string, HashSet<char>> unlockings, HashSet<char> remainingKeys, Coord currentPos)
         {
             _recurseCounter++;
@@ -105,7 +105,7 @@ namespace AdventofCode.AoC_2019
                 {
 
                     _bestEver = sumDist;
-                    Log($"Best so far: {sumDist} Path: {path}: {(DateTime.Now-_ts).TotalSeconds} counter: {_recurseCounter}");
+                    Log($"Best so far: {sumDist} Path: {path}: {(DateTime.Now - _ts).TotalSeconds} counter: {_recurseCounter}");
                 }
                 return sumDist;
             }
@@ -142,19 +142,21 @@ namespace AdventofCode.AoC_2019
                 var newUnlockedDoors = new HashSet<char>(unlockedDoors);
 
                 var newUnlockings = new Dictionary<string, HashSet<char>>(unlockings);
+                newUnlockedDoors.Add(k);
                 if (coordDic.ContainsKey(door))
                 {
                     newUnlockedDoors.Add(door);
-                    var matching = 0;
-                    foreach (var x in unlockings.Keys)
+                }
+
+                var matching = 0;
+                foreach (var x in unlockings.Keys)
+                {
+                    if (x.All(ch => newUnlockedDoors.Contains(ch)))
                     {
-                        if (x.All(ch => newUnlockedDoors.Contains(ch)))
-                        {
-                            newUnlockings.Remove(x);
-                            foreach(var un in unlockings[x])
+                        foreach (var un in newUnlockings[x])
                             newReachableKeys.Add(un);
-                            matching++;
-                        }
+                        newUnlockings.Remove(x);
+                        matching++;
                     }
                 }
                 var newPath = path + k;
@@ -173,7 +175,7 @@ namespace AdventofCode.AoC_2019
 
         private string OrderDoors(string unlockedDoors, char door)
         {
-            return new string((unlockedDoors + door).ToCharArray().OrderBy(ch => ch).ToArray());
+            return new string((unlockedDoors + door).ToCharArray().OrderBy(ch => char.ToUpper(ch)).ToArray());
         }
 
         private void PrintMap(SparseBuffer<char> map)
@@ -295,7 +297,9 @@ namespace AdventofCode.AoC_2019
                         {
                             if (!res[x.doors].Contains(c))
                                 res[x.doors].Add(c);
-                            pending.Enqueue((neigbour, x.doors));
+                            var newDoors = OrderDoors(x.doors, c);
+                            res[newDoors] = new HashSet<char>();
+                            pending.Enqueue((neigbour, newDoors));
                         }
                         else if (c == '.')
                         {
