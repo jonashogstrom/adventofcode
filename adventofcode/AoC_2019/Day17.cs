@@ -88,10 +88,6 @@ namespace AdventofCode.AoC_2019
 
             var routines = SolvePartitioning(sb.ToString());
 
-//            var main = "A,B,A,B,C,A,B,C,A,C";
-//            var A = "R,6,L,10,R,8";
-//            var B = "R,8,R,12,L,8,L,8";
-//            var C = "L,10,R,6,R,6,L,8";
             var input = new List<long>();
             input.AddRange(FormatInput(routines.main));
             input.AddRange(FormatInput(routines.sub[0]));

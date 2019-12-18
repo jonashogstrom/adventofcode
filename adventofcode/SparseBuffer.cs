@@ -94,5 +94,13 @@ namespace AdventofCode
         {
             return this[Coord.FromXY(x, y)];
         }
+
+        public SparseBuffer<T> Clone()
+        {
+            var res = new SparseBuffer<T>(_def);
+            foreach (var x in _board.Keys)
+                res[x] = _board[x];
+            return res;
+        }
     }
 }
