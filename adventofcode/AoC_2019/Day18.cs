@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
@@ -18,7 +19,7 @@ namespace AdventofCode.AoC_2019
     class Day18 : TestBaseClass<Part1Type, Part2Type>
     {
         private int _bestEver;
-        private Dictionary<string, int> _bestStates;
+        private Dictionary<state, int> _bestStates;
         private Dictionary<Coord, Dictionary<Coord, int>> _allDistances;
 
         private DateTime _ts;
@@ -58,7 +59,7 @@ namespace AdventofCode.AoC_2019
             var unlockings = ExploreUnlocking(world.map, world.locationDictionary, world.botCoords);
             _bestEver = int.MaxValue;
             _recurseCounter = 0;
-            _bestStates = new Dictionary<string, int>();
+            _bestStates = new Dictionary<state, int>();
             var reachableKeys = unlockings[""];
             unlockings.Remove("");
 
@@ -107,9 +108,7 @@ namespace AdventofCode.AoC_2019
             }
 
 
-            var state = new string(remainingKeys.OrderBy(c => c).ToArray());
-            foreach(var p in bots)
-                state += ':' + p.X + ':' + p.Y;
+            var state = new state(remainingKeys, bots.ToArray());
             if (_bestStates.ContainsKey(state) && _bestStates[state] < sumDist)
             {
                 _stateabort += 1;
@@ -120,7 +119,7 @@ namespace AdventofCode.AoC_2019
             _bestStates[state] = sumDist;
             var bestDist = int.MaxValue;
 
-            foreach (var k in reachableKeys) //.OrderBy(key => _allDistances[pos][coordDic[key]]))
+            foreach (var k in reachableKeys)
             {
                 var botId = 0;
                 var dist = 0;
@@ -133,12 +132,11 @@ namespace AdventofCode.AoC_2019
                         dist = d;
                     }
                 }
-                var pos = bots[botId];
 
-//                if (path.Contains(k))
-//                {
-//                    Log("What da fuck");
-//                }
+                //                if (path.Contains(k))
+                //                {
+                //                    Log("What da fuck");
+                //                }
 
                 var newDist = sumDist + dist;
                 if (newDist >= _bestEver)
@@ -147,18 +145,18 @@ namespace AdventofCode.AoC_2019
                 var newReachableKeys = new HashSet<char>(reachableKeys);
                 newReachableKeys.Remove(k);
 
-                var newUnlockedDoors = new HashSet<char>(unlockedDoors);
+                //                var newUnlockedDoors = new HashSet<char>(unlockedDoors);
 
                 var newUnlockings = new Dictionary<string, HashSet<char>>(unlockings);
-                newUnlockedDoors.Add(k);
+                unlockedDoors.Add(k);
                 if (coordDic.ContainsKey(door))
                 {
-                    newUnlockedDoors.Add(door);
+                    unlockedDoors.Add(door);
                 }
 
                 foreach (var x in unlockings.Keys)
                 {
-                    if (x.All(ch => newUnlockedDoors.Contains(ch)))
+                    if (x.All(ch => unlockedDoors.Contains(ch)))
                     {
                         foreach (var un in newUnlockings[x])
                             newReachableKeys.Add(un);
@@ -166,11 +164,22 @@ namespace AdventofCode.AoC_2019
                     }
                 }
                 var newPath = path + k;
-                var newRemainingKeys = new HashSet<char>(remainingKeys);
-                newRemainingKeys.Remove(k);
+                //                var newRemainingKeys = new HashSet<char>(remainingKeys);
+                remainingKeys.Remove(k);
 
-                var newBots = new List<Coord>(bots) {[botId] = coordDic[k] };
-                var res = Recurse(coordDic, newDist, newPath, newReachableKeys, newUnlockedDoors, newUnlockings, newRemainingKeys, newBots);
+                //var newBots = new List<Coord>(bots) {[botId] = coordDic[k] };
+                var oldBotPos = bots[botId];
+                bots[botId] = coordDic[k];
+                var res = Recurse(coordDic, newDist, newPath, newReachableKeys, unlockedDoors, newUnlockings, remainingKeys, bots);
+                // restore the old data
+                bots[botId] = oldBotPos;
+                remainingKeys.Add(k);
+                unlockedDoors.Remove(k);
+                if (coordDic.ContainsKey(door))
+                {
+                    unlockedDoors.Remove(door);
+                }
+
                 if (res < bestDist)
                     bestDist = res;
             }
@@ -357,6 +366,44 @@ namespace AdventofCode.AoC_2019
                 }
 
             return res;
+        }
+
+        public struct state
+        {
+            private readonly int _hash;
+            private readonly char[] _keys;
+            private readonly Coord[] _coords;
+            public state(HashSet<char> remainingKeys, Coord[] botCoords)
+            {
+                _coords = new Coord[botCoords.Length];
+                _keys = remainingKeys.OrderBy(c => c).ToArray();
+                _hash = 0;
+                unchecked
+                {
+                    foreach (var k in _keys)
+                        _hash = _hash ^ k.GetHashCode() * 397;
+                    for (int i=0; i<botCoords.Length; i++)
+                    {
+                        _hash = _hash ^ botCoords[i].GetHashCode() * 397;
+                        _coords[i] = botCoords[i];
+                    }
+                }
+            }
+
+            public bool Equals(state other)
+            {
+                return _keys.SequenceEqual(other._keys) && _coords.SequenceEqual(_coords);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is state other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return _hash;
+            }
         }
 
         public struct World
