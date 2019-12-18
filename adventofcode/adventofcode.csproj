@@ -183,6 +183,7 @@
     <EmbeddedResource Include="AoC_2019\Day18_test2.txt" />
     <EmbeddedResource Include="AoC_2019\Day18_test5.txt" />
     <EmbeddedResource Include="AoC_2019\Day18_test4.txt" />
+    <EmbeddedResource Include="AoC_2019\Day18_2.txt" />
     <Content Include="AoC_2019\Day1_test.txt" />
     <Content Include="AoC_2019\Day2.txt" />
     <Content Include="AoC_2019\Day2_test.txt" />
