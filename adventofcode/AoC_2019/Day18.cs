@@ -70,6 +70,9 @@ namespace AdventofCode.AoC_2019
 
             var bestDist = Recurse(res.dic, 0, "", reachableKeys, new HashSet<char>(), unlockings, remainingKeys, currentPos);
             //            var start = res.dic['@'];
+
+            Log($"Time: {(DateTime.Now - _ts).TotalSeconds:F4} Counter: {_recurseCounter}");
+
             return (bestDist, 0);
         }
 
@@ -82,7 +85,7 @@ namespace AdventofCode.AoC_2019
             var time = (DateTime.Now - _lastPrint).TotalSeconds;
             if (time > 10)
             {
-                Log(path + " " + (DateTime.Now - _ts).TotalSeconds);
+                Log($"{path} Time: {(DateTime.Now - _ts).TotalSeconds:F4} Counter: {_recurseCounter}");
                 _lastPrint = DateTime.Now;
             }
             var remaining = new string(remainingKeys.OrderBy(c => c).ToArray());
@@ -301,6 +304,9 @@ namespace AdventofCode.AoC_2019
                     }
                 }
             }
+
+            foreach (var x in res.Keys.Where(k => res[k].Count == 0).ToArray())
+                res.Remove(x);
 
             var sb = new StringBuilder();
             foreach (var door in res.Keys)
