@@ -14,7 +14,6 @@ namespace AoCStats
                      
                 // Tobii
                 new LeaderboardParser().GenerateReport(371692, new[] { 2019, 2018 }, true, forceLoad);
-                new LeaderboardParser().GenerateReport(371692, new[] { 2019, 2018 }, false, false);
 
                 // jonnes lista
                 new LeaderboardParser().GenerateReport(139489, new[] { 2019, 2018 }, false, forceLoad);
@@ -27,6 +26,9 @@ namespace AoCStats
 
                 // jeppes lista
                 new LeaderboardParser().GenerateReport(34481, new[] { 2019, 2018, 2017, 2016, 2015 }, false, forceLoad);
+
+                // tobii with all participants
+                new LeaderboardParser().GenerateReport(371692, new[] { 2019, 2018 }, false, false);
 
                 forceLoad = false;
 

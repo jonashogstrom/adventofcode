@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace AdventofCode.AoC_2019
 {
-
-
     using Part1Type = Int32;
     using Part2Type = Int32;
 
@@ -25,9 +19,8 @@ namespace AdventofCode.AoC_2019
         private DateTime _ts;
         private DateTime _lastPrint;
         private int _recurseCounter;
-        private int _stateabort;
+        private int _stateAbortCounter;
 
-        //        private Dictionary<string, List<char>> _unlockings;
         public bool Debug { get; set; }
 
         [Test]
@@ -78,16 +71,21 @@ namespace AdventofCode.AoC_2019
             return (bestDist, 0);
         }
 
-        private int Recurse(Dictionary<char, Coord> coordDic,
-            int sumDist, string path,
-            HashSet<char> reachableKeys, HashSet<char> unlockedDoors,
-            Dictionary<string, HashSet<char>> unlockings, HashSet<char> remainingKeys, List<Coord> bots)
+        private int Recurse(
+            Dictionary<char, Coord> coordDic,
+            int sumDist, 
+            string path,
+            HashSet<char> reachableKeys, 
+            HashSet<char> unlockedDoors,
+            Dictionary<string, HashSet<char>> unlockings, 
+            HashSet<char> remainingKeys, 
+            List<Coord> bots)
         {
             _recurseCounter++;
             var time = (DateTime.Now - _lastPrint).TotalSeconds;
             if (time > 10)
             {
-                Log($"{path} Time: {(DateTime.Now - _ts).TotalSeconds:F4} Counter: {_recurseCounter}, aborts: {_stateabort}");
+                Log($"{path} Time: {(DateTime.Now - _ts).TotalSeconds:F4} Counter: {_recurseCounter}, aborts: {_stateAbortCounter}");
                 _lastPrint = DateTime.Now;
             }
 
@@ -111,10 +109,9 @@ namespace AdventofCode.AoC_2019
             var state = new state(remainingKeys, bots.ToArray());
             if (_bestStates.ContainsKey(state) && _bestStates[state] < sumDist)
             {
-                _stateabort += 1;
+                _stateAbortCounter += 1;
                 return int.MaxValue;
             }
-
 
             _bestStates[state] = sumDist;
             var bestDist = int.MaxValue;
@@ -145,8 +142,6 @@ namespace AdventofCode.AoC_2019
                 var newReachableKeys = new HashSet<char>(reachableKeys);
                 newReachableKeys.Remove(k);
 
-                //                var newUnlockedDoors = new HashSet<char>(unlockedDoors);
-
                 var newUnlockings = new Dictionary<string, HashSet<char>>(unlockings);
                 unlockedDoors.Add(k);
                 if (coordDic.ContainsKey(door))
@@ -164,10 +159,8 @@ namespace AdventofCode.AoC_2019
                     }
                 }
                 var newPath = path + k;
-                //                var newRemainingKeys = new HashSet<char>(remainingKeys);
                 remainingKeys.Remove(k);
 
-                //var newBots = new List<Coord>(bots) {[botId] = coordDic[k] };
                 var oldBotPos = bots[botId];
                 bots[botId] = coordDic[k];
                 var res = Recurse(coordDic, newDist, newPath, newReachableKeys, unlockedDoors, newUnlockings, remainingKeys, bots);
@@ -232,53 +225,6 @@ namespace AdventofCode.AoC_2019
             return res;
         }
 
-        private Dictionary<char, int> ExploreMap(SparseBuffer<char> map, Dictionary<char, Coord> dic)
-        {
-            var reachablekeys = new Dictionary<char, int>();
-            var start = dic['@'];
-            var distances = new Dictionary<Coord, int>();
-            distances[start] = 0;
-
-            var pending = new Queue<Coord>();
-            pending.Enqueue(start);
-            while (pending.Any())
-            {
-                var coord = pending.Dequeue();
-                var newDist = distances[coord] + 1;
-                foreach (var neigbour in coord.GenAdjacent4())
-                {
-                    var c = map[neigbour];
-                    if (distances.ContainsKey(neigbour) && newDist < distances[neigbour])
-                        distances[neigbour] = newDist; // return to 
-                    else if (c == '#')
-                        ; // wall
-                    else if (c >= 'A' && c <= 'Z')
-                        ; // locked door
-                    else if (c == '.')
-                    {
-                        if (!distances.ContainsKey(neigbour))
-                        {
-                            distances[neigbour] = newDist;
-                            pending.Enqueue(neigbour);
-                        }
-                    }
-                    else if (c >= 'a' && c <= 'z')
-                    {
-                        if (!distances.ContainsKey(neigbour))
-                        {
-                            reachablekeys[map[neigbour]] = newDist;
-                            distances[neigbour] = newDist;
-                            pending.Enqueue(neigbour);
-                        }
-                    }
-                }
-            }
-            if (Debug)
-                foreach (var k in reachablekeys.Keys)
-                    Log($"Reachable: {k}={reachablekeys[k]}");
-            return reachablekeys;
-        }
-
         private Dictionary<string, HashSet<char>> ExploreUnlocking(SparseBuffer<char> map, Dictionary<char, Coord> dic, List<Coord> coords)
         {
             var res = new Dictionary<string, HashSet<char>>();
@@ -294,14 +240,13 @@ namespace AdventofCode.AoC_2019
                     explored.Add(x.c);
                     foreach (var neigbour in x.c.GenAdjacent4())
                     {
-
-                        if (explored.Contains(neigbour))
-                            ;
-                        else
+                        if (!explored.Contains(neigbour))
                         {
                             var c = map[neigbour];
                             if (c == '#')
-                                ; // wall
+                            {
+                                // wall
+                            }
                             else if (c >= 'A' && c <= 'Z')
                             {
                                 var newDoors = OrderDoors(x.doors, c);
@@ -382,7 +327,7 @@ namespace AdventofCode.AoC_2019
                 {
                     foreach (var k in _keys)
                         _hash = _hash ^ k.GetHashCode() * 397;
-                    for (int i=0; i<botCoords.Length; i++)
+                    for (int i = 0; i < botCoords.Length; i++)
                     {
                         _hash = _hash ^ botCoords[i].GetHashCode() * 397;
                         _coords[i] = botCoords[i];
@@ -411,7 +356,6 @@ namespace AdventofCode.AoC_2019
             public SparseBuffer<char> map;
             public Dictionary<char, Coord> locationDictionary;
             public List<Coord> botCoords;
-
         }
     }
 }

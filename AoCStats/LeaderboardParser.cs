@@ -861,13 +861,13 @@ namespace AoCStats
 
         public void GenerateReport(int leaderboardid, int[] years, bool handleExcludes, bool forceLoad)
         {
-
             foreach (var year in years)
             {
                 _excludeZero = true;
                 GenerateReport(leaderboardid, year, years, handleExcludes, forceLoad);
                 _excludeZero = false;
-                GenerateReport(leaderboardid, year, years, handleExcludes, forceLoad);
+                GenerateReport(leaderboardid, year, years, handleExcludes, false);
+                forceLoad = false;
             }
 
         }

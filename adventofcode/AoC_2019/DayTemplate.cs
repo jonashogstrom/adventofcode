@@ -23,7 +23,10 @@ namespace AdventofCode.AoC_2019
 
         private (Part1Type Part1, Part2Type Part2) Compute(string[] source)
         {
-            return (0, 0);
+            var comp = new IntCodeComputer(source[0]);
+            comp.Execute();
+            var part1 = (int)comp.LastOutput;
+            return (part1, 0);
         }
     }
 }

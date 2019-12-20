@@ -37,12 +37,17 @@ namespace AdventofCode.AoC_2019
         private string _name;
         private bool _paramModifierWarningWritten;
         private bool _opModifierWarningWritten;
+        private readonly Dictionary<int, DataType?> _restoreMem = new Dictionary<int, long?>();
 
-        public IntCodeComputer(string program) : this(new List<long>(), program)
+        public IntCodeComputer(long[] program) : this(new List<long>(), program)
         {
         }
 
-        public IntCodeComputer(List<DataType> input, string program, int noun = -1, int verb = -1)
+        public IntCodeComputer(string program) : this(ParseProgram(program))
+        {
+        }
+
+        public IntCodeComputer(List<DataType> input, long[] program, int noun = -1, int verb = -1)
         {
             _input = input;
             RegisterOp(new GenericIntFunc("ADD", 1, (i, j) => i + j));
@@ -55,10 +60,10 @@ namespace AdventofCode.AoC_2019
             RegisterOp(new ReadInput());
             RegisterOp(new WriteOutput());
             RegisterOp(new AdjustRelBase());
-            var prog = program.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
-            for (int i = 0; i < prog.Length; i++)
-                _memory[i] = prog[i];
-            endOfMemory = prog.Length - 1;
+
+            for (int i = 0; i < program.Length; i++)
+                _memory[i] = program[i];
+            endOfMemory = program.Length - 1;
             Pointer = 0;
             if (noun != -1)
                 _memory[1] = noun;
@@ -67,6 +72,16 @@ namespace AdventofCode.AoC_2019
             Terminated = false;
             Name = "IntCodeComputer";
             Log.Add("============= Starting IntCodeComputer ==============");
+
+        }
+        public IntCodeComputer(List<DataType> input, string program, int noun = -1, int verb = -1) : this(input, ParseProgram(program), noun, verb)
+        {
+
+        }
+
+        public static long[] ParseProgram(string program)
+        {
+            return program.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
         }
 
         private void RegisterOp(IOperation op)
@@ -265,11 +280,50 @@ namespace AdventofCode.AoC_2019
                 Console.WriteLine("Warning, writing to a param-address: " + addr);
                 _opModifierWarningWritten = true;
             }
+
+            if (SupportRestore && !_restoreMem.ContainsKey(addr))
+            {
+                if (_memory.ContainsKey(addr))
+                    _restoreMem[addr] = _memory[addr];
+                else
+                {
+                    _restoreMem[addr] = null;
+                }
+            }
+
             _memory[addr] = value;
             if (Debug)
                 Log.Add($"Write {value} to addr {addr}");
             endOfMemory = Math.Max(endOfMemory, addr);
             MemWriteCounter++;
+        }
+
+        public bool SupportRestore { get; set; }
+
+        public void Reset()
+        {
+            Pointer = 0;
+            foreach (var k in _restoreMem.Keys)
+            {
+                if (_restoreMem[k].HasValue)
+                    _memory[k] = _restoreMem[k].Value;
+                else
+                {
+                    _memory.Remove(k);
+                }
+            }
+
+            this.Log.Clear();
+            this.OpCounter = 0;
+            this.RelativeBase = 0;
+            this._input.Clear();
+            this.OutputQ.Clear();
+            this.Output.Clear();
+            this.MemWriteCounter = 0;
+            this._dataAdresses.Clear();
+            this._opAdresses.Clear();
+            Terminated = false;
+            _interrupt = false;
         }
     }
 

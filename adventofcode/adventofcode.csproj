@@ -60,7 +60,9 @@
     <Compile Include="AoC_2019\Day16.cs" />
     <Compile Include="AoC_2019\Day17.cs" />
     <Compile Include="AoC_2019\Day18.cs" />
+    <Compile Include="AoC_2019\Day19.cs" />
     <Compile Include="AoC_2019\Day2.cs" />
+    <Compile Include="AoC_2019\Day20.cs" />
     <Compile Include="AoC_2019\Day3.cs" />
     <Compile Include="AoC_2019\Day4.cs" />
     <Compile Include="AoC_2019\Day5.cs" />
@@ -184,8 +186,13 @@
     <EmbeddedResource Include="AoC_2019\Day18_test5.txt" />
     <EmbeddedResource Include="AoC_2019\Day18_test4.txt" />
     <EmbeddedResource Include="AoC_2019\Day18_2.txt" />
+    <EmbeddedResource Include="AoC_2019\Day19.txt" />
+    <EmbeddedResource Include="AoC_2019\Day20_test.txt" />
     <Content Include="AoC_2019\Day1_test.txt" />
     <Content Include="AoC_2019\Day2.txt" />
+    <EmbeddedResource Include="AoC_2019\Day20.txt" />
+    <EmbeddedResource Include="AoC_2019\Day20_testlarge.txt" />
+    <EmbeddedResource Include="AoC_2019\Day20_testpart2.txt" />
     <Content Include="AoC_2019\Day2_test.txt" />
     <Content Include="AoC_2019\Day3.txt" />
     <Content Include="AoC_2019\Day3_test.txt" />

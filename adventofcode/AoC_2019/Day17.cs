@@ -181,9 +181,9 @@ namespace AdventofCode.AoC_2019
         {
             var davids = "R8L4R4R10R8R8L4R4R10R8L12L12R8R8R10R4R4L12L12R8R8R10R4R4L12L12R8R8R10R4R4R10R4R4R8L4R4R10R8";
             var jonas = "RfLjRhRhRlLhLhRfLjRhRhRlLhLhLjRfRfLhRfLjRhRhRlLhLhLjRfRfLhRfLjRhLjRfRfLh";
-
-            var program = davids;
-            SolvePartitioning(program);
+            
+            SolvePartitioning(jonas);
+            SolvePartitioning(davids);
         }
 
         private (string main, string[] sub) SolvePartitioning(string program)
