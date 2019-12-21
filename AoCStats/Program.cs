@@ -32,10 +32,13 @@ namespace AoCStats
 
                 forceLoad = false;
 
-                Console.Write("Waiting... Press Space to forceLoad, any other key to quit");
+                Console.WriteLine("Waiting... Press Space to forceLoad, any other key to quit");
                 var ts = DateTime.Now;
+                int i = 0;
                 while ((DateTime.Now-ts).TotalSeconds < 60)
                 {
+                    if (i++%20==0)
+                        Console.Write('.');
                     Thread.Sleep(TimeSpan.FromSeconds(0.1));
                     if (Console.KeyAvailable)
                     {

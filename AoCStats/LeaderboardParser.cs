@@ -519,15 +519,22 @@ namespace AoCStats
             var age = DateTime.Now - timestamp;
             if (age > interval || forceLoad)
             {
-                Log($"Downloading new data for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId})");
+                Log($"Downloading new data for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId}), ForceLoad: {forceLoad}, ExclZero: {_excludeZero}, ExcludeUsers: {_handleExcludes}");
                 // Create Target
                 var url = $"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}.json";
-                var s = DownloadFromURL(url);
-                if (File.Exists(_jsonFileName) && File.ReadAllText(_jsonFileName) == s)
-                    return false;
-                if (!string.IsNullOrEmpty(s))
-                    File.WriteAllText(_jsonFileName, s);
-                return true;
+                try
+                {
+                    var s = DownloadFromURL(url);
+                    if (File.Exists(_jsonFileName) && File.ReadAllText(_jsonFileName) == s)
+                        return false;
+                    if (!string.IsNullOrEmpty(s))
+                        File.WriteAllText(_jsonFileName, s);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Log("Failed to download:"+e.Message);
+                }
             }
 
             return false;
