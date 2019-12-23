@@ -1,0 +1,12 @@
+NOT A T
+NOT B J
+OR T J
+NOT C T 
+OR T J
+AND D J // J says if it is safe to jump once
+NOT J T // if it is safe to jump, T should be false
+OR E T
+OR H T
+AND T J 
+
+RUN

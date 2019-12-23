@@ -18,12 +18,12 @@ namespace AdventofCode.AoC_2019
         public bool Debug { get; set; }
 
         // 515, too low 516
-        // 6500 too high
+        // 6500 too high, 5906 wrong
 
         [Test]
-        [TestCase(23, null, "Day20_test.txt")]
+        [TestCase(23, 26, "Day20_test.txt")]
         [TestCase(58, null, "Day20_testlarge.txt")]
-        [TestCase(null, 396, "Day20_testpart2.txt")]
+        [TestCase(77, 396, "Day20_testpart2.txt")]
         [TestCase(516, -1, "Day20.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
@@ -37,23 +37,24 @@ namespace AdventofCode.AoC_2019
             var world = ParseMap(source);
             var start = world.portalNames["AA"];
             var goal = world.portalNames["ZZ"];
-            var part1 = SearchPath(world, start, goal);
-            var part1data = SearchPath2(world, start, 0, new HashSet<Coord>(), goal, 0, "", false);
-            var part1b = part1data.Where(t => t.Item1.Equals(goal))
-                .OrderBy(t => t.Item2).First();
+            Log("=== solving part 1 ===");
+             var part1data = SearchPath2(world, start, 0, new HashSet<Coord>(), goal, 0, "", false);
+             var part1 = part1data.Where(t => t.Item1.Equals(goal))
+                 .OrderBy(t => t.Item2).First();
+             Log($"=== Solution part 1: {part1.Item2}, {part1.Item3}===");
 
-            Assert.That(part1, Is.EqualTo(part1b.Item2));
             if (doPart2)
             {
+                Log("=== solving part 2 ===");
                 _ts = DateTime.Now;
                 var part2data = SearchPath2(world, start, 0, new HashSet<Coord>(), goal, 0, "", true);
                 var part2 = part2data.Where(t => t.Item1.Equals(goal))
                     .OrderBy(t => t.Item2).First();
-                Log("Path: " + part2.Item3);
-                return (part1, part2.Item2);
+                Log($"=== Solution part 2: {part2.Item2}, {part2.Item3}===");
+                return (part1.Item2, part2.Item2);
             }
 
-            return (part1, null);
+            return (part1.Item2, null);
 
         }
 
@@ -85,13 +86,18 @@ namespace AdventofCode.AoC_2019
             return distances[goal];
         }
 
-        private List<Tuple<Coord, int, string>> SearchPath2(World19 world, Coord start, int level, HashSet<Coord> portalsUsed, Coord goal, int initialDist, string path, bool recurse)
+        private List<Tuple<Coord, int, string>> SearchPath2(World19 world,
+            Coord start, int level, HashSet<Coord> portalsUsed, Coord goal, int initialDist, string path, bool recurse)
         {
             if ((DateTime.Now - _ts).TotalSeconds > 10)
             {
                 _ts = DateTime.Now;
                 Log(path);
             }
+
+            if (level > 25 || initialDist > 6500)
+                return new List<Tuple<Coord, int, string>>();
+
             var distances = new Dictionary<Coord, int>();
             var queue = new Queue<Tuple<Coord, string>>();
             distances[start] = initialDist;
@@ -110,6 +116,7 @@ namespace AdventofCode.AoC_2019
                     var newDist = distances[pxxx] + nextPortal.Item2;
                     if (nextPortal.Item1.Equals(goal))
                     {
+                        Log($"Found solution: {newDist}, path: {tuple.Item2}");
                         exits.Add(new Tuple<Coord, int, string>(nextPortal.Item1, newDist, tuple.Item2));
                     }
 
@@ -124,10 +131,11 @@ namespace AdventofCode.AoC_2019
                         }
                         else
                         {
-                            var enterPath = tuple.Item2 + portalName + "v ";
-                            Log($"Enter level {level + 1} at coord {nextPortal.Item1}=>{portalDestination} via {portalName}, currentDist {newDist} path: {enterPath}");
+                            var enterPath = $"{tuple.Item2}(L{level}, D{newDist}){portalName}v ";
+                            if (Debug)
+                                Log($"Enter level {level + 1} at coord {nextPortal.Item1}=>{portalDestination} via {portalName}, currentDist {newDist + 1} path: {enterPath}");
                             var newPortalsUsed = new HashSet<Coord>(portalsUsed);
-                            newPortalsUsed.Add(nextPortal.Item1);
+                                newPortalsUsed.Add(nextPortal.Item1);
 
                             List<Tuple<Coord, int, string>> res;
                             if (recurse)
@@ -139,7 +147,7 @@ namespace AdventofCode.AoC_2019
                             else
                             {
                                 res = new List<Tuple<Coord, int, string>>();
-                                res.Add(new Tuple<Coord, int, string>(portalDestination, newDist,
+                                res.Add(new Tuple<Coord, int, string>(portalDestination, newDist + 1,
                                     enterPath));
                             }
 
@@ -147,10 +155,10 @@ namespace AdventofCode.AoC_2019
                             {
                                 if (!distances.ContainsKey(t.Item1) || distances[t.Item1] > t.Item2)
                                 {
-                                    var returnPath = t.Item3 + world.portalNames2[t.Item1] + "^ ";
-                                    Log(
-                                        $"Return to level {level} at coord {t.Item1} via {world.portalNames2[t.Item1]} currentDist: {t.Item2} path: {returnPath}");
-                                    distances[t.Item1] = t.Item2+1;
+                                    var returnPath = $"{t.Item3}(L{level} D{t.Item2}){world.portalNames2[t.Item1]}^ ";
+                                    if (Debug)
+                                        Log($"Return to level {level} at coord {t.Item1} via {world.portalNames2[t.Item1]} currentDist: {t.Item2} path: {returnPath}");
+                                    distances[t.Item1] = t.Item2;
                                     queue.Enqueue(new Tuple<Coord, string>(t.Item1, returnPath));
                                 }
                             }
@@ -158,15 +166,6 @@ namespace AdventofCode.AoC_2019
 
                     }
                 }
-
-                // foreach (var n in neighbours)
-                // {
-                //     if (!distances.ContainsKey(n) || distances[n] > newDist)
-                //     {
-                //         queue.Enqueue(new Tuple<Coord, string>(n, tuple.Item2));
-                //         distances[n] = newDist;
-                //     }
-                // }
             }
 
             return exits;

@@ -398,6 +398,38 @@ namespace AoCStats
 
             tabs["09-Time *2"] = logTimeStar2;
 
+            var tobiiScore = InitLog("TobiiScore", leaderboard.HighestDay, true);
+
+            var tobiiPos = 0;
+            foreach (var p in leaderboard.Players.OrderByDescending(p => p.Stars).ThenBy(p => p.AccumulatedTobiiScoreTotal))
+            {
+                tobiiPos++;
+                if (!_excludeZero || p.TotalScore > 0)
+                {
+                    tobiiScore.Append(AddStartOfRowAndNameCell(p, tobiiPos));
+
+                    for (int day = 0; day < leaderboard.HighestDay; day++)
+                        for (int star = 0; star < 2; star++)
+                        {
+                            var medal = GetMedalClass(p.PositionForStar[day][star]);
+                            if (p.PositionForStar[day][star] != -1)
+                            {
+                                tobiiScore.Append(Cell(p.AccumulatedTobiiScore[day][star], medal));
+                            }
+                            else
+                            {
+                                tobiiScore.Append(EmptyCell());
+                            }
+                        }
+
+                    tobiiScore.AppendLine(EndOfRow(p));
+                }
+            }
+
+            ExitLog(tobiiScore);
+
+            tabs["99-TobiiScore"] = tobiiScore;
+
 
             //==
 
@@ -414,12 +446,12 @@ namespace AoCStats
             var first = true;
             htmlContent.Append("<div>Leaderboard for " + listName);
             if (_excludeZero)
-                htmlContent.Append(", inactive players removed (<a href=\""+_htmlFileName.Replace(".html", "_0.html")+"\">add them</a>)");
+                htmlContent.Append(", inactive players removed (<a href=\"" + _htmlFileName.Replace(".html", "_0.html") + "\">add them</a>)");
             else
                 htmlContent.Append($", <a href=\"https://adventofcode.com/{_year}/leaderboard/private/view/{_leaderBoardId}\">AoC-style</a> (<a href=\"{_htmlFileName.Replace("_0.html", ".html")}\">remove inactive players</a>)");
             htmlContent.Append("</div>");
 
-            foreach (var k in tabs.Keys.OrderBy(x=>x))
+            foreach (var k in tabs.Keys.OrderBy(x => x))
             {
                 var tabName = k.Split(new[] { '-' }, 2).Last();
                 var red = first ? " w3-red" : "";
@@ -481,16 +513,17 @@ namespace AoCStats
             return Cell(player.Name) + "</tr>";
         }
 
-        private string AddStartOfRowAndNameCell(Player p)
+        private string AddStartOfRowAndNameCell(Player p, int positionOverride = -1)
         {
             var parts = p.Props.Split(new[] { ',' });
             var res = "<tr class=\"item\">";
-            res += Cell(p.CurrentPosition + ". " + p.Name);
+            res += Cell((positionOverride != -1 ? positionOverride : p.CurrentPosition) + ". " + p.Name);
             for (int i = 0; i < _metacolumns.Count; i++)
                 res += Cell(parts.Length > i ? parts[i].Trim() : "");
             res += CellWithAlt(p.LocalScore, p.PendingPoints == 0 ? "" : ("Max: " + (p.LocalScore + p.PendingPoints)));
             res += Cell(p.GlobalScore);
             res += Cell(p.Stars);
+            res += Cell(p.AccumulatedTobiiScoreTotal);
             return res;
         }
 
@@ -533,7 +566,7 @@ namespace AoCStats
                 }
                 catch (Exception e)
                 {
-                    Log("Failed to download:"+e.Message);
+                    Log("Failed to download:" + e.Message);
                 }
             }
 
@@ -656,11 +689,14 @@ namespace AoCStats
                                 player.TotalScore += playerCount - player.PositionForStar[day][star];
                             player.OffsetFromWinner[day][star] = player.TimeToComplete[day][star] - bestTime[day][star];
                             lastStar[player] = player.unixCompletionTime[day][star];
+                            player.AccumulatedTobiiScoreTotal += player.PositionForStar[day][star];
                         }
 
                         player.AccumulatedScore[day][star] = player.TotalScore;
                         if (player.TotalScore > leaderboard.TopScorePerDay[day][star])
                             leaderboard.TopScorePerDay[day][star] = player.TotalScore;
+
+                        player.AccumulatedTobiiScore[day][star] = player.AccumulatedTobiiScoreTotal;
 
                         player.LocalScore = player.TotalScore;
 
@@ -800,10 +836,13 @@ namespace AoCStats
         private string _x_suffix;
         private bool _excludeZero;
 
-        private string TableHeader(int colPos, int tableid, string header)
+        private string TableHeader(int colPos, int tableid, string header, string alt = "")
         {
+            var content = header;
+            if (alt != "")
+                content = $"<span title=\"{alt}\">{content}</span>";
             return
-                $"<th onclick=\"sortTable({colPos}, 'table_{tableid}')\" align='left' class='sortable'>{header}</th>";
+                $"<th onclick=\"sortTable({colPos}, 'table_{tableid}')\" align='left' class='sortable'>{content}</th>";
         }
 
         private StringBuilder InitLog(string name, int highestDay, bool colForStar = true)
@@ -819,6 +858,7 @@ namespace AoCStats
             log.AppendLine(TableHeader(colPos++, tableid, "L"));
             log.AppendLine(TableHeader(colPos++, tableid, "G"));
             log.AppendLine(TableHeader(colPos++, tableid, "S"));
+            log.AppendLine(TableHeader(colPos++, tableid, "T", "Tobii Score, lower is better"));
             for (int day = 0; day < highestDay; day++)
                 for (int star = 0; star < starCols; star++)
                 {

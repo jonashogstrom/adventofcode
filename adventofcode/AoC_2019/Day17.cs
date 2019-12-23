@@ -89,11 +89,13 @@ namespace AdventofCode.AoC_2019
             var routines = SolvePartitioning(sb.ToString());
 
             var input = new List<long>();
+
             input.AddRange(FormatInput(routines.main));
             input.AddRange(FormatInput(routines.sub[0]));
             input.AddRange(FormatInput(routines.sub[1]));
             input.AddRange(FormatInput(routines.sub[2]));
             input.AddRange(FormatInput("n"));
+
             foreach (var i in input)
                 c2.AddInput(i);
             c2.Execute();

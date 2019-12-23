@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Remoting;
-using System.Security.Policy;
 using System.Text;
 
 using DataType = System.Int64;
@@ -13,9 +10,11 @@ namespace AdventofCode.AoC_2019
 
     public class IntCodeComputer
     {
-        private readonly List<DataType> _input;
-        private readonly Dictionary<int, DataType> _memory = new Dictionary<int, DataType>();
+        private string _name;
         private int endOfMemory;
+
+        private readonly Queue<DataType> _input;
+        private readonly Dictionary<int, DataType> _memory = new Dictionary<int, DataType>();
         public int Pointer;
         public int RelativeBase;
         public int OpCounter;
@@ -33,8 +32,8 @@ namespace AdventofCode.AoC_2019
         private IntCodeComputer _outputTarget;
         public List<DataType> Output => _output;
         public Queue<DataType> OutputQ => _outputQ;
+        public Queue<DataType> InputQ => _input;
         public List<string> Log = new List<string>();
-        private string _name;
         private bool _paramModifierWarningWritten;
         private bool _opModifierWarningWritten;
         private readonly Dictionary<int, DataType?> _restoreMem = new Dictionary<int, long?>();
@@ -49,7 +48,7 @@ namespace AdventofCode.AoC_2019
 
         public IntCodeComputer(List<DataType> input, long[] program, int noun = -1, int verb = -1)
         {
-            _input = input;
+            _input = new Queue<long>(input);
             RegisterOp(new GenericIntFunc("ADD", 1, (i, j) => i + j));
             RegisterOp(new GenericIntFunc("MUL", 2, (i, j) => i * j));
             RegisterOp(new GenericIntFunc("LT", 7, (i, j) => i < j ? 1 : 0));
@@ -96,7 +95,7 @@ namespace AdventofCode.AoC_2019
 
         public void AddInput(DataType value)
         {
-            _input.Add(value);
+            _input.Enqueue(value);
         }
 
         public void Execute()
@@ -214,8 +213,7 @@ namespace AdventofCode.AoC_2019
         {
             if (_input.Any())
             {
-                var res = _input.First();
-                _input.RemoveAt(0);
+                var res = _input.Dequeue();
                 return res;
             }
 
@@ -299,6 +297,7 @@ namespace AdventofCode.AoC_2019
         }
 
         public bool SupportRestore { get; set; }
+        public bool HasInput => _input.Any();
 
         public void Reset()
         {

@@ -17,6 +17,7 @@ namespace AoCStats
             OffsetFromWinner = new TimeSpan?[dayCount][];
             TimeToCompleteStar2 = new TimeSpan?[dayCount];
             PositionForStar = new int[dayCount][];
+            AccumulatedTobiiScore = new int[dayCount][];
             AccumulatedScore = new int[dayCount][];
             AccumulatedPosition = new int[dayCount][];
             GlobalScoreForDay = new int?[dayCount][];
@@ -25,6 +26,7 @@ namespace AoCStats
                 unixCompletionTime[i] = new long[] { -1, -1 };
                 PositionForStar[i] = new[] { -1, -1 };
                 AccumulatedScore[i] = new[] { -1, -1 };
+                AccumulatedTobiiScore[i] = new[] { -1, -1 };
                 AccumulatedPosition[i] = new[] { -1, -1 };
                 GlobalScoreForDay[i] = new int?[] { null, null };
                 TimeToComplete[i] = new TimeSpan?[2];
@@ -38,6 +40,7 @@ namespace AoCStats
 
         public int TotalScore { get; set; }
         public int[][] PositionForStar { get; set; }
+        public int[][] AccumulatedTobiiScore { get; set; }
         public int[][] AccumulatedScore { get; set; }
         public int[][] AccumulatedPosition { get; set; }
 
@@ -55,6 +58,7 @@ namespace AoCStats
         public string Props { get; set; }
         public int CurrentPosition { get; set; }
         public int PendingPoints { get; set; }
+        public int AccumulatedTobiiScoreTotal { get; set; }
     }
 
     public class LeaderBoard
