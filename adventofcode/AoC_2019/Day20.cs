@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2019
@@ -24,7 +21,7 @@ namespace AdventofCode.AoC_2019
         [TestCase(23, 26, "Day20_test.txt")]
         [TestCase(58, null, "Day20_testlarge.txt")]
         [TestCase(77, 396, "Day20_testpart2.txt")]
-        [TestCase(516, -1, "Day20.txt")]
+        [TestCase(516, 5966, "Day20.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
@@ -38,23 +35,36 @@ namespace AdventofCode.AoC_2019
             var start = world.portalNames["AA"];
             var goal = world.portalNames["ZZ"];
             Log("=== solving part 1 ===");
-             var part1data = SearchPath2(world, start, 0, new HashSet<Coord>(), goal, 0, "", false);
-             var part1 = part1data.Where(t => t.Item1.Equals(goal))
-                 .OrderBy(t => t.Item2).First();
-             Log($"=== Solution part 1: {part1.Item2}, {part1.Item3}===");
+            _bestSolution = int.MaxValue;
+            _bestPath = "";
+
+            SearchPath3(world, start, 0, new HashSet<Coord>(), goal, 0, "", false, 0);
+            var part1 = _bestSolution;
+            Log($"=== Solution part 1: {_bestSolution}, {_bestPath} ===");
 
             if (doPart2)
             {
                 Log("=== solving part 2 ===");
                 _ts = DateTime.Now;
-                var part2data = SearchPath2(world, start, 0, new HashSet<Coord>(), goal, 0, "", true);
-                var part2 = part2data.Where(t => t.Item1.Equals(goal))
-                    .OrderBy(t => t.Item2).First();
-                Log($"=== Solution part 2: {part2.Item2}, {part2.Item3}===");
-                return (part1.Item2, part2.Item2);
+                var limit = 64;
+                while (true)
+                {
+                    _bestSolution = limit;
+                    _bestPath = "";
+
+                    SearchPath3(world, start, 0, new HashSet<Coord>(), goal, 0, "", true, 0);
+                    if (_bestSolution < limit)
+                    {
+                        Log($"=== Solution part 2: {_bestSolution}, {_bestPath} ===");
+                        return (part1, _bestSolution);
+                    }
+
+                    limit = limit * 2;
+                }
+
             }
 
-            return (part1.Item2, null);
+            return (part1, null);
 
         }
 
@@ -135,7 +145,7 @@ namespace AdventofCode.AoC_2019
                             if (Debug)
                                 Log($"Enter level {level + 1} at coord {nextPortal.Item1}=>{portalDestination} via {portalName}, currentDist {newDist + 1} path: {enterPath}");
                             var newPortalsUsed = new HashSet<Coord>(portalsUsed);
-                                newPortalsUsed.Add(nextPortal.Item1);
+                            newPortalsUsed.Add(nextPortal.Item1);
 
                             List<Tuple<Coord, int, string>> res;
                             if (recurse)
@@ -170,6 +180,48 @@ namespace AdventofCode.AoC_2019
 
             return exits;
         }
+
+
+        private int _bestSolution = int.MaxValue;
+        private string _bestPath = "";
+
+        private void SearchPath3(World19 world,
+            Coord start, int level, HashSet<Coord> portalsUsed,
+            Coord goal, int initialDist, string path, bool recurse, int depth)
+        {
+            if ((DateTime.Now - _ts).TotalSeconds > 10)
+            {
+                _ts = DateTime.Now;
+                Log(path);
+            }
+
+            if (level < 0  || initialDist > _bestSolution) 
+                return;
+            var reachable = world.reachable[start];
+
+            foreach (var nextPortal in reachable)
+            {
+                var newDist = initialDist + nextPortal.Item2;
+                if (level == 0 && nextPortal.Item1.Equals(goal))
+                {
+                    if (initialDist + nextPortal.Item2 < _bestSolution)
+                    {
+                        Log($"Found new solution: Dist: {newDist}, Depth: {depth} path: {path}");
+                        _bestSolution = initialDist + nextPortal.Item2;
+                        _bestPath = path;
+                    }
+                }
+                else if (world.portals.TryGetValue(nextPortal.Item1, out var nextStart))
+                {
+                    var direction = world.portalDirections[nextPortal.Item1];
+
+                    var newPath = path + $"({level}) {world.portalNames2[start]}=>{world.portalNames2[nextPortal.Item1]}";
+                    var newLevel = level + (recurse ? direction : 0);
+                    SearchPath3(world, nextStart, newLevel, portalsUsed, goal, newDist + 1, newPath, recurse, depth+1);
+                }
+            }
+        }
+
         private World19 ParseMap(string[] source)
         {
             var world = new World19();
@@ -275,6 +327,18 @@ namespace AdventofCode.AoC_2019
             //     if (c.GenAdjacent4().Any(n => portalNameCoords.Contains(n)))
             //         portalCoords.Add(c);
             // }
+
+            foreach (var x in world.reachable.Keys.OrderBy(p => world.portalNames2[p]))
+            {
+                var dir1 = world.portalDirections[x] == -1 ? "OUTSIDE" : "INSIDE";
+
+                Log($"Can go from {world.portalNames2[x]} ({x.X},{x.Y} {dir1})");
+                foreach (var y in world.reachable[x])
+                {
+                    var dir2 = world.portalDirections[y.Item1] == -1 ? "OUTSIDE" : "INSIDE";
+                    Log($"                     To {world.portalNames2[y.Item1]} ({y.Item1.X},{y.Item1.Y} {dir2} in {y.Item2} steps");
+                }
+            }
             return world;
         }
     }
