@@ -1,0 +1,45 @@
+north
+take sand
+north
+north
+take astrolabe
+south
+south
+south
+east
+take klein bottle
+north
+north
+north
+take dehydrated water
+south
+south
+south
+east
+take semiconductor
+west // back at scilab
+west
+west
+north
+take shell
+south
+south
+// take giant electromagnet
+east
+// take photons
+south
+// take molten lava
+north
+west
+west
+take ornament
+west
+south
+//drop ornament
+//drop astrolabe
+//drop sand
+drop semiconductor
+//drop shell
+drop dehydrated water
+drop klein bottle
+south
