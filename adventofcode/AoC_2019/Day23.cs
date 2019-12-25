@@ -30,26 +30,24 @@ namespace AdventofCode.AoC_2019
             {
                 computers[i] = new IntCodeComputer(source[0]);
                 computers[i].AddInput(i);
+                computers[i].AddInput(-1);
                 computers[i].Execute();
             }
 
             var ttq = false;
             long lastNaty = -1;
-            long lastNatx = -1;
             long naty = -1;
             long natx = -1;
             var firstNatY = -1;
-            var part2 = -1;
             while (!ttq)
             {
                 var allIdle = true;
                 foreach (var c in computers)
                 {
-                    if (!c.InputQ.Any())
-                        c.AddInput(-1);
                     c.Execute();
                     while (c.OutputQ.Any())
                     {
+                    
                         var address = c.OutputQ.Dequeue();
                         var x = c.OutputQ.Dequeue();
                         var y = c.OutputQ.Dequeue();

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
@@ -27,8 +29,8 @@ namespace AdventofCode.AoC_2019
         [TestCase(4096, null, "Day22.txt", "", 2019, 10007)]
 
 
-        [TestCase(null, null, "Day22_testnew.txt","", 0, 101)]
-        [TestCase(null, null, "Day22_test4.txt","", 0, 101)]
+        [TestCase(null, null, "Day22_testnew.txt", "", 0, 101)]
+        [TestCase(null, null, "Day22_test4.txt", "", 0, 101)]
 
         public void Test1(Part1Type exp1, Part2Type? exp2, string resourceName, string order, int finalCard, int deckSize)
         {
@@ -52,14 +54,14 @@ namespace AdventofCode.AoC_2019
 
             var x = source.Select(instr => instr.Split(' ')).ToArray();
 
-            for (int i = 0; i < deck.Length*3; i++)
+            for (int i = 0; i < deck.Length * 3; i++)
             {
                 foreach (var instr in x)
                 {
                     deck = ExecuteInstruction(instr, deck);
                 }
-                if (deck.cards[0] == 0) 
-                    Log("after : "+(i+1)+ ": "+ deck.PrintDeck());
+                if (deck.cards[0] == 0)
+                    Log("after : " + (i + 1) + ": " + deck.PrintDeck());
             }
 
             if (order != "")
@@ -166,6 +168,194 @@ namespace AdventofCode.AoC_2019
                 res.cards[(i + move) % deck.Length] = deck.cards[i];
             return res;
         }
+
+
+        /*
+        def egcd(a, b):
+            if a == 0:
+        return (b, 0, 1)
+        else:
+        g, y, x = egcd(b % a, a)
+        return (g, x - (b // a) * y, y)
+
+        def modinv(a, m):
+            g, x, y = egcd(a, m)
+            if g != 1:
+        raise Exception('modular inverse does not exist')
+            else:
+            return x % m
+
+            */
+
+
+        long modInverse(long a, long n)
+        {
+            long i = n, v = 0, d = 1;
+            while (a > 0)
+            {
+                long t = i / a, x = a;
+                a = i % x;
+                i = x;
+                x = d;
+                d = v - t * x;
+                v = x;
+            }
+            v %= n;
+            if (v < 0) v = (v + n) % n;
+            return v;
+        }
+
+
+        BigInteger modInverse(BigInteger a, BigInteger n)
+        {
+            BigInteger i = n, v = 0, d = 1;
+            while (a > 0)
+            {
+                BigInteger t = i / a, x = a;
+                a = i % x;
+                i = x;
+                x = d;
+                d = v - t * x;
+                v = x;
+            }
+            v %= n;
+            if (v < 0) v = (v + n) % n;
+            return v;
+        }
+
+        private long ReverseDeal(long pos, long deckSize)
+        {
+            return deckSize - 1 - pos;
+        }
+        private long ReverseCut(long pos, long cutPos, long deckSize)
+        {
+            return (pos + cutPos + deckSize) % deckSize;
+        }
+
+        private long ReverseDealWithIncrement(long pos, long increment, long deckSize)
+        {
+            return modInverse(increment, deckSize) * pos % deckSize;
+        }
+
+        [TestCase("Day22_test.txt", 10, 1, 6)]
+        [TestCase("Day22_test2.txt", 10, 1, 6)]
+        [TestCase("Day22_test3.txt", 10, 1, 6)]
+        [TestCase("Day22_test4.txt", 10, 1, 6)]
+        [TestCase("deal with increment 3", 10, 1, 6)]
+        [TestCase("cut -4", 10, 1, 6)]
+
+        public void Test2(string resourceName, long deckSize, long repeats, long finalCardPos)
+        {
+            var source = GetResource(resourceName);
+            var final = new StringBuilder();
+            var org = new StringBuilder();
+            foreach (var s in source)
+                Log(s);
+            for (long i = 0; i < deckSize; i++)
+            {
+                org.Append(i + " ");
+                var r = Reverse(source, deckSize, i);
+                final.Append(r + " ");
+            }
+            Log("Org (rev):" + org);
+            Log("Final....:" + final);
+
+            // Log(org.ToString);
+            // var reversed2 = Reverse(source, deckSize, reversed1);
+            // Log(finalCardPos.ToString);
+            // Log(reversed1.ToString);
+            // Log(reversed2.ToString);
+        }
+
+        [TestCase("Day22.txt", 119315717514047, 101741582076661, 2020)]
+        [TestCase("Day22.txt", 10007, 17, 4)]
+        // [TestCase("Day22_test.txt", 10, 1, 6)]
+        // [TestCase("Day22_test2.txt", 10, 1, 6)]
+        // [TestCase("Day22_test3.txt", 10, 1, 6)]
+        // [TestCase("Day22_test4.txt", 10, 1, 6)]
+        // [TestCase("deal with increment 3", 10, 1, 6)]
+        // [TestCase("cut -4", 10, 1, 6)]
+
+        public void Test3(string resourceName, long deckSize, long repeats, long finalCardPos)
+        {
+            var source = GetResource(resourceName);
+            var answer = -1;
+            if (deckSize < 100000 && repeats < 100)
+            {
+                var deck = new Deck((int)deckSize, true);
+
+                var x = source.Select(instr => instr.Split(' ')).ToArray();
+
+                for (var round = 0; round < repeats; round++)
+                {
+                    foreach (var instr in x)
+                    {
+                        deck = ExecuteInstruction(instr, deck);
+                    }
+                }
+
+                answer = deck.cards[finalCardPos];
+            }
+
+            var d = new BigInteger(deckSize);
+
+            var reversed1 = Reverse(source, deckSize, finalCardPos);
+            var reversed2 = Reverse(source, deckSize, reversed1);
+            Log("Last:" + finalCardPos);
+            Log("Last-1:" + reversed1);
+            Log("Last-2:" + reversed2);
+            var X = new BigInteger(finalCardPos);
+            var Y = new BigInteger(reversed1);
+            var Z = new BigInteger(reversed2);
+            //            var yminz = ((Y - Z) + deckSize) % deckSize;
+            var a = (Y - Z) * modInverse(X - Y + d, d) % d;
+            a = (a + d) % d;
+            var b = (Y - a * X) % d;
+            b = (b + d) % d;
+            Log("A: " + a);
+            Log("B: " + b);
+
+            var A = a;
+            var B = b;
+            var n = new BigInteger(repeats);
+            var powand = BigInteger.ModPow(A, n, d);
+            Log("pow(a, n, d) = " + powand);
+
+            var res =
+                (powand * X + (powand - 1) * modInverse(a - 1, d) * B) % d;
+
+            Log(res.ToString);
+
+            if (answer != -1)
+            {
+                var intres = int.Parse(res.ToString());
+                Assert.That(intres, Is.EqualTo(answer)); 
+            }
+
+            // too low: 76866793081881
+            //          52966429516366 still low...
+
+
+
+        }
+
+        private long Reverse(string[] instructions, long deckSize, long finalCardPos)
+        {
+            long res = finalCardPos;
+            foreach (var instr in instructions.Reverse())
+            {
+                if (instr.StartsWith("cut"))
+                    res = ReverseCut(res, int.Parse(instr.Split(' ').Last()), deckSize);
+                else if (instr.StartsWith("deal with"))
+                    res = ReverseDealWithIncrement(res, int.Parse(instr.Split(' ').Last()), deckSize);
+                else
+                    res = ReverseDeal(res, deckSize);
+            }
+
+            return res;
+
+        }
+
 
     }
 

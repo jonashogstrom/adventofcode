@@ -113,14 +113,21 @@ namespace AoCStats
         private void UploadStatistics()
         {
             Log($"Uploading html for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId})");
-            using (WebClient client = new WebClient())
+            try
             {
-                client.Credentials = new NetworkCredential(_settings["ftpuser"], _settings["ftppwd"]);
-                var targetUri = _settings["ftptarget"] + _htmlFileName;
-                client.UploadFile(
-                    targetUri,
-                    WebRequestMethods.Ftp.UploadFile,
-                    _htmlFileName);
+                using (WebClient client = new WebClient())
+                {
+                    client.Credentials = new NetworkCredential(_settings["ftpuser"], _settings["ftppwd"]);
+                    var targetUri = _settings["ftptarget"] + _htmlFileName;
+                    client.UploadFile(
+                        targetUri,
+                        WebRequestMethods.Ftp.UploadFile,
+                        _htmlFileName);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
