@@ -234,7 +234,14 @@ namespace AdventofCode.AoC_2019
 
         private long ReverseDealWithIncrement(long pos, long increment, long deckSize)
         {
-            return modInverse(increment, deckSize) * pos % deckSize;
+            var pos2 = new BigInteger(pos);
+            var increment2 = new BigInteger(increment);
+            var deckSize2 = new BigInteger(deckSize);
+            var res = modInverse(increment, deckSize) * pos % deckSize;
+            var res2 = modInverse(increment2, deckSize2) * pos2 % deckSize2;
+            var res2_long = long.Parse(res2.ToString());
+//            Assert.That(res2_long, Is.EqualTo(res));
+            return res2_long;
         }
 
         [TestCase("Day22_test.txt", 10, 1, 6)]
@@ -268,7 +275,8 @@ namespace AdventofCode.AoC_2019
         }
 
         [TestCase("Day22.txt", 119315717514047, 101741582076661, 2020)]
-        [TestCase("Day22.txt", 10007, 17, 4)]
+        [TestCase("Day22.txt", 119315717514047, 101741582076661, 3)]
+        [TestCase("Day22.txt", 10007, 17, 7)]
         // [TestCase("Day22_test.txt", 10, 1, 6)]
         // [TestCase("Day22_test2.txt", 10, 1, 6)]
         // [TestCase("Day22_test3.txt", 10, 1, 6)]
@@ -308,32 +316,51 @@ namespace AdventofCode.AoC_2019
             var Y = new BigInteger(reversed1);
             var Z = new BigInteger(reversed2);
             //            var yminz = ((Y - Z) + deckSize) % deckSize;
-            var a = (Y - Z) * modInverse(X - Y + d, d) % d;
+            var a = (((Y - Z) + d) % d) * (modInverse(X - Y + d, d) % d);
             a = (a + d) % d;
-            var b = (Y - a * X) % d;
+            var ax = (a * X);
+            ax = ax % d;
+            var b = (Y - ax) % d;
             b = (b + d) % d;
             Log("A: " + a);
             Log("B: " + b);
 
             var A = a;
             var B = b;
+
+            var Yver = (a * X + b) % d;
+            var ZVer = (a * Y + b) % d;
+            Assert.That(Y, Is.EqualTo(Yver));
+            Assert.That(Z, Is.EqualTo(ZVer));
             var n = new BigInteger(repeats);
             var powand = BigInteger.ModPow(A, n, d);
             Log("pow(a, n, d) = " + powand);
 
+            // (pow(A, n, D)*X + (pow(A, n, D)-1) * modinv(A-1, D) * B) % D)
+            var p1 = powand * X;
+            var p2_1 = (powand - 1);
+            var p2_2 = modInverse(a - 1, d);
+            var p2_3 = B;
+            var p2 = p2_1 * p2_2 * p2_3;
+            var p = (p1 + p2) % d;
+            var pxxx = p % d;
             var res =
-                (powand * X + (powand - 1) * modInverse(a - 1, d) * B) % d;
+                (powand*X + (powand - 1) * modInverse(a - 1, d) * B) % d;
 
             Log(res.ToString);
 
             if (answer != -1)
             {
                 var intres = int.Parse(res.ToString());
-                Assert.That(intres, Is.EqualTo(answer)); 
+                Assert.That(intres, Is.EqualTo(answer));
             }
 
-            // too low: 76866793081881
-            //          52966429516366 still low...
+            // decksize: 119315717514047 
+            // too low:   76866793081881
+            //            78613970589919
+            // too high:  84291970833532
+            //           
+
 
 
 
@@ -344,12 +371,15 @@ namespace AdventofCode.AoC_2019
             long res = finalCardPos;
             foreach (var instr in instructions.Reverse())
             {
+                var next = -1L;
                 if (instr.StartsWith("cut"))
-                    res = ReverseCut(res, int.Parse(instr.Split(' ').Last()), deckSize);
+                    next = ReverseCut(res, int.Parse(instr.Split(' ').Last()), deckSize);
                 else if (instr.StartsWith("deal with"))
-                    res = ReverseDealWithIncrement(res, int.Parse(instr.Split(' ').Last()), deckSize);
+                    next = ReverseDealWithIncrement(res, int.Parse(instr.Split(' ').Last()), deckSize);
                 else
-                    res = ReverseDeal(res, deckSize);
+                    next = ReverseDeal(res, deckSize);
+                Assert.That(next, Is.GreaterThan(-1));
+                res = next;
             }
 
             return res;
