@@ -451,7 +451,7 @@ namespace AoCStats
             htmlContent.AppendLine("<div class=\"w3-container\">");
             htmlContent.AppendLine("<div id=\"tabmenu\" class=\"w3-bar w3-black\">");
             var first = true;
-            htmlContent.Append("<div>Leaderboard for " + listName);
+            htmlContent.Append($"<div>Leaderboard for {listName} {_year}");
             if (_excludeZero)
                 htmlContent.Append(", inactive players removed (<a href=\"" + _htmlFileName.Replace(".html", "_0.html") + "\">add them</a>)");
             else
@@ -569,6 +569,8 @@ namespace AoCStats
                         return false;
                     if (!string.IsNullOrEmpty(s))
                         File.WriteAllText(_jsonFileName, s);
+                    else
+                        Log("Session cookie expired???");
                     return true;
                 }
                 catch (Exception e)
@@ -733,7 +735,7 @@ namespace AoCStats
 
         private LeaderBoard ParseJson()
         {
-            var highestDay = -1;
+            var highestDay = 0;
             var players = new List<Player>();
             var json = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(_jsonFileName));
             var jmembers = json.Property("members").First();
