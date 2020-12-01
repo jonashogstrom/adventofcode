@@ -343,12 +343,12 @@ namespace AdventofCode.AoC_2019
         }
     }
 
-    internal struct State19
-    {
-        public int level;
-        public Coord coord;
-        public int distance;
-    }
+    // internal struct State19
+    // {
+    //     public int level;
+    //     public Coord coord;
+    //     public int distance;
+    // }
 
     internal class World19
     {

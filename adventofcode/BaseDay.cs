@@ -145,8 +145,6 @@ namespace AdventofCode
             where S : struct
             where T : struct
     {
-        //970120 nope
-
         protected void DoAsserts((T? part1, S? part2) actual, T? exp1, S? exp2)
         {
             var (actual1, actual2) = actual;
@@ -161,6 +159,21 @@ namespace AdventofCode
 
             if (actual2.HasValue && exp2.HasValue)
                 Assert.That(actual2, Is.EqualTo(exp2.Value), "Incorrect value for Part 2");
+        }
+
+        protected (T? part1, S? part2) ComputeWithTimer(string[] source)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var res = DoComputeWithTimer(source);
+            sw.Stop();
+            Log(()=>$"Total Time: {sw.ElapsedMilliseconds} ms");
+            return res;
+        }
+
+        protected virtual (T? part1, S? part2) DoComputeWithTimer(string[] source)
+        {
+            throw new NotImplementedException();
         }
     }
 

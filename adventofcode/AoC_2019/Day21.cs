@@ -39,8 +39,8 @@ namespace AdventofCode.AoC_2019
 
             return (damage1, damage2);
 
-            var part1 = (int)comp.LastOutput;
-            return (part1, 0);
+            // var part1 = (int)comp.LastOutput;
+            // return (part1, 0);
         }
 
         private long WriteOutput(IntCodeComputer comp)
