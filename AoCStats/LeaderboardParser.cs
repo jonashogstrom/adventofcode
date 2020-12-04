@@ -63,16 +63,19 @@ namespace AoCStats
             var updatedData = DownloadIfOld(interval, forceLoad);
 
             var leaderboard = ParseJson();
-            for (int d = 1; d <= leaderboard.HighestDay; d++)
-                DownloadGlobalLeaderboard(year, d);
+            if (leaderboard != null)
+            {
+                for (int d = 1; d <= leaderboard.HighestDay; d++)
+                    DownloadGlobalLeaderboard(year, d);
 
-            DeriveMoreStats(leaderboard);
-            ParseGlobalBoards(leaderboard, year);
+                DeriveMoreStats(leaderboard);
+                ParseGlobalBoards(leaderboard, year);
 
-            Log($"Generating new html for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId})");
-            var modified = GenerateHtml(leaderboard);
-            if (updatedData || modified)
-                UploadStatistics();
+                Log($"Generating new html for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId})");
+                var modified = GenerateHtml(leaderboard);
+                if (updatedData || modified)
+                    UploadStatistics();
+            }
         }
 
         private void ParseGlobalBoards(LeaderBoard leaderboard, int year)
@@ -136,7 +139,7 @@ namespace AoCStats
             var tabs = new Dictionary<string, StringBuilder>();
             var scripts = new Dictionary<string, StringBuilder>();
 
-            var logAccumulatedPosition = InitLog("AccumulatedPosition", leaderboard.HighestDay);
+            var logAccumulatedPosition = InitLog("Leaderboard/Local score (pos)", leaderboard.HighestDay);
 
             foreach (var p in leaderboard.OrderedPlayers)
             {
@@ -168,7 +171,7 @@ namespace AoCStats
             tabs["00-Leaderboard (Pos)"] = logAccumulatedPosition;
 
             //==
-            var logScoreDiff = InitLog("Points behind the leader", leaderboard.HighestDay);
+            var logScoreDiff = InitLog("Points behind the leader (local score)", leaderboard.HighestDay);
 
             foreach (var p in leaderboard.OrderedPlayers)
             {
@@ -225,12 +228,12 @@ namespace AoCStats
             //==
 
 
-            var logPositionForStar = InitLog("Position for star", leaderboard.HighestDay);
+            var logPositionForStar = InitLog("Daily position", leaderboard.HighestDay);
             var logOffsetFromWinner = InitLog("Offset from winner", leaderboard.HighestDay);
             var logTotalSolveTime = InitLog("Total time to solve since the problem was published", leaderboard.HighestDay);
             var logAccumulatedSolveTime = InitLog("Accumulated time to solve", leaderboard.HighestDay);
-            var logAccumulatedScore = InitLog("Accumulated score", leaderboard.HighestDay);
-            var logGlobalScore = InitLog("Global scores", leaderboard.HighestDay);
+            var logAccumulatedScore = InitLog("Leaderboard/Local score (accumulated score)", leaderboard.HighestDay);
+            var logGlobalScore = InitLog("Leaderboard/Global score (score)", leaderboard.HighestDay);
 
             foreach (var p in leaderboard.OrderedPlayers)
             {
@@ -405,10 +408,11 @@ namespace AoCStats
 
             tabs["09-Time *2"] = logTimeStar2;
 
-            var tobiiScore = InitLog("TobiiScore", leaderboard.HighestDay, true);
+            var tobiiScore = InitLog("Leaderboard/TobiiScore (accumulated score)", leaderboard.HighestDay, true);
+            
 
             var tobiiPos = 0;
-            foreach (var p in leaderboard.Players.OrderByDescending(p => p.Stars).ThenBy(p => p.AccumulatedTobiiScoreTotal))
+            foreach (var p in leaderboard.Players.OrderByDescending(p => p.Stars).ThenBy(p => p.AccumulatedTobiiScoreTotal).ThenBy(p=>p.LastStar))
             {
                 tobiiPos++;
                 if (!_excludeZero || p.TotalScore > 0)
@@ -434,6 +438,10 @@ namespace AoCStats
             }
 
             ExitLog(tobiiScore);
+            tobiiScore.Append(
+                "<hr>TobiiScore leaderboard is ordered by <br><ol><li>Completed stars</li><li>TobiiScore</li><li>Time for last star</li></ol>" +
+                "TobiiScore calculated as the number of players on the list with a better result for each star. That means that a gold medal gives 0 points, silver gives 1 point etc. <br>" +
+                "The advantage of this is that the score does not change if new players enters the list, and the ordering method encourages participants to solve all puzzles");
 
             tabs["99-TobiiScore"] = tobiiScore;
 
@@ -524,7 +532,8 @@ namespace AoCStats
         {
             var parts = p.Props.Split(new[] { ',' });
             var res = "<tr class=\"item\">";
-            res += Cell((positionOverride != -1 ? positionOverride : p.CurrentPosition) + ". " + p.Name);
+            var pos = (positionOverride != -1 ? positionOverride : p.CurrentPosition);
+            res += Cell(pos + ". " + p.Name, pos);
             for (int i = 0; i < _metacolumns.Count; i++)
                 res += Cell(parts.Length > i ? parts[i].Trim() : "");
             res += CellWithAlt(p.LocalScore, p.PendingPoints == 0 ? "" : ("Max: " + (p.LocalScore + p.PendingPoints)));
@@ -694,11 +703,13 @@ namespace AoCStats
                             else
                                 player.PositionForStar[day][star] = index;
 
-                            if (!(_year == 2018 && day == 5)) // points day 6 were recalled 
+                            if (!ExcludeDay(day)) // points day 6 were recalled 
+                            {
                                 player.TotalScore += playerCount - player.PositionForStar[day][star];
+                                player.AccumulatedTobiiScoreTotal += player.PositionForStar[day][star];
+                            }
                             player.OffsetFromWinner[day][star] = player.TimeToComplete[day][star] - bestTime[day][star];
                             lastStar[player] = player.unixCompletionTime[day][star];
-                            player.AccumulatedTobiiScoreTotal += player.PositionForStar[day][star];
                         }
 
                         player.AccumulatedScore[day][star] = player.TotalScore;
@@ -733,11 +744,46 @@ namespace AoCStats
             }
         }
 
+        private bool ExcludeDay(int day)
+        {
+            // Because of a bug in the day 6 puzzle that made it unsolvable for some users until about two hours after unlock, day 6 is worth no points.
+
+            if (_year == 2018 && day == 5) return true;
+            if (_settings.TryGetValue($"excludeday_{_year}_{day}", out var ids))
+            {
+                if (ids.Split(',').Select(int.Parse).Contains(_leaderBoardId))
+                    return true;
+            }
+
+            return false;
+
+        }
+
         private LeaderBoard ParseJson()
         {
             var highestDay = 0;
             var players = new List<Player>();
-            var json = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(_jsonFileName));
+
+            var text = File.ReadAllText(_jsonFileName);
+            if (text.StartsWith("<"))
+            {
+                File.Delete(_jsonFileName);
+                Log($"Logfile contained html data. deleting it");
+                return null;
+            }
+
+            JObject json;
+            try
+            {
+                json = (JObject) JsonConvert.DeserializeObject(text);
+            }
+            catch (Exception e)
+            {
+                File.Delete(_jsonFileName);
+                Log($"Failed to parse json: "+e.Message);
+                return null;
+            }
+
             var jmembers = json.Property("members").First();
             foreach (JProperty jmember in jmembers)
             {
@@ -845,34 +891,39 @@ namespace AoCStats
         private string _x_suffix;
         private bool _excludeZero;
 
-        private string TableHeader(int colPos, int tableid, string header, string alt = "")
+        private string TableHeader(int colPos, int tableid, string header, string alt = "", string alignment="left")
         {
             var content = header;
             if (alt != "")
                 content = $"<span title=\"{alt}\">{content}</span>";
             return
-                $"<th onclick=\"sortTable({colPos}, 'table_{tableid}')\" align='left' class='sortable'>{content}</th>";
+                $"<th onclick=\"sortTable({colPos}, 'table_{tableid}')\" align='{alignment}' class='sortable'>{content}</th>";
         }
 
-        private StringBuilder InitLog(string name, int highestDay, bool colForStar = true)
+        private StringBuilder InitLog(string name, int highestDay, bool colForStar = true, string description = "")
         {
             var starCols = colForStar ? 2 : 1;
             //            var randomid = _r.Next();
             tableid++;
             var colPos = 0;
             var log = new StringBuilder($"<h1>{name}</h1><div style=\"overflow-x:auto;\"> <table id=\"table_{tableid}\"><tr>");
-            log.AppendLine(TableHeader(colPos++, tableid, name));
+            log.AppendLine(TableHeader(colPos++, tableid, name + (string.IsNullOrEmpty(description)?"":$"<br><small>{description}</small>")));
             foreach (var s in _metacolumns)
                 log.AppendLine(TableHeader(colPos++, tableid, s));
-            log.AppendLine(TableHeader(colPos++, tableid, "L"));
-            log.AppendLine(TableHeader(colPos++, tableid, "G"));
-            log.AppendLine(TableHeader(colPos++, tableid, "S"));
-            log.AppendLine(TableHeader(colPos++, tableid, "T", "Tobii Score, lower is better"));
+            log.AppendLine(TableHeader(colPos++, tableid, "L", "Local score", "right"));
+            log.AppendLine(TableHeader(colPos++, tableid, "G", "Global score", "right"));
+            log.AppendLine(TableHeader(colPos++, tableid, "S", "Stars", "right"));
+            log.AppendLine(TableHeader(colPos++, tableid, "T", "Tobii Score, lower is better. Winner for each star gets 0 points ", "right"));
             for (int day = 0; day < highestDay; day++)
                 for (int star = 0; star < starCols; star++)
                 {
                     var stars = new string('*', star + 1);
-                    var cellContent = $"Day {day + 1}<br>{stars}";
+                    string cellContent = "";
+                    if (ExcludeDay(day))
+                        cellContent += "<p style=\"color:red\">";
+                    cellContent += $"Day {day + 1}<br>{stars}";
+                    if (ExcludeDay(day))
+                        cellContent += "</p>";
                     log.AppendLine($"<th onclick=\"sortTable({colPos++}, 'table_{tableid}')\" align='right' class='sortable'>{cellContent}</th>");
                 }
 

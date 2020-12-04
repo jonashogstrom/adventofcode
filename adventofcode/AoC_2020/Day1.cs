@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Linq;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -47,13 +47,31 @@ namespace AdventofCode.AoC_2020
 
         private int GetAnswer2(int[] ints)
         {
+            ints = ints.OrderBy(x => x).ToArray();
+            var counter = 0;
             for (int i = 0; i < ints.Length - 3; i++)
                 for (int j = i + 1; j < ints.Length - 2; j++)
+                {
+                    var sum2 = ints[i] + ints[j];
+                    if (sum2 >= 2020)
+                        break;
+
                     for (int k = j + 1; k < ints.Length - 1; k++)
-                        if (ints[i] + ints[j] + ints[k] == 2020)
+                    {
+                        counter++;
+                        var sum3 = ints[i] + ints[j] + ints[k];
+                        if (sum3 > 2020)
+                            break;
+                        if (sum3 == 2020)
                         {
+                            Log($"i={i}, j={j}, k={k}");
+                            Log($"v1={ints[i]}, v2={ints[j]}, v3={ints[k]}");
+                            Log($"comparisons: {counter}");
                             return ints[i] * ints[j] * ints[k];
                         }
+
+                    }
+                }
 
             return -1;
         }

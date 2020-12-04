@@ -81,6 +81,8 @@
     <Compile Include="AoC_2019\DayTemplate2.cs" />
     <Compile Include="AoC_2020\Day1.cs" />
     <Compile Include="AoC_2020\Day2.cs" />
+    <Compile Include="AoC_2020\Day3.cs" />
+    <Compile Include="AoC_2020\Day4.cs" />
     <Compile Include="AoC_2020\DayTemplate.cs" />
     <Compile Include="AoC_2020\DayTemplate2.cs" />
     <Compile Include="EnumerableExt.cs" />
@@ -172,6 +174,12 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2020\Day4_test2_invalid.txt" />
+    <EmbeddedResource Include="AoC_2020\Day4_test2_valid.txt" />
+    <EmbeddedResource Include="AoC_2020\Day4.txt" />
+    <EmbeddedResource Include="AoC_2020\Day4_test.txt" />
+    <EmbeddedResource Include="AoC_2020\Day3_test.txt" />
+    <EmbeddedResource Include="AoC_2020\Day3.txt" />
     <EmbeddedResource Include="AoC_2020\Day2_test.txt" />
     <EmbeddedResource Include="AoC_2020\Day2.txt" />
     <EmbeddedResource Include="AoC_2020\Day1.txt" />

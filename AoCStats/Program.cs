@@ -30,6 +30,18 @@ namespace AoCStats
                 // Leica
                 new LeaderboardParser().GenerateReport(373164, new[] { 2020, 2019, 2018 }, false, forceLoad);
 
+                // FredrikMarcus
+                new LeaderboardParser().GenerateReport(126234, new[] { 2020, 2019, 2018 }, false, forceLoad);
+                // repl.it
+                new LeaderboardParser().GenerateReport(374141, new[] { 2020}, false, forceLoad);
+
+                // catawiki
+                new LeaderboardParser().GenerateReport(190418, new[] { 2020}, false, forceLoad);
+
+                // smartstreet
+                new LeaderboardParser().GenerateReport(193188, new[] { 2020}, false, forceLoad);
+
+
                 // tobii with all participants
                 //new LeaderboardParser().GenerateReport(371692, new[] { 2020, 2019, 2018 }, false, false);
 

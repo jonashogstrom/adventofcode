@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -12,8 +14,8 @@ namespace AdventofCode.AoC_2020
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(-1, null, "Day2_test.txt")]
-        [TestCase(-1, null, "Day2.txt")]
+        [TestCase(2, 1, "Day2_test.txt")]
+        [TestCase(636, 588, "Day2.txt")]
         public void Test1(Part1Type exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
@@ -23,11 +25,46 @@ namespace AdventofCode.AoC_2020
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
         {
-            // var comp = new IntCodeComputer(source[0]);
-            // comp.Execute();
-            // var part1 = (int)comp.LastOutput;
-            // return (part1, 0);
-            return (0, 0);
+            var passwords = source.Select(s => new Pwd(s)).ToArray();
+            var part1 = passwords.Count(p => p.Valid1);
+            var part2 = passwords.Count(p => p.Valid2);
+            return (part1, part2);
         }
     }
+
+    internal class Pwd
+    {
+        public Pwd(string s)
+        {
+            var parts = s.Split(new[] { '-', ' ', ':' }, StringSplitOptions.RemoveEmptyEntries);
+            Low = int.Parse(parts[0]);
+            High = int.Parse(parts[1]);
+            Ch = parts[2][0];
+            Password = parts[3];
+        }
+
+        public int Low { get; }
+
+        public int High { get; }
+
+        public char Ch { get; }
+
+        public string Password { get; }
+
+        public bool Valid1
+        {
+            get
+            {
+                var count = 0;
+                foreach (var c in Password)
+                    if (c == Ch)
+                        count++;
+                return count >= Low && count <= High;
+                return Low <= count && count <= High;
+            }
+        }
+
+        public bool Valid2 => Password[Low - 1] == Ch ^ Password[High - 1] == Ch;
+    }
 }
+
