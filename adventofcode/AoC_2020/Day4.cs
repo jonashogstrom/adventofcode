@@ -11,7 +11,7 @@ namespace AdventofCode.AoC_2020
     [TestFixture]
     class Day4 : TestBaseClass<Part1Type, Part2Type>
     {
-        public bool Debug { get; set; }
+        //        public bool Debug { get; set; }
 
         [Test]
         [TestCase(4, 0, "Day4_test2_invalid.txt")]
@@ -29,103 +29,204 @@ namespace AdventofCode.AoC_2020
         {
             var part1 = 0;
             var part2 = 0;
-            var passport = new Dictionary<string, string>();
-            var input = source.Append("").ToArray();
-            foreach (var x in input)
+            var passports = Passport.ParseInputToPassports(source);
+
+            foreach (var p in passports)
             {
-                if (string.IsNullOrEmpty(x))
+                if (p.ValidateMandatoryFields())
+                    part1++;
+                var errors = p.ValidateLevel2().ToArray();
+                if (errors.Any())
                 {
-                    if (ValidatePassport(passport))
-                        part1++;
-                    if (ValidatePassport2(passport))
-                        part2++;
-                    passport = new Dictionary<string, string>();
+                    foreach(var e in errors)
+                        Log(()=>e, 5);
+
                 }
-                else
-                {
-                    foreach (var p in x.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        var p2 = p.Split(':');
-                        passport[p2[0]] = p2[1];
-                    }
-                }
+                    else part2++;
 
             }
             return (part1, part2);
         }
+    }
 
-        private bool ValidatePassport(Dictionary<string, string> passport)
+    internal class Passport
+    {
+        /*
+        byr (Birth Year)
+        iyr (Issue Year)
+        eyr (Expiration Year)
+        hgt (Height)
+        hcl (Hair Color)
+        ecl (Eye Color)
+        pid (Passport ID)
+        cid (Country ID)        
+         */
+        private readonly Dictionary<string, string> _data = new Dictionary<string, string>();
+        private readonly Dictionary<string, Func<string, bool>> _validators = new Dictionary<string, Func<string, bool>>();
+        public Passport()
         {
-            var mandatory = new[] { "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid" };
-            foreach (var x in mandatory)
-                if (!passport.ContainsKey(x))
-                    return false;
+            _validators["byr"] = value => ValidateRange2(value, 1920, 2002, i => BirthYear = i);
+            _validators["iyr"] = value => ValidateRange2(value, 2010, 2020, i => IssueYear = i);
+            _validators["eyr"] = value => ValidateRange2(value, 2020, 2030, i => ExpirationYear = i);
+            _validators["hgt"] = ValidateHeight;
+            _validators["hcl"] = ValidateHairColor;
+            _validators["pid"] = ValidatePassportId;
+            _validators["ecl"] = ValidateEyeColor;
+        }
+        #region validators
+        private bool ValidateEyeColor(string value)
+        {
+            if (Enum.TryParse(value, out EyeColor temp))
+            {
+                EyeCol = temp;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ValidatePassportId(string pid)
+        {
+            if (pid.Length != 9)
+                return false;
+            if (!int.TryParse(pid, out var pidValue))
+                return false;
+            PassportId = pidValue;
             return true;
         }
-        private bool ValidatePassport2(Dictionary<string, string> passport)
+
+        private bool ValidateHairColor(string haircolor)
         {
-            if (!ValidatePassport(passport))
-                return false;
-            if (!ValidateRange(passport, "byr", 1920, 2002))
-                return false;
-            if (!ValidateRange(passport, "iyr", 2010, 2020))
-                return false;
-            if (!ValidateRange(passport, "eyr", 2020, 2030))
-                return false;
-
-            if (passport["hgt"].EndsWith("cm"))
-            {
-                if (!ValidateRange(passport, "hgt", 150, 193, "cm"))
-                    return false;
-            }
-            else if (passport["hgt"].EndsWith("in"))
-            {
-                if (!ValidateRange(passport, "hgt", 59, 76, "in"))
-                    return false;
-            }
-            else
-            {
-                return false;
-            }
-
-            var haircolor = passport["hcl"];
             if (haircolor.Length != 7 || haircolor[0] != '#')
                 return false;
             var hex = "0123456789abcdef";
             for (int i = 1; i < 7; i++)
                 if (!hex.Contains(haircolor[i].ToString()))
                     return false;
-
-            var validHairColors = new HashSet<string>()
-            {
-                "amb", "blu", "brn", "gry", "grn", "hzl", "oth"
-            };
-            if (!validHairColors.Contains(passport["ecl"]))
-                return false;
-
-
-            var pid = passport["pid"];
-            if (pid.Length != 9)
-                return false;
-            if (!int.TryParse(pid, out var pidValue))
-                return false;
+            HairColor = Convert.ToInt32(haircolor.Substring(1), 16);
             return true;
-
-
         }
 
-
-
-
-        private bool ValidateRange(Dictionary<string, string> passport, string code, int min, int max, string suffix = null)
+        private bool ValidateHeight(string value)
         {
-            var strValue = passport[code];
-            if (suffix != null)
-                strValue = strValue.Replace(suffix, "");
-            var value = int.Parse(strValue);
-            if (value < min || value > max)
-                return false;
+            if (value.EndsWith("cm"))
+            {
+                HeightUnit = HeightUnit.cm;
+                return ValidateRange2(value.Substring(0, value.Length - 2), 150, 193, i => Height = i);
+            }
+
+            if (value.EndsWith("in"))
+            {
+                HeightUnit = HeightUnit.cm;
+                return ValidateRange2(value.Substring(0, value.Length - 2), 59, 76, i => Height = i);
+
+            }
+            return false;
+        }
+
+        private bool ValidateRange2(string value, int min, int max, Action<int> setter)
+        {
+            if (int.TryParse(value, out var i) && i >= min && i <= max)
+            {
+                setter(i);
+                return true;
+            }
+
+            return false;
+        }
+#endregion
+
+
+        private static readonly string[] mandatory =
+        {
+            "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"
+        };
+
+
+        public bool HasData => _data.Any();
+
+        public int BirthYear { get; private set; }
+        public int IssueYear { get; private set; }
+        public int ExpirationYear { get; private set; }
+        public HeightUnit HeightUnit { get; private set; }
+        public int Height { get; private set; }
+        public int HairColor { get; private set; }
+        public EyeColor EyeCol { get; private set; }
+        public int PassportId { get; private set; }
+
+
+        public bool ValidateMandatoryFields()
+        {
+            foreach (var x in mandatory)
+                if (!_data.ContainsKey(x))
+                    return false;
             return true;
         }
+
+        public void AddData(string key, string value)
+        {
+            _data[key] = value;
+        }
+
+        public IEnumerable<string> ValidateLevel2()
+        {
+            var valid = true;
+            if (!ValidateMandatoryFields())
+            {
+                yield return "Mandatory field missing";
+                yield break;
+            }
+            foreach (var key in _validators.Keys)
+            {
+                if (!_data.ContainsKey(key))
+                {
+                    yield return $"Passport missing mandatory field {key}";
+                } 
+                else if (!_validators[key](_data[key]))
+                {
+                    yield return $"Passport validation failed for {key}: {_data[key]}";
+                }
+            }
+        }
+
+        public static List<Passport> ParseInputToPassports(string[] source)
+        {
+            var passports = new List<Passport>();
+            var passport = new Passport();
+            foreach (var line in source)
+            {
+                if (string.IsNullOrEmpty(line) && passport.HasData)
+                {
+                    passports.Add(passport);
+                    passport = new Passport();
+                }
+                else
+                {
+                    foreach (var p in line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        var p2 = p.Split(':');
+                        passport.AddData(p2[0], p2[1]);
+                    }
+                }
+            }
+
+            if (passport.HasData)
+            {
+                passports.Add(passport);
+            }
+
+            return passports;
+        }
+    }
+
+    internal enum HeightUnit
+    {
+        cm, inch
+    }
+
+    internal enum EyeColor
+    {
+        amb, blu, brn, gry, grn, hzl, oth
+
     }
 }
