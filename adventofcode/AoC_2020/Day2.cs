@@ -60,7 +60,6 @@ namespace AdventofCode.AoC_2020
                     if (c == Ch)
                         count++;
                 return count >= Low && count <= High;
-                return Low <= count && count <= High;
             }
         }
 

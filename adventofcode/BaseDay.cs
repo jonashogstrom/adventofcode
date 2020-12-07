@@ -167,7 +167,7 @@ namespace AdventofCode
             sw.Start();
             var res = DoComputeWithTimer(source);
             sw.Stop();
-            Log(()=>$"Total Time: {sw.ElapsedMilliseconds} ms");
+            Log(()=>$"Total Time: {sw.ElapsedTicks/10f} micros");
             return res;
         }
 
