@@ -21,7 +21,7 @@ namespace AdventofCode.AoC_2020
         [Test]
         [TestCase(4, 32, "Day7_test.txt")]
         [TestCase(null, 126, "Day7_test2.txt")]
-        [TestCase(211, null, "Day7.txt")]
+        [TestCase(211, 12414, "Day7.txt")]
         public void Test1(Part1Type exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
@@ -45,7 +45,7 @@ namespace AdventofCode.AoC_2020
             }
 
             part1 = FindBags(rules, "shiny gold");
-            part2 = FindBagsContents(rules, "shiny gold");
+            part2 = FindBagsContents(rules, "shiny gold") - 1;
             return (part1, part2);
         }
 
@@ -57,34 +57,21 @@ namespace AdventofCode.AoC_2020
 
         private int FindBagsContents(Dictionary<string, BagRule> rules, string target)
         {
-            while (rules[target].contents == -1)
+            var rule = rules[target];
+            if (rule.contents == -1)
             {
-                foreach (var r in rules.Keys)
+                var sum = 1;
+                foreach (var t in rule.dest.Keys)
                 {
-                    var rule = rules[r];
-                    if (rule.contents == -1)
-                    {
-                        var sum = 1;
-                        var ok = true;
-                        foreach (var d in rule.dest.Keys)
-                        {
-                            if (rules[d].contents != -1)
-                                sum += rule.dest[d] * rules[d].contents;
-                            else
-                            {
-                                ok = false;
-                            }
-
-                        }
-
-                        if (ok)
-                            rule.contents = sum;
-                    }
+                    sum += FindBagsContents(rules, t) * rule.dest[t];
                 }
+
+                rule.contents = sum;
             }
 
-            return rules[target].contents-1;
+            return rule.contents;
         }
+
         private HashSet<string> FindBags2(Dictionary<string, BagRule> rules, HashSet<string> targets)
         {
             var res = new HashSet<string>(targets);
