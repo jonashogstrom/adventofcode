@@ -692,7 +692,7 @@ namespace AoCStats
                 {
                     var orderedPlayers = leaderboard.Players.Where(p => p.unixCompletionTime[day][star] != -1)
                         .OrderBy(p => p.unixCompletionTime[day][star]).ThenBy(p => lastStar[p]).ToList();
-                    foreach (var player in leaderboard.Players)
+                    foreach (var player in leaderboard.Players.OrderBy(p => p.unixCompletionTime[day][star]).ThenBy(p => lastStar[p]))
                     {
                         if (player.unixCompletionTime[day][star] != -1)
                         {
