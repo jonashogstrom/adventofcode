@@ -79,6 +79,7 @@
     <Compile Include="AoC_2019\Day25.cs" />
     <Compile Include="AoC_2019\DayTemplate.cs" />
     <Compile Include="AoC_2019\DayTemplate2.cs" />
+    <Compile Include="AoC_2020\Comp.cs" />
     <Compile Include="AoC_2020\Day1.cs" />
     <Compile Include="AoC_2020\Day2.cs" />
     <Compile Include="AoC_2020\Day3.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="AoC_2020\Day5.cs" />
     <Compile Include="AoC_2020\Day6.cs" />
     <Compile Include="AoC_2020\Day7.cs" />
+    <Compile Include="AoC_2020\Day8.cs" />
     <Compile Include="AoC_2020\DayTemplate.cs" />
     <Compile Include="AoC_2020\DayTemplate2.cs" />
     <Compile Include="utils\DicWithDefault.cs" />
@@ -181,6 +183,8 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2020\Day8.txt" />
+    <EmbeddedResource Include="AoC_2020\Day8_test.txt" />
     <EmbeddedResource Include="AoC_2020\Day7_test2.txt" />
     <EmbeddedResource Include="AoC_2020\Day7_test.txt" />
     <EmbeddedResource Include="AoC_2020\Day7.txt" />
