@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -26,6 +27,13 @@ namespace AdventofCode.AoC_2020
             var part1 = 0;
             var part2 = 0;
 
+            var sw = Stopwatch.StartNew();
+
+            LogAndReset("Parse", sw);
+
+            LogAndReset("*1", sw);
+
+            LogAndReset("*2", sw);
             return (part1, part2);
         }
     }

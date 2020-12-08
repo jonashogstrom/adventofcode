@@ -25,6 +25,8 @@ namespace AdventofCode
 
         protected string[] GetResource(string nameOrValue)
         {
+            if (nameOrValue.StartsWith("DayX"))
+                throw new Exception("You have to rename the resource from "+nameOrValue);
             var assembly = Assembly.GetExecutingAssembly();
             var f = GetType().Namespace;
             var fullName = f + "." + nameOrValue;
@@ -33,7 +35,9 @@ namespace AdventofCode
             var resourceName = resourceNames.FirstOrDefault(str => str.EndsWith(fullName));
             if (resourceName == null)
             {
-                Log("Resource not found, using value literal: " + nameOrValue);
+                Log("*!*!* ");
+                Log("*!*!* Resource not found, using value literal: " + nameOrValue);
+                Log("*!*!* ");
                 return new[] { nameOrValue };
             }
 
@@ -159,6 +163,12 @@ namespace AdventofCode
 
             if (actual2.HasValue && exp2.HasValue)
                 Assert.That(actual2, Is.EqualTo(exp2.Value), "Incorrect value for Part 2");
+        }
+
+        protected void LogAndReset(string label, Stopwatch sw)
+        {
+            Log($"{label}: {sw.ElapsedTicks / 10}us");
+            sw.Restart();
         }
 
         protected (T? part1, S? part2) ComputeWithTimer(string[] source)

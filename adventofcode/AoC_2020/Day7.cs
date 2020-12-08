@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO.Compression;
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security;
-using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -22,6 +18,7 @@ namespace AdventofCode.AoC_2020
         [TestCase(4, 32, "Day7_test.txt")]
         [TestCase(null, 126, "Day7_test2.txt")]
         [TestCase(211, 12414, "Day7.txt")]
+        [Repeat(10)]
         public void Test1(Part1Type exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
@@ -31,86 +28,86 @@ namespace AdventofCode.AoC_2020
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
         {
-            var part1 = 0;
-            var part2 = 0;
             var rules = new Dictionary<string, BagRule>();
+            var sw = Stopwatch.StartNew();
             foreach (var s in source)
             {
-                var parts = s.Split(new[] { "bags", "contain", "bag", ",", "." }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => x.Trim())
-                    .Where(y => !string.IsNullOrEmpty(y))
-                    .ToArray();
-                var rule = new BagRule(parts);
+                var rule = new BagRule(s, rules);
                 rules[rule.source] = rule;
             }
 
-            part1 = FindBags(rules, "shiny gold");
-            part2 = FindBagsContents(rules, "shiny gold") - 1;
+            LogAndReset("Parse", sw);
+
+            var shinyGoldBag = rules["shiny gold"];
+
+            var part1 = rules.Values.Count(r => r.CanContain(shinyGoldBag));
+            LogAndReset("*1", sw);
+
+            var part2 = shinyGoldBag.ContentCount;
+            LogAndReset("*2", sw);
             return (part1, part2);
-        }
-
-        private int FindBags(Dictionary<string, BagRule> rules, string target)
-        {
-            var t = FindBags2(rules, new HashSet<string> { target });
-            return t.Count - 1;
-        }
-
-        private int FindBagsContents(Dictionary<string, BagRule> rules, string target)
-        {
-            var rule = rules[target];
-            if (rule.contents == -1)
-            {
-                var sum = 1;
-                foreach (var t in rule.dest.Keys)
-                {
-                    sum += FindBagsContents(rules, t) * rule.dest[t];
-                }
-
-                rule.contents = sum;
-            }
-
-            return rule.contents;
-        }
-
-        private HashSet<string> FindBags2(Dictionary<string, BagRule> rules, HashSet<string> targets)
-        {
-            var res = new HashSet<string>(targets);
-            foreach (var x in rules.Keys)
-            {
-                foreach (var t in targets)
-                    if (rules[x].dest.ContainsKey(t))
-                        res.Add(x);
-            }
-
-            if (res.Count == targets.Count)
-                return res;
-            return FindBags2(rules, res);
-
         }
     }
 
     internal class BagRule
     {
+        private readonly Dictionary<string, BagRule> _rules;
         public string source;
-        public Dictionary<string, int> dest = new Dictionary<string, int>();
+        public List<(string color, int count)> ContentsList = new List<(string, int)>();
+        private int _contentCount = -1;
+        private Dictionary<BagRule, bool> _canContain2 = new Dictionary<BagRule, bool>();
 
-        public BagRule(string[] parts)
+        public BagRule(string bagDescription, Dictionary<string, BagRule> rules)
         {
-            source = parts[0];
-            foreach (var p in parts.Skip(1))
-            {
-                if (p != "no other")
-                {
-                    var pp = p.Split(new[] { ' ' }, 2);
+            _rules = rules;
 
-                    dest[pp[1]] = int.Parse(pp[0]);
-                    contents = -1;
-                }
-                else
-                    contents = 1;
+            var pp1 = bagDescription.Split(' ');
+            source = pp1[0] + " " + pp1[1];
+            var pos = 4;
+            while (pos < pp1.Length && pp1[pos] != "no")
+            {
+                ContentsList.Add(($"{pp1[pos+1]} {pp1[pos+2]}", int.Parse(pp1[pos])));
+                pos += 4;
             }
         }
 
-        public int contents;
+        public int ContentCount
+        {
+            get
+            {
+                if (_contentCount == -1)
+                {
+                    var sum = 0;
+                    foreach (var c in ContentsList)
+                    {
+                        sum += (_rules[c.color].ContentCount + 1) * c.count;
+                    }
+
+                    _contentCount = sum;
+                }
+
+                return _contentCount;
+            }
+        }
+
+        public bool CanContain(BagRule r)
+        {
+            if (!_canContain2.ContainsKey(r))
+            {
+                var res = false;
+                foreach (var x in ContentsList)
+                {
+                    var r2 = _rules[x.color];
+                    res = r2 == r || r2.CanContain(r);
+
+                    if (res)
+                        break;
+                }
+
+                _canContain2[r] = res;
+            }
+
+            return _canContain2[r];
+        }
     }
 }
