@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using NUnit.Framework;
 
@@ -9,6 +10,45 @@ namespace AdventofCode.AoC_2020
 {
     class OtherStuff : TestBaseClass<int, int>
     {
+        [Test]
+        public void TestFibb()
+        {
+            var c = new Cache<BigInteger, int>();
+            var count = 500;
+//            var x = fibb(count);
+            var fib = c.Do(fibb, count);
+
+            Console.WriteLine(fib);
+            Assert.That(fib, Is.EqualTo(fib));
+        }
+
+        public BigInteger fibb(int i, Cache<BigInteger, int> c)
+        {
+            switch (i)
+            {
+                case 0:
+                    return 0;
+                case 1:
+                    return 1;
+                default:
+                    return c.Do(fibb, i - 1) + c.Do(fibb, i - 2);
+            }
+        }
+
+
+        public long fibb(int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return 0;
+                case 1:
+                    return 1;
+                default:
+                    return fibb(i - 1) + fibb(i - 2);
+            }
+        }
+
 
         /*
 Asia 4,541,638,755
@@ -133,7 +173,7 @@ Oceania   42,721,994
             Log(s);
 
             // TACGATGCATGGCTACREENFUAURETTAGACTAGCACTCGA
-//            var code = "YZZWXVAVYZ";
+            //            var code = "YZZWXVAVYZ";
             //          REENFUAURE
             // V = 55 = U
             // W = 4E = N

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Security;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -21,7 +20,7 @@ namespace AdventofCode.AoC_2020
         {
             var source = GetResource(resourceName);
             var res = ComputeWithTimer(source);
-            DoAsserts(res, exp1, exp2);
+            DoAsserts(res, exp1, exp2, resourceName);
         }
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
@@ -31,25 +30,26 @@ namespace AdventofCode.AoC_2020
             var c = new Comp(source);
             LogAndReset("Parse", sw);
             var part1 = c.Execute(true);
-            Log("*1 - lastJump: " + part1.LastJump);
 
             LogAndReset("*1", sw);
             ExecutionState part2 = null;
 
-            for (int i = 0; i < source.Length; i++)
+            for (int i = 0; i < c.Program.Count; i++)
             {
-                if (c.Program[i].OpCode == OpCodex.nop)
-                    c.Overrides[i] = c.Program[i].Clone(OpCodex.jmp);
-                else if (c.Program[i].OpCode == OpCodex.jmp)
-                    c.Overrides[i] = c.Program[i].Clone(OpCodex.nop);
+                if (part1.Instructions[i] == 0)
+                    continue;
+                var op = c.Program[i];
+                if (op.OpCode == OpCodex.nop)
+                    c.Overrides[i] = op.Clone(OpCodex.jmp);
+                else if (op.OpCode == OpCodex.jmp)
+                    c.Overrides[i] = op.Clone(OpCodex.nop);
                 else continue;
 
                 var result = c.Execute(true);
-                c.Overrides.Clear();
-                if (!result.ReExecuted)
+                c.Overrides[i] = null;
+                if (result.Terminated)
                 {
                     part2 = result;
-                    Log("*2 - Modified op: " + i);
                     break;
                 }
             }

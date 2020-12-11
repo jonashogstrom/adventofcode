@@ -19,7 +19,7 @@ namespace AdventofCode.AoC_2020
         {
             var source = GetResource(resourceName);
             var res = ComputeWithTimer(source);
-            DoAsserts(res, exp1, exp2);
+            DoAsserts(res, exp1, exp2, resourceName);
         }
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -25,8 +26,9 @@ namespace AdventofCode
 
         protected string[] GetResource(string nameOrValue)
         {
+            _log.Clear();
             if (nameOrValue.StartsWith("DayX"))
-                throw new Exception("You have to rename the resource from "+nameOrValue);
+                throw new Exception("You have to rename the resource from " + nameOrValue);
             var assembly = Assembly.GetExecutingAssembly();
             var f = GetType().Namespace;
             var fullName = f + "." + nameOrValue;
@@ -93,6 +95,10 @@ namespace AdventofCode
         {
             return input.Select(x => int.Parse(x)).ToArray();
         }
+        protected long[] GetLongInput(string[] input)
+        {
+            return input.Select(x => long.Parse(x)).ToArray();
+        }
 
         protected IEnumerable<int> GetInts(string s, bool allowNegative = false)
         {
@@ -149,14 +155,24 @@ namespace AdventofCode
             where S : struct
             where T : struct
     {
-        protected void DoAsserts((T? part1, S? part2) actual, T? exp1, S? exp2)
+        private DateTime _startTime;
+
+        protected void DoAsserts((T? part1, S? part2) actual, T? exp1, S? exp2, string name = "")
         {
             var (actual1, actual2) = actual;
+
+            var ok1 = GetStatus(actual1, exp1);
+            var ok2 = GetStatus(actual2, exp2);
+
             if (actual1.HasValue)
-                Log("Calculated Part1: " + actual1);
+                Log($"Calculated Part1 [{ok1}]: {actual1} ");
 
             if (actual2.HasValue)
-                Log("Calculated Part2: " + actual2);
+                Log($"Calculated Part2 [{ok2}]: {actual2}");
+
+            var time = _startTime.ToString("yyyy-MM-dd_HH-mm-ss");
+
+            File.WriteAllText($"{this.GetType().FullName}_{time}_[{ok1}]_[{ok2}]_{Path.GetFileNameWithoutExtension(name)}.log", _log.ToString());
 
             if (actual1.HasValue && exp1.HasValue)
                 Assert.That(actual1, Is.EqualTo(exp1), "Incorrect value for Part 1");
@@ -165,19 +181,60 @@ namespace AdventofCode
                 Assert.That(actual2, Is.EqualTo(exp2.Value), "Incorrect value for Part 2");
         }
 
+        private string GetStatus(T? actual, T? expected)
+        {
+            if (expected.HasValue)
+            {
+                if (actual.HasValue)
+                {
+                    return actual.Value.Equals(expected.Value) ? "OK" : "XX";
+                }
+
+                return "  ";
+            }
+
+            return "??";
+        }
+        private string GetStatus(S? actual, S? expected)
+        {
+            if (expected.HasValue)
+            {
+                if (actual.HasValue)
+                {
+                    return actual.Value.Equals(expected.Value) ? "OK" : "XX";
+                }
+
+                return "  ";
+            }
+
+            return "??";
+        }
+
         protected void LogAndReset(string label, Stopwatch sw)
         {
-            Log($"{label}: {sw.ElapsedTicks / 10}us");
+            sw.Stop();
+            Log($"{label}: {FormatTimeSpan(sw.Elapsed)}");
             sw.Restart();
+        }
+
+        public string FormatTimeSpan(TimeSpan ts)
+        {
+            if (ts > TimeSpan.FromSeconds(0.5))
+                return $"{ts.TotalSeconds:F3}s";
+            if (ts > TimeSpan.FromMilliseconds(50))
+                return $"{ts.TotalMilliseconds:F1}ms";
+            return $"{ts.Ticks / 10}us";
         }
 
         protected (T? part1, S? part2) ComputeWithTimer(string[] source)
         {
+            _startTime = DateTime.Now;
             var sw = new Stopwatch();
             sw.Start();
             var res = DoComputeWithTimer(source);
             sw.Stop();
-            Log(()=>$"Total Time: {sw.ElapsedTicks/10f} micros");
+            Log(() => $"Total Time: {FormatTimeSpan(sw.Elapsed)}");
+            Log("Completed:" + (_startTime - DateTime.Today.AddHours(6)));
             return res;
         }
 

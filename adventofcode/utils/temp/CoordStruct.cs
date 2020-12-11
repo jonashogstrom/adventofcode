@@ -2,35 +2,35 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace AdventofCode
+namespace AdventofCodexxx.X
 {
     [DebuggerDisplay("({Row},{Col})")]
-    public class Coord
+    public class CoordStruct
     {
-        public static Coord N = new Coord(-1, 0);
-        public static Coord E = new Coord(0, 1);
-        public static Coord S = new Coord(1, 0);
-        public static Coord W = new Coord(0, -1);
-        public static Coord Origin = new Coord(0, 0);
-        public static Coord[] NSWE = new[]{N, S, W, E};
+        public static CoordStruct N = new CoordStruct(-1, 0);
+        public static CoordStruct E = new CoordStruct(0, 1);
+        public static CoordStruct S = new CoordStruct(1, 0);
+        public static CoordStruct W = new CoordStruct(0, -1);
+        public static CoordStruct Origin = new CoordStruct(0, 0);
+        public static CoordStruct[] NSWE = new[]{N, S, W, E};
 
-        public static Coord NW = N.Move(W);
-        public static Coord NE = N.Move(E);
-        public static Coord SE = S.Move(E);
-        public static Coord SW = S.Move(W);
+        public static CoordStruct NW = N.Move(W);
+        public static CoordStruct NE = N.Move(E);
+        public static CoordStruct SE = S.Move(E);
+        public static CoordStruct SW = S.Move(W);
 
-        public static readonly Coord[] Directions4 = { N, E, S, W };
-        public static readonly Coord[] Directions8 = { N, NE, E, SE, S, SW, W, NW };
+        public static readonly CoordStruct[] Directions4 = { N, E, S, W };
+        public static readonly CoordStruct[] Directions8 = { N, NE, E, SE, S, SW, W, NW };
 
-        public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
+        public static readonly Dictionary<CoordStruct, char> trans2NESW = new Dictionary<CoordStruct, char>()
         {
             {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'},
         };
-        public static readonly Dictionary<Coord, char> trans2Arrow = new Dictionary<Coord, char>()
+        public static readonly Dictionary<CoordStruct, char> trans2Arrow = new Dictionary<CoordStruct, char>()
         {
             {N, 'v'}, {S, '^'}, {E, '>'}, {W, '<'},
         };
-        public static readonly Dictionary<char, Coord> trans2Coord = new Dictionary<char, Coord>()
+        public static readonly Dictionary<char, CoordStruct> trans2Coord = new Dictionary<char, CoordStruct>()
         {
             {'N', N}, {'S', S}, {'E', E}, {'W', W},
             {'^', N}, {'v', S}, {'>', E}, {'<', W},
@@ -43,7 +43,7 @@ namespace AdventofCode
         public int X => Col;
         public int Y => Row;
 
-        public Coord(int row, int col)
+        public CoordStruct(int row, int col)
         {
             CoordCounter++;
             Row = row;
@@ -52,11 +52,11 @@ namespace AdventofCode
 
         public static int CoordCounter;
 
-        public static Coord FromXY(int x, int y)
+        public static CoordStruct FromXY(int x, int y)
         {
-            return new Coord(y, x);
+            return new CoordStruct(y, x);
         }
-        private bool Equals(Coord other)
+        private bool Equals(CoordStruct other)
         {
             return Row == other.Row && Col == other.Col;
         }
@@ -66,7 +66,7 @@ namespace AdventofCode
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Coord)obj);
+            return Equals((CoordStruct)obj);
         }
 
         public override int GetHashCode()
@@ -77,7 +77,7 @@ namespace AdventofCode
             }
         }
 
-        public static Coord CharToDir(char c)
+        public static CoordStruct CharToDir(char c)
         {
             return trans2Coord[c];
         }
@@ -87,34 +87,34 @@ namespace AdventofCode
             return trans2NESW[this];
         }
 
-        public Coord RotateCCW90()
+        public CoordStruct RotateCCW90()
         {
-            return new Coord(-Col, Row);
+            return new CoordStruct(-Col, Row);
         }
 
-        public Coord RotateCW90()
+        public CoordStruct RotateCW90()
         {
-            return new Coord(Col, -Row);
+            return new CoordStruct(Col, -Row);
         }
 
-        public IEnumerable<Coord> GenAdjacent4()
+        public IEnumerable<CoordStruct> GenAdjacent4()
         {
             foreach (var d in Directions4)
                 yield return Move(d);
         }
 
-        public IEnumerable<Coord> GenAdjacent8()
+        public IEnumerable<CoordStruct> GenAdjacent8()
         {
             foreach (var d in Directions8)
                 yield return Move(d);
         }
 
-        public Coord Move(Coord coord, int count = 1)
+        public CoordStruct Move(CoordStruct coordStruct, int count = 1)
         {
-            return new Coord(Row + coord.Row * count, Col + coord.Col * count);
+            return new CoordStruct(Row + coordStruct.Row * count, Col + coordStruct.Col * count);
         }
 
-        public int Dist(Coord pos)
+        public int Dist(CoordStruct pos)
         {
             return Math.Abs(Row - pos.Row) + Math.Abs(Col - pos.Col); 
         }

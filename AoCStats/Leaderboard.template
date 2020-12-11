@@ -151,14 +151,23 @@ table tr:hover {
   margin:0 !important;
 }
 
-</style>
+p.footer {
+    margin-left: 20px;
+}
 
+</style>
 </head>
 <body>
 $(DATA)
 <small>
+<p class="footer">
+This page is created/maintaned by Jonas Högström, Tobii. During the month of AdventofCode I try to keep it as up to date as possible without putting too much stress on the AoC servers.<br>
+If you find any bugs, have any questions or if you are interested in having these stats for your own private leaderboard, please contact me at jonas.hogstrom@tobii.com.<br>
+
 <!-- timestamps -->
 Generated at $(GENDATE)<br>
-Data downloaded at $(DATADATE)
+Data downloaded at $(DATADATE)<br><br>
+
+</p>
 </body>
 </html>

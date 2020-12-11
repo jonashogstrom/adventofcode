@@ -156,7 +156,7 @@ namespace AoCStats
                             if (p.PositionForStar[day][star] == -1)
                                 medal = "gray";
                             if (pos != -1)
-                                logAccumulatedPosition.Append(Cell(pos + 1, medal));
+                                logAccumulatedPosition.Append(Cell(pos + 1, medal, p.Flyoverhint(day)));
                             else
                             {
                                 logAccumulatedPosition.Append(EmptyCell());
@@ -253,7 +253,7 @@ namespace AoCStats
                             var medal = GetMedalClass(pos);
 
                             if (p.AccumulatedTimeToComplete[day][star].HasValue)
-                                logAccumulatedSolveTime.Append(Cell(p.AccumulatedTimeToComplete[day][star].Value, medal));
+                                logAccumulatedSolveTime.Append(Cell(p.AccumulatedTimeToComplete[day][star].Value, medal, p.Flyoverhint(day)));
                             else
                                 logAccumulatedSolveTime.Append(EmptyCell());
 
@@ -263,11 +263,11 @@ namespace AoCStats
                                 var time = p.TimeToComplete[day][star].Value;
                                 logTotalSolveTime.Append(Cell(time, medal, time.TotalSeconds.ToString()));
                                 if (pos == 0)
-                                    logOffsetFromWinner.Append(Cell("Winner", 0, true, medal));
+                                    logOffsetFromWinner.Append(Cell("Winner", 0, true, medal, p.Flyoverhint(day)));
                                 else
                                 {
                                     var value = p.OffsetFromWinner[day][star].Value;
-                                    logOffsetFromWinner.Append(Cell("+" + value, (int)value.TotalSeconds, true, medal));
+                                    logOffsetFromWinner.Append(Cell("+" + value, (int)value.TotalSeconds, true, medal, p.Flyoverhint(day)));
                                 }
                             }
                             else
@@ -295,7 +295,7 @@ namespace AoCStats
                             {
                                 if (p.PositionForStar[day][star] == -1)
                                     medal = "gray";
-                                logAccumulatedScore.Append(Cell(p.AccumulatedScore[day][star], medal));
+                                logAccumulatedScore.Append(Cell(p.AccumulatedScore[day][star], medal, p.Flyoverhint(day)));
                             }
                             else
                             {
@@ -380,7 +380,7 @@ namespace AoCStats
             scripts["Daily Position chart"] = logDailyPosGraphScript;
 
 
-            var logTimeStar2 = InitLog("Time to complete second star", leaderboard.HighestDay, false);
+            var logTimeStar2 = InitLog("Time to complete second star", leaderboard.HighestDay, false, "",new []{"* => **"});
 
             foreach (var p in leaderboard.OrderedPlayers)
             {
@@ -393,7 +393,9 @@ namespace AoCStats
                         var medal = GetMedalClass(pos);
 
                         if (p.TimeToCompleteStar2[day].HasValue)
-                            logTimeStar2.Append(Cell(p.TimeToCompleteStar2[day].Value, medal));
+                        {
+                            logTimeStar2.Append(Cell(p.TimeToCompleteStar2[day].Value, medal, p.Flyoverhint(day)));
+                        }
                         else
                         {
                             logTimeStar2.Append(EmptyCell());
@@ -425,7 +427,7 @@ namespace AoCStats
                             var medal = GetMedalClass(p.PositionForStar[day][star]);
                             if (p.PositionForStar[day][star] != -1)
                             {
-                                tobiiScore.Append(Cell(p.AccumulatedTobiiScore[day][star], medal));
+                                tobiiScore.Append(Cell(p.AccumulatedTobiiScore[day][star], medal, p.Flyoverhint(day)));
                             }
                             else
                             {
@@ -452,7 +454,7 @@ namespace AoCStats
             var html = File.ReadAllText("..\\..\\Leaderboard.template");
             if (!_settings.TryGetValue(_leaderBoardId + "_name", out var listName))
                 listName = leaderboard.Players.Single(p => p.Id == _leaderBoardId.ToString()).Name;
-            html = html.Replace("$(TITLE)", listName);
+            html = html.Replace("$(TITLE)", $"{listName} {_year}");
             html = html.Replace("$(GENDATE)", DateTime.Now.ToString());
             html = html.Replace("$(DATADATE)", File.GetLastWriteTime(_jsonFileName).ToString());
 
@@ -871,9 +873,9 @@ namespace AoCStats
         {
             return Cell(value.ToString(), value, true, "", alt);
         }
-        private static string Cell(int value, string htmlClass = "")
+        private static string Cell(int value, string htmlClass = "", string alt = "")
         {
-            return Cell(value.ToString(), value, true, htmlClass);
+            return Cell(value.ToString(), value, true, htmlClass, alt);
         }
         private static string Cell(TimeSpan value, string htmlClass, string alt = "")
         {
@@ -900,8 +902,10 @@ namespace AoCStats
                 $"<th onclick=\"sortTable({colPos}, 'table_{tableid}')\" align='{alignment}' class='sortable'>{content}</th>";
         }
 
-        private StringBuilder InitLog(string name, int highestDay, bool colForStar = true, string description = "")
+        private StringBuilder InitLog(string name, int highestDay, bool colForStar = true, string description = "", string[] starheader = null)
         {
+            if (starheader == null)
+                starheader = new[] {"*", "**"};
             var starCols = colForStar ? 2 : 1;
             //            var randomid = _r.Next();
             tableid++;
@@ -917,7 +921,7 @@ namespace AoCStats
             for (int day = 0; day < highestDay; day++)
                 for (int star = 0; star < starCols; star++)
                 {
-                    var stars = new string('*', star + 1);
+                    var stars = starheader [star];
                     string cellContent = "";
                     if (ExcludeDay(day))
                         cellContent += "<p style=\"color:red\">";

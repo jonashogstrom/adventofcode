@@ -59,6 +59,11 @@ namespace AoCStats
         public int CurrentPosition { get; set; }
         public int PendingPoints { get; set; }
         public int AccumulatedTobiiScoreTotal { get; set; }
+
+        public string Flyoverhint(int day)
+        {
+            return $"Time *1: {TimeToComplete[day][0]}\nTime *2: {TimeToComplete[day][1]}";
+        }
     }
 
     public class LeaderBoard

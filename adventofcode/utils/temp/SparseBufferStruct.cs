@@ -5,47 +5,47 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace AdventofCode
+namespace AdventofCodexxx.X
 {
     public class SparseBuffer<T>
     {
-        private Coord topLeft = new Coord(0, 0);
-        private Coord bottomRight = new Coord(0, 0);
+        private CoordStruct topLeft = new CoordStruct(0, 0);
+        private CoordStruct bottomRight = new CoordStruct(0, 0);
         private readonly T _def;
-        private readonly Dictionary<Coord, T> _board = new Dictionary<Coord, T>();
+        private readonly Dictionary<CoordStruct, T> _board = new Dictionary<CoordStruct, T>();
 
         public SparseBuffer(T def = default)
         {
             _def = def;
         }
 
-        public T this[Coord coord]
+        public T this[CoordStruct coordStruct]
         {
             get
             {
-                if (!_board.TryGetValue(coord, out var res))
+                if (!_board.TryGetValue(coordStruct, out var res))
                     return _def;
                 return res;
             }
             set
             {
-                _board[coord] = value;
-                if (coord.X < topLeft.X || coord.Y < topLeft.Y)
-                    topLeft = Coord.FromXY(Math.Min(topLeft.X, coord.X), Math.Min(topLeft.Y, coord.Y));
-                if (coord.X > bottomRight.X || coord.Y > bottomRight.Y)
-                    bottomRight = Coord.FromXY(Math.Max(bottomRight.X, coord.X), Math.Max(bottomRight.Y, coord.Y));
+                _board[coordStruct] = value;
+                if (coordStruct.X < topLeft.X || coordStruct.Y < topLeft.Y)
+                    topLeft = CoordStruct.FromXY(Math.Min(topLeft.X, coordStruct.X), Math.Min(topLeft.Y, coordStruct.Y));
+                if (coordStruct.X > bottomRight.X || coordStruct.Y > bottomRight.Y)
+                    bottomRight = CoordStruct.FromXY(Math.Max(bottomRight.X, coordStruct.X), Math.Max(bottomRight.Y, coordStruct.Y));
 
             }
         }
 
         public void Set(int x, int y, T value)
         {
-            var c = Coord.FromXY(x, y);
+            var c = CoordStruct.FromXY(x, y);
             this[c] = value;
 
         }
 
-        public string ToString(Func<T, Coord, string> func, int cellWidth = 1)
+        public string ToString(Func<T, CoordStruct, string> func, int cellWidth = 1)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Top: {topLeft.Y} Bottom: {bottomRight.Y} Left: {topLeft.X} Right: {bottomRight.X}");
@@ -62,7 +62,7 @@ namespace AdventofCode
                 sb.Append($"{Math.Abs(y):D4} ║");
                 for (int x = topLeft.X; x <= bottomRight.X; x++)
                 {
-                    sb.Append(func(Get(x, y), Coord.FromXY(x, y)));
+                    sb.Append(func(Get(x, y), CoordStruct.FromXY(x, y)));
                 }
 
                 sb.Append('║');
@@ -76,23 +76,23 @@ namespace AdventofCode
         public int Width => bottomRight.X - topLeft.X + 1;
         public int Height => bottomRight.Y - topLeft.Y + 1;
 
-        public IEnumerable<Coord> Keys => _board.Keys;
+        public IEnumerable<CoordStruct> Keys => _board.Keys;
 
         public string ToString(Func<T, string> func)
         {
             return ToString((v, c) => func(v));
         }
 
-        private Coord Reuse(Coord coord, int x, int y)
+        private CoordStruct Reuse(CoordStruct coordStruct, int x, int y)
         {
-            if (coord.X == x && coord.Y == y)
-                return coord;
-            return new Coord(x, y);
+            if (coordStruct.X == x && coordStruct.Y == y)
+                return coordStruct;
+            return new CoordStruct(x, y);
         }
 
         public T Get(int x, int y)
         {
-            return this[Coord.FromXY(x, y)];
+            return this[CoordStruct.FromXY(x, y)];
         }
 
         public SparseBuffer<T> Clone()
@@ -111,7 +111,7 @@ namespace AdventofCode
             {
                 for (int col = 0; col < input[row].Length; col++)
                 {
-                    var c = Coord.FromXY(col, row);
+                    var c = CoordStruct.FromXY(col, row);
                     floor[c] = input[row][col];
                 }
             }

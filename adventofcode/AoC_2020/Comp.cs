@@ -9,10 +9,12 @@ namespace AdventofCode.AoC_2020
 
         public Comp(IEnumerable<string> input)
         {
+            Overrides = new List<Instruction>();
             foreach (var s in input)
             {
                 var parts = s.Split(' ');
                 Program.Add(new Instruction((OpCodex)Enum.Parse(typeof(OpCodex), parts[0]), int.Parse(parts[1])));
+                Overrides.Add(null);
             }
         }
 
@@ -25,13 +27,14 @@ namespace AdventofCode.AoC_2020
             var execCounter = 0;
             while (ptr < Program.Count)
             {
-                if (!Overrides.TryGetValue(ptr, out var instr))
-                    instr = Program[ptr];
-
                 if (stopAtReExecute && instructions[ptr] != 0)
                 {
-                    return new ExecutionState(accumulator, true, ptr, lastJump);
+                    return new ExecutionState(accumulator, false, ptr, lastJump, instructions);
                 }
+
+                var instr = Overrides[ptr];
+                if (instr == null)
+                    instr = Program[ptr];
 
                 execCounter++;
                 instructions[ptr] = execCounter;
@@ -50,13 +53,12 @@ namespace AdventofCode.AoC_2020
                         accumulator += instr.Arg;
                         break;
                 }
-
             }
 
-            return new ExecutionState(accumulator, false, ptr, lastJump);
+            return new ExecutionState(accumulator, true, ptr, lastJump, instructions);
         }
 
-        public Dictionary<int, Instruction> Overrides = new Dictionary<int, Instruction>();
+        public List<Instruction> Overrides { get; }
         public class Instruction
         {
             public OpCodex OpCode { get; }
@@ -78,16 +80,18 @@ namespace AdventofCode.AoC_2020
     public class ExecutionState
     {
         public long Accumulator { get; }
-        public bool ReExecuted { get; }
+        public bool Terminated { get; }
         public int Ptr { get; }
         public int LastJump { get; }
+        public int[] Instructions { get; }
 
-        public ExecutionState(long accumulator, bool reExecuted, int ptr, int lastJump)
+        public ExecutionState(long accumulator, bool terminated, int ptr, int lastJump, int[] instructions)
         {
             Accumulator = accumulator;
-            ReExecuted = reExecuted;
+            Terminated = terminated;
             Ptr = ptr;
             LastJump = lastJump;
+            Instructions = instructions;
         }
     }
 
