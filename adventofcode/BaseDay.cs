@@ -193,7 +193,7 @@ namespace AdventofCode
                 return "  ";
             }
 
-            return "??";
+            return "__";
         }
         private string GetStatus(S? actual, S? expected)
         {
@@ -207,7 +207,7 @@ namespace AdventofCode
                 return "  ";
             }
 
-            return "??";
+            return "__";
         }
 
         protected void LogAndReset(string label, Stopwatch sw)

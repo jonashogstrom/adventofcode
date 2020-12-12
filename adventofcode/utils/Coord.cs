@@ -91,6 +91,25 @@ namespace AdventofCode
         {
             return new Coord(-Col, Row);
         }
+        public Coord RotateCCWDegrees(int degrees)
+        {
+            if (degrees%90 != 0)
+                throw new Exception("can only rotate even 90 degrees");
+            var res = this;
+            for (var i = 0; i < degrees / 90; i++)
+                res = res.RotateCCW90();
+            return res;
+        }
+
+        public Coord RotateCWDegrees(int degrees)
+        {
+            if (degrees%90 != 0)
+                throw new Exception("can only rotate even 90 degrees");
+            var res = this;
+            for (var i = 0; i < degrees / 90; i++)
+                res = res.RotateCW90();
+            return res;
+        }
 
         public Coord RotateCW90()
         {
