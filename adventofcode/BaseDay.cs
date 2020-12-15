@@ -122,6 +122,28 @@ namespace AdventofCode
             }
         }
 
+        protected IEnumerable<long> Getlongs(string s, bool allowNegative = false)
+        {
+            var temp = "";
+            foreach (var c in s)
+            {
+                if (c >= '0' && c <= '9' || allowNegative && c == '-')
+                {
+                    temp += c;
+                }
+                else if (temp != "")
+                {
+                    yield return long.Parse(temp);
+                    temp = "";
+                }
+            }
+
+            if (temp != "")
+            {
+                yield return long.Parse(temp);
+            }
+        }
+
         protected IEnumerable<float> GetFloats(string s)
         {
             var temp = "";

@@ -29,16 +29,16 @@ namespace AdventofCode.AoC_2020
 
             LogAndReset("Parse", sw);
 
-            var part1 = CalculatePart(source, Coord.E, NSEWMove.boat);
+            var part1 = CalculatePart(source, Coord.E, NSEWMove.boat, false);
             LogAndReset("*1", sw);
 
-            var part2 = CalculatePart(source, Coord.Origin.Move(Coord.E, 10).Move(Coord.N, 1), NSEWMove.target);
+            var part2 = CalculatePart(source, Coord.Origin.Move(Coord.E, 10).Move(Coord.N, 1), NSEWMove.target, true);
             LogAndReset("*2", sw);
             return (part1, part2);
         }
 
 
-        private static int CalculatePart(string[] source, Coord target, NSEWMove nsewMove)
+        private int CalculatePart(string[] source, Coord target, NSEWMove nsewMove, bool igorsequence)
         {
             var pos = Coord.Origin;
 
@@ -46,6 +46,7 @@ namespace AdventofCode.AoC_2020
             {
                 var value = int.Parse(s.Substring(1));
                 var instr = s[0];
+
                 switch (instr)
                 {
                     case 'L':
@@ -68,6 +69,8 @@ namespace AdventofCode.AoC_2020
                             target = target.Move(dir, value);
                         break;
                 }
+                if (igorsequence)
+                    Log($"[{pos.X}, {pos.Y-40000}, 100000, 20, 0],");
             }
 
             return pos.Dist(Coord.Origin);

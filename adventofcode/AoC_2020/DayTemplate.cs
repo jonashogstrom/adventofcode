@@ -15,7 +15,7 @@ namespace AdventofCode.AoC_2020
         [Test]
         [TestCase(-1, null, "DayX_test.txt")]
         [TestCase(-1, null, "DayX.txt")]
-        public void Test1(Part1Type exp1, Part2Type? exp2, string resourceName)
+        public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
             var res = ComputeWithTimer(source);
@@ -24,8 +24,8 @@ namespace AdventofCode.AoC_2020
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
         {
-            var part1 = 0;
-            var part2 = 0;
+            Part1Type part1 = 0;
+            Part2Type part2 = 0;
 
             var sw = Stopwatch.StartNew();
 

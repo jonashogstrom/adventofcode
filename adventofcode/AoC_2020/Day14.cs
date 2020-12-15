@@ -16,6 +16,8 @@ namespace AdventofCode.AoC_2020
     class Day14 : TestBaseClass<Part1Type, Part2Type>
     {
         public bool Debug { get; set; }
+        private bool _skipPart1;
+        private bool _skipPart2;
 
         [Test]
         [TestCase(165, null, "Day14_test.txt")]
@@ -24,6 +26,9 @@ namespace AdventofCode.AoC_2020
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
+            _skipPart1 = exp1.HasValue;
+            _skipPart2 = exp2.HasValue;
+
             var res = ComputeWithTimer(source);
             DoAsserts(res, exp1, exp2, resourceName);
         }
@@ -36,14 +41,20 @@ namespace AdventofCode.AoC_2020
             var sw = Stopwatch.StartNew();
 
             LogAndReset("Parse", sw);
-            var mem = ExecutePart1(source);
+            if (!_skipPart1)
+            {
+                var mem = ExecutePart1(source);
 
-            part1 = mem.Values.Sum();
+                part1 = mem.Values.Sum();
+            }
 
             LogAndReset("*1", sw);
-            mem = ExecutePart2(source);
+            if (!_skipPart2)
+            {
+                var mem = ExecutePart2(source);
 
-            part2 = mem.Values.Sum();
+                part2 = mem.Values.Sum();
+            }
 
             LogAndReset("*2", sw);
             return (part1, part2);
