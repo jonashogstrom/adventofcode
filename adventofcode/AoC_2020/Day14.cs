@@ -26,8 +26,8 @@ namespace AdventofCode.AoC_2020
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
-            _skipPart1 = exp1.HasValue;
-            _skipPart2 = exp2.HasValue;
+            _skipPart1 = !exp1.HasValue;
+            _skipPart2 = !exp2.HasValue;
 
             var res = ComputeWithTimer(source);
             DoAsserts(res, exp1, exp2, resourceName);
