@@ -238,6 +238,12 @@ namespace AdventofCode
             Log($"{label}: {FormatTimeSpan(sw.Elapsed)}");
             sw.Restart();
         }
+        protected void LogMidTime(string label, Stopwatch sw)
+        {
+            sw.Stop();
+            Log($"{label}: {FormatTimeSpan(sw.Elapsed)}");
+            sw.Restart();
+        }
 
         public string FormatTimeSpan(TimeSpan ts)
         {

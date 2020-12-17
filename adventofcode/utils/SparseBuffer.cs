@@ -119,5 +119,9 @@ namespace AdventofCode
             return floor;
         }
 
+        public int Count(T c)
+        {
+            return _board.Values.Count(x => x.Equals(c));
+        }
     }
 }

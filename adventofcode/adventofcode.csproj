@@ -27,6 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>true</Prefer32Bit>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -97,6 +98,7 @@
     <Compile Include="AoC_2020\Day14.cs" />
     <Compile Include="AoC_2020\Day15.cs" />
     <Compile Include="AoC_2020\Day16.cs" />
+    <Compile Include="AoC_2020\Day17.cs" />
     <Compile Include="AoC_2020\DayTemplate.cs" />
     <Compile Include="AoC_2020\DayTemplate2.cs" />
     <Compile Include="utils\DicWithDefault.cs" />
@@ -192,6 +194,8 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2020\Day17.txt" />
+    <EmbeddedResource Include="AoC_2020\Day17_test.txt" />
     <EmbeddedResource Include="AoC_2020\Day16_jesper.txt" />
     <EmbeddedResource Include="AoC_2020\Day16_test2.txt" />
     <EmbeddedResource Include="AoC_2020\Day16_test.txt" />

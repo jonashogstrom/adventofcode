@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Security;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -19,8 +18,8 @@ namespace AdventofCode.AoC_2020
         [Test]
         [TestCase(71, null, "Day16_test.txt")]
         [TestCase(null, 1, "Day16_test2.txt")]
-        [TestCase(25916, null, "Day16.txt")]
-        [TestCase(null, null, "Day16_jesper.txt")]
+        [TestCase(25916, 2564529489989, "Day16.txt")]
+        [TestCase(20060, 2843534243843, "Day16_jesper.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
@@ -40,7 +39,8 @@ namespace AdventofCode.AoC_2020
             var myTicket = GetInts(x[1].Last()).ToList();
             var tickets = x[2].Skip(1).ToList();
             var ranges = new List<List<int>>();
-            var ruleDic = new Dictionary<string, List<int>>();
+            var ruleDic2 = new List<(string name, List<int> values)>();
+
 
             foreach (var r in rules)
             {
@@ -51,7 +51,7 @@ namespace AdventofCode.AoC_2020
                 range.Add(int.Parse(parts[3]));
                 range.Add(int.Parse(parts[4]));
                 ranges.Add(range);
-                ruleDic[parts[0]] = range;
+                ruleDic2.Add((parts[0], range));
             }
             LogAndReset("Parse", sw);
             var invalidSum = 0L;
@@ -80,51 +80,62 @@ namespace AdventofCode.AoC_2020
                 {
                     possiblyValidTickets.Add(values.ToList());
                 }
-
             }
 
             part1 = invalidSum;
             LogAndReset("*1", sw);
-            var unmatchedRuleIndices = new HashSet<int>(Enumerable.Range(0, ruleDic.Count));
-            var unmatchedRuleNames = new HashSet<string>(ruleDic.Keys);
+
+            var matchingRules = new List<(int index, HashSet<string> names)>();
+            for (var ruleIndex = 0; ruleIndex < ruleDic2.Count; ruleIndex++)
+            {
+                var matchingRules2 = new HashSet<string>();
+
+                foreach (var rule in ruleDic2)
+                {
+                    var allTicketsValidForRule = true;
+                    var r = rule.values;
+                    foreach (var ticket in possiblyValidTickets)
+                    {
+                        var valid = isValid(ticket[ruleIndex], r);
+
+                        if (!valid)
+                        {
+                            allTicketsValidForRule = false;
+                            break;
+                        }
+                    }
+
+                    if (allTicketsValidForRule)
+                    {
+                        matchingRules2.Add(rule.name);
+                    }
+                }
+                matchingRules.Add((ruleIndex, matchingRules2));
+            }
+            LogMidTime("*2-1", sw);
+
+            var unmatchedRuleNames = new HashSet<string>(ruleDic2.Select(r => r.name));
             var ruleOrders = new Dictionary<string, int>();
             var rounds = 0;
-            while (unmatchedRuleNames.Any(name=>name.StartsWith("departure")))
+            while (unmatchedRuleNames.Any())//name => name.StartsWith("departure")))
             {
-                foreach (var ruleIndex in unmatchedRuleIndices.ToList())
+                foreach (var rule in matchingRules.Where(r => r.names.Count == 1).ToList())
                 {
-                    var matchingRules = new List<string>();
-                    foreach (var rule in unmatchedRuleNames)
+                    var ruleName = rule.names.First();
+                    unmatchedRuleNames.Remove(ruleName);
+                    ruleOrders[ruleName] = rule.index;
+                    foreach (var o in matchingRules)
                     {
-                        var allTicketsValidForRule = true;
-
-                        foreach (var t in possiblyValidTickets)
-                        {
-                            var valid = isValid(t[ruleIndex], ruleDic[rule]);
-
-                            if (!valid)
-                            {
-                                allTicketsValidForRule = false;
-                                break;
-                            }
-                        }
-                        if (allTicketsValidForRule)
-                            matchingRules.Add(rule);
+                        o.Item2.Remove(ruleName);
                     }
 
-                    if (matchingRules.Count == 1)
-                    {
-                        unmatchedRuleNames.Remove(matchingRules.First());
-                        unmatchedRuleIndices.Remove(ruleIndex);
-                        ruleOrders[matchingRules.First()] = ruleIndex;
-                        Log($"Found unique matching rule: {matchingRules.First()} => index {ruleIndex}");
-                    }
-
+                    //                    Log($"Found unique matching rule: {ruleName} => index {rule.index}");
                 }
-
                 rounds++;
             }
-            var sum = 1L;
+
+            Log("Rounds: " + rounds);
+            part2 = 1;
 
             foreach (var r in ruleOrders.Keys)
             {
@@ -132,13 +143,12 @@ namespace AdventofCode.AoC_2020
                 {
                     var ruleOrder = ruleOrders[r];
                     var ticketValue = myTicket[ruleOrder];
-                    sum *= ticketValue;
-                    Log($"rule {r}:{ruleOrder} value: {ticketValue} => res {sum}");
+                    part2 *= ticketValue;
+                    //                    Log($"rule {r}:{ruleOrder} value: {ticketValue} => res {part2 }");
 
                 }
             }
 
-            part2 = sum;
             LogAndReset("*2", sw);
             return (part1, part2);
         }
