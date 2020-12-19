@@ -193,8 +193,11 @@ namespace AdventofCode
                 Log($"Calculated Part2 [{ok2}]: {actual2}");
 
             var time = _startTime.ToString("yyyy-MM-dd_HH-mm-ss");
+            var filename =
+                $"{this.GetType().FullName}_{time}_[{ok1}]_[{ok2}]_{Path.GetFileNameWithoutExtension(name)}.log";
+            filename = filename.Replace("*", "_");
 
-            File.WriteAllText($"{this.GetType().FullName}_{time}_[{ok1}]_[{ok2}]_{Path.GetFileNameWithoutExtension(name)}.log", _log.ToString());
+            File.WriteAllText(filename, _log.ToString());
 
             if (actual1.HasValue && exp1.HasValue)
                 Assert.That(actual1, Is.EqualTo(exp1), "Incorrect value for Part 1");

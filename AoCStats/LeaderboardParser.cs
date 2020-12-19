@@ -42,7 +42,7 @@ namespace AoCStats
             _handleExcludes = handleExcludes;
             _x_suffix = (handleExcludes ? "_X" : "") + (_excludeZero ? "" : "_0");
 
-            var interval = TimeSpan.FromHours(24);
+            var interval = TimeSpan.FromHours(5*24);
             if (year == DateTime.Now.Year)
             {
                 interval = TimeSpan.FromMinutes(15);
@@ -71,7 +71,7 @@ namespace AoCStats
                 DeriveMoreStats(leaderboard);
                 ParseGlobalBoards(leaderboard, year);
 
-                Log($"Generating new html for {_settings[_leaderBoardId + "_name"]}/{_year} ({_leaderBoardId})");
+                Log($"Generating new html for {_settings[_leaderBoardId + "_name"]}/{_year}{(_excludeZero ? 'X':' ')} ({_leaderBoardId})");
                 var modified = GenerateHtml(leaderboard);
                 if (updatedData || modified)
                     UploadStatistics();

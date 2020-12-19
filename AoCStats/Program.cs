@@ -32,14 +32,15 @@ namespace AoCStats
 
                 // FredrikMarcus
                 new LeaderboardParser().GenerateReport(126234, new[] { 2020, 2019, 2018 }, false, forceLoad);
+
                 // repl.it
-                new LeaderboardParser().GenerateReport(374141, new[] { 2020}, false, forceLoad);
+                new LeaderboardParser().GenerateReport(374141, new[] { 2020 }, false, forceLoad);
 
                 // catawiki
-                new LeaderboardParser().GenerateReport(190418, new[] { 2020}, false, forceLoad);
+                new LeaderboardParser().GenerateReport(190418, new[] { 2020 }, false, forceLoad);
 
-                // smartstreet
-                new LeaderboardParser().GenerateReport(193188, new[] { 2020}, false, forceLoad);
+                // smartystreet
+                new LeaderboardParser().GenerateReport(193188, new[] { 2020 }, false, forceLoad);
 
 
                 // tobii with all participants

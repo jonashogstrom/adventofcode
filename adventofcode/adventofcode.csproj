@@ -99,8 +99,12 @@
     <Compile Include="AoC_2020\Day15.cs" />
     <Compile Include="AoC_2020\Day16.cs" />
     <Compile Include="AoC_2020\Day17.cs" />
+    <Compile Include="AoC_2020\Day18.cs" />
+    <Compile Include="AoC_2020\Day19.cs" />
+    <Compile Include="AoC_2020\Day20.cs" />
     <Compile Include="AoC_2020\DayTemplate.cs" />
     <Compile Include="AoC_2020\DayTemplate2.cs" />
+    <Compile Include="utils\GenCoord.cs" />
     <Compile Include="utils\DicWithDefault.cs" />
     <Compile Include="AoC_2020\OtherStuff.cs" />
     <Compile Include="AoC_2020\Passport.cs" />
@@ -194,6 +198,12 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2020\Day20_test.txt" />
+    <EmbeddedResource Include="AoC_2020\Day20.txt" />
+    <EmbeddedResource Include="AoC_2020\Day19_test2.txt" />
+    <EmbeddedResource Include="AoC_2020\Day19_test.txt" />
+    <EmbeddedResource Include="AoC_2020\Day19.txt" />
+    <EmbeddedResource Include="AoC_2020\Day18.txt" />
     <EmbeddedResource Include="AoC_2020\Day17.txt" />
     <EmbeddedResource Include="AoC_2020\Day17_test.txt" />
     <EmbeddedResource Include="AoC_2020\Day16_jesper.txt" />
