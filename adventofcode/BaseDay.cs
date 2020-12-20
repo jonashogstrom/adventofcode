@@ -245,7 +245,7 @@ namespace AdventofCode
         {
             sw.Stop();
             Log($"{label}: {FormatTimeSpan(sw.Elapsed)}");
-            sw.Restart();
+            sw.Start();
         }
 
         public string FormatTimeSpan(TimeSpan ts)

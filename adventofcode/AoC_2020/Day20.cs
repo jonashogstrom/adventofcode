@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms.VisualStyles;
 using NUnit.Framework;
 
 
@@ -57,7 +58,7 @@ namespace AdventofCode.AoC_2020
             {
                 if (edgeId[t].Count == 1)
                 {
-//                    Log($"UniqueEdge found in {edgeId[t].First().index}: {t}");
+                    //                    Log($"UniqueEdge found in {edgeId[t].First().index}: {t}");
                     unique[edgeId[t].First().index]++;
                 }
             }
@@ -67,7 +68,7 @@ namespace AdventofCode.AoC_2020
             var corners = new List<Tile>();
             foreach (var x in unique.Keys)
             {
-//                Log($"UniqueEdges for {x} = {unique[x]}");
+                //                Log($"UniqueEdges for {x} = {unique[x]}");
                 if (unique[x] == 4)
                 {
                     xx *= x;
@@ -85,8 +86,6 @@ namespace AdventofCode.AoC_2020
 
             var side = (int)Math.Sqrt(tiles.Count);
             var allTiles = new SparseBuffer<Tile>();
-            var unusedTileNumbers = new HashSet<int>(tiles.Keys);
-            unusedTileNumbers.Remove(topLeft.index);
             allTiles[Coord.FromXY(0, 0)] = topLeft;
             for (var row = 0; row < side; row++)
                 for (var col = 0; col < side; col++)
@@ -94,74 +93,77 @@ namespace AdventofCode.AoC_2020
                     var c = Coord.FromXY(col, row);
                     if (allTiles[c] == null)
                     {
-                        var candidates = new List<Tile>();
                         var northNeighbour = allTiles[c.Move(Coord.N)];
-                        var westNeighbout = allTiles[c.Move(Coord.W)];
+                        var westNeighbour = allTiles[c.Move(Coord.W)];
                         string northEdge = null;
-//                        Tile t = null;
+                        Tile t = null;
                         if (northNeighbour != null)
                         {
                             northEdge = northNeighbour.SS;
-//                            t = edgeId[northEdge].First(x => x.index != northNeighbour.index);
+                            t = edgeId[northEdge].First(x => x.index != northNeighbour.index);
                         }
                         string westEdge = null;
-                        if (westNeighbout != null)
-                            westEdge = westNeighbout.SE;
-                        foreach (var ix in unusedTileNumbers)
+                        if (t == null && westNeighbour != null)
                         {
-                            var t = tiles[ix];
-                            foreach (var t2 in t.AllOrientations())
-                                if ((northEdge == null || t2.SN == northEdge) &&
-                                    (westEdge == null || t2.SW == westEdge))
-                                {
-                                    candidates.Add(t2);
-                                }
-
+                            westEdge = westNeighbour.SE;
+                            t = edgeId[westEdge].First(x => x.index != westNeighbour.index);
                         }
 
-                        allTiles[c] = candidates.First();
-
-//                        Log($"Tile x={c.X} y={c.Y} index: {allTiles[c].index}");
-                        unusedTileNumbers.Remove(allTiles[c].index);
+                        foreach (var t2 in t.AllOrientations())
+                            if ((northEdge == null || t2.SN == northEdge) &&
+                                (westEdge == null || t2.SW == westEdge))
+                            {
+                                allTiles[c] = t2;
+                                break;
+                            }
+                        //                        Log($"Tile x={c.X} y={c.Y} index: {allTiles[c].index}");
                     }
                 }
 
-            var bigMap = new SparseBuffer<char>('-');
-            foreach (var c in allTiles.Keys)
-            {
-                var tile = allTiles[c];
-                for (int col = 0; col < tile.data.Width ; col++)
-                for (int row = 0; row < tile.data.Height ; row++)
-                {
-                    var bigCoord = Coord.FromXY(c.X * (tile.data.Width+1) + col - 1, c.Y * (tile.data.Height+1) + row - 1);
-                    bigMap[bigCoord] = tile.data[Coord.FromXY(col, row)];
-                }
-            }
+            LogMidTime("FoundAllPieces", sw);
 
-//            Log(bigMap.ToString(c=>c.ToString()));
+            var bigMap = new SparseBuffer<char>('-');
+            // foreach (var c in allTiles.Keys)
+            // {
+            //     var tile = allTiles[c];
+            //     for (int col = 0; col < tile.data.Width; col++)
+            //         for (int row = 0; row < tile.data.Height; row++)
+            //         {
+            //             var bigCoord = Coord.FromXY(c.X * (tile.data.Width + 1) + col - 1, c.Y * (tile.data.Height + 1) + row - 1);
+            //             bigMap[bigCoord] = tile.data[Coord.FromXY(col, row)];
+            //         }
+            // }
+            // LogMidTime("built bitmap1", sw);
+
+            //            Log(bigMap.ToString(c=>c.ToString()));
 
             bigMap = new SparseBuffer<char>('-');
             foreach (var c in allTiles.Keys)
             {
                 var tile = allTiles[c];
-                for (int col = 1; col < tile.data.Width-1; col++)
-                for (int row = 1; row < tile.data.Height-1; row++)
-                {
-                    var bigCoord = Coord.FromXY(c.X * (tile.data.Width -2) + col - 1, c.Y * (tile.data.Height - 2) + row - 1);
-                    bigMap[bigCoord] = tile.data[Coord.FromXY(col, row)];
-                }
+                for (int col = 1; col < tile.data.Width - 1; col++)
+                    for (int row = 1; row < tile.data.Height - 1; row++)
+                    {
+                        var bigCoord = Coord.FromXY(c.X * (tile.data.Width - 2) + col - 1, c.Y * (tile.data.Height - 2) + row - 1);
+                        bigMap[bigCoord] = tile.data[Coord.FromXY(col, row)];
+                    }
             }
 
-//            Log(bigMap.ToString(c => c.ToString()));
+            LogMidTime("built bitmap2", sw);
+            //            Log(bigMap.ToString(c => c.ToString()));
 
             var monster = GetMonster();
             var maxMonsters = 0;
             foreach (var m in monster.AllOrientations())
             {
                 var res = FindMonsterInMap(m, bigMap);
-                //Log(res.ToString);
                 maxMonsters = Math.Max(maxMonsters, res);
+                if (maxMonsters > 0)
+                    break;
+//                LogMidTime("looking for more monsters", sw);
             }
+            LogMidTime("found all monsters", sw);
+
 
             part2 = bigMap.Count('#') - maxMonsters * monster.data.Count('#');
             LogAndReset("*2", sw);
@@ -174,9 +176,16 @@ namespace AdventofCode.AoC_2020
             foreach (var topLeft in bigMap.Keys)
             {
                 var match = true;
-                foreach(var monstercoord in monster.data.Keys)
+                foreach (var monstercoord in monster.data.Keys)
+                {
                     if (monster.data[monstercoord] == '#')
-                        match = match && bigMap[topLeft.Move(monstercoord)] == '#';
+                        if (bigMap[topLeft.Move(monstercoord)] != '#')
+                        {
+                            match = false;
+                            break;
+                        }
+
+                }
                 if (match)
                     foundMonsters++;
             }
@@ -238,22 +247,23 @@ namespace AdventofCode.AoC_2020
 
         public IEnumerable<Tile> AllOrientations()
         {
-            if (_allOrientations == null)
+            // if (_allOrientations == null)
+            // {
+            _allOrientations = new List<Tile>();
+            var temp = this;
+            var temp2 = FlipV();
+            for (int i = 0; i < 4; i++)
             {
-                _allOrientations = new List<Tile>();
-                var temp = this;
-                for (int i = 0; i < 4; i++)
-                {
-                    var t = temp.Rot90();
-                    _allOrientations.Add(t);
-                    _allOrientations.Add(t.FlipH());
-                    _allOrientations.Add(t.FlipV());
-                    _allOrientations.Add(t.FlipV().FlipH());
-                    temp = t;
-                }
+                temp = temp.Rot90();
+                yield return temp;
+                //                    _allOrientations.Add(temp);
+                temp2 = temp2.Rot90();
+                yield return temp2;
+                //                    _allOrientations.Add(temp2);
             }
+            // }
 
-            return _allOrientations;
+            //          return _allOrientations;
         }
 
         public Tile FlipH()
