@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Linq;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -13,7 +16,7 @@ namespace AdventofCode.AoC_2020
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(-1, null, "Day21_test.txt")]
+        [TestCase(5, null, "Day21_test.txt")]
         [TestCase(-1, null, "Day21.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
@@ -28,13 +31,129 @@ namespace AdventofCode.AoC_2020
             Part2Type part2 = 0;
 
             var sw = Stopwatch.StartNew();
+            var foodList = new List<Food>();
+            foreach (var s in source)
+                foodList.Add(ParseFood(s));
+
+
 
             LogAndReset("Parse", sw);
 
+            var allergeneToFoodDic = new DicWithDefaultFunc<string, List<Food>>(() => new List<Food>());
+            var allAllergenes = new HashSet<string>();
+            var allingredients = new HashSet<string>();
+
+            foreach (var f in foodList)
+            {
+                foreach (var a in f.Allergenes)
+                {
+                    allergeneToFoodDic[a].Add(f);
+                    allAllergenes.Add(a);
+                }
+
+                foreach (var i in f.Ingredients)
+                {
+                    allingredients.Add(i);
+                }
+            }
+
+
+            var safeIngredients = new HashSet<string>(allingredients);
+            foreach (var a in allAllergenes)
+            {
+                var allergenesIsInFood = allergeneToFoodDic[a];
+                var possibleIngredients = allergenesIsInFood.First().Ingredients;
+                foreach (var f in allergeneToFoodDic[a])
+                {
+                    possibleIngredients = possibleIngredients.Intersect(f.Ingredients).ToHashSet();
+                }
+
+                foreach (var i in possibleIngredients)
+                {
+                    safeIngredients.Remove(i);
+                }
+            }
+
+            foreach (var i in safeIngredients)
+            {
+                foreach (var f in foodList)
+                {
+                    if (f.Ingredients.Contains(i))
+                        part1++;
+                }
+            }
+
             LogAndReset("*1", sw);
+            foreach (var i in safeIngredients)
+                EliminateIngredient(i, foodList);
+
+            foreach (var f in foodList)
+            {
+                var xx = string.Join(",", f.Ingredients);
+                var yy = string.Join(",", f.Allergenes);
+                Log($"{f.Ingredients.Count}=>{f.Allergenes.Count}  {xx} => {yy}");
+            }
+
+            var identifiedIngredients = new Dictionary<string, string>();
+            while (identifiedIngredients.Count < allAllergenes.Count)
+            {
+                foreach (var a in allAllergenes)
+                {
+                    var allergenesIsInFood = allergeneToFoodDic[a];
+                    var possibleIngredients = allergenesIsInFood.First().Ingredients;
+                    foreach (var f in allergeneToFoodDic[a])
+                    {
+                        possibleIngredients = possibleIngredients.Intersect(f.Ingredients).ToHashSet();
+                    }
+ 
+                    if (possibleIngredients.Count == 1)
+                    {
+                        var identifiedIngredient = possibleIngredients.First();
+                        EliminateIngredient(identifiedIngredient, foodList);
+                        EliminateAllergene(a, foodList);
+                        identifiedIngredients[a] = identifiedIngredient;
+                        Log($"{a} => {identifiedIngredient}");
+                    }
+                }
+            }
+
+            var res = string.Join(",", identifiedIngredients.Keys.OrderBy(a => a).Select(x=>identifiedIngredients[x]));
+            Log(res);
+
 
             LogAndReset("*2", sw);
             return (part1, part2);
+        }
+
+        private void EliminateAllergene(string allergene, List<Food> foodList)
+        {
+            foreach (var f in foodList)
+                f.Allergenes.Remove(allergene);
+        }
+
+        private void EliminateIngredient(string ingredient, List<Food> foodList)
+        {
+            foreach (var f in foodList)
+                f.Ingredients.Remove(ingredient);
+        }
+
+        private Food ParseFood(string s)
+        {
+            s = s.Replace(" (", "").Replace(")", "").Replace(",", "");
+            var parts = s.Split(new[] { "contains " }, StringSplitOptions.RemoveEmptyEntries);
+            return new Food(parts[0].Split(' '), parts[1].Split(' '));
+        }
+    }
+    
+    internal class Food
+    {
+        public HashSet<string> Ingredients { get; }
+        public HashSet<string> Allergenes { get; }
+
+        public Food(string[] ingredients, string[] allergenes)
+        {
+            Ingredients = ingredients.ToHashSet();
+            Allergenes = allergenes.ToHashSet();
         }
     }
 }
