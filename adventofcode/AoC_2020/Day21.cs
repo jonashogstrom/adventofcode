@@ -16,8 +16,8 @@ namespace AdventofCode.AoC_2020
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(5, null, "Day21_test.txt")]
-        [TestCase(-1, null, "Day21.txt")]
+        [TestCase(5, -1389192152, "Day21_test.txt")]
+        [TestCase(2280, -1879313247, "Day21.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
@@ -87,14 +87,14 @@ namespace AdventofCode.AoC_2020
             foreach (var i in safeIngredients)
                 EliminateIngredient(i, foodList);
 
-            foreach (var f in foodList)
-            {
-                var xx = string.Join(",", f.Ingredients);
-                var yy = string.Join(",", f.Allergenes);
-                Log($"{f.Ingredients.Count}=>{f.Allergenes.Count}  {xx} => {yy}");
-            }
+            // foreach (var f in foodList)
+            // {
+            //     var xx = string.Join(",", f.Ingredients);
+            //     var yy = string.Join(",", f.Allergenes);
+            //     Log($"{f.Ingredients.Count}=>{f.Allergenes.Count}  {xx} => {yy}");
+            // }
 
-            var identifiedIngredients = new Dictionary<string, string>();
+            var identifiedIngredients = new List<(string i, string a)>();
             while (identifiedIngredients.Count < allAllergenes.Count)
             {
                 foreach (var a in allAllergenes)
@@ -111,15 +111,20 @@ namespace AdventofCode.AoC_2020
                         var identifiedIngredient = possibleIngredients.First();
                         EliminateIngredient(identifiedIngredient, foodList);
                         EliminateAllergene(a, foodList);
-                        identifiedIngredients[a] = identifiedIngredient;
-                        Log($"{a} => {identifiedIngredient}");
+                        identifiedIngredients.Add((identifiedIngredient, a));
+//                        Log($"{a} => {identifiedIngredient}");
                     }
                 }
             }
 
-            var res = string.Join(",", identifiedIngredients.Keys.OrderBy(a => a).Select(x=>identifiedIngredients[x]));
-            Log(res);
+            foreach (var x in identifiedIngredients)
+            {
+                Log($"{x.a} => {x.i}");
+            }
 
+            var res = string.Join(",", identifiedIngredients.OrderBy(x=>x.a).Select(x=>x.i));
+            Log($"Part1: {res}");
+            part2 = res.GetHashCode();
 
             LogAndReset("*2", sw);
             return (part1, part2);

@@ -42,6 +42,9 @@ namespace AoCStats
                 // smartystreet
                 new LeaderboardParser().GenerateReport(193188, new[] { 2020 }, false, forceLoad);
 
+                // David Lozzi
+                new LeaderboardParser().GenerateReport(1030369, new[] { 2020 }, false, forceLoad);
+
 
                 // tobii with all participants
                 //new LeaderboardParser().GenerateReport(371692, new[] { 2020, 2019, 2018 }, false, false);
