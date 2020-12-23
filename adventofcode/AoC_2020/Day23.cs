@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -29,8 +27,8 @@ namespace AdventofCode.AoC_2020
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
         {
-            Part1Type part1 = 0;
-            Part2Type part2 = 0;
+            Part1Type part1;
+            Part2Type part2;
 
             var sw = Stopwatch.StartNew();
             var stack = InitStack(source[0], out var stackPointers, 9);
@@ -118,14 +116,14 @@ namespace AdventofCode.AoC_2020
             Log(()=>$"-- Move {i} --", 10);
 
             Log(()=> GetCupString(stack, p), 10);
-            var x1 = ExtractNode(p.Next, stack);
-            var x2 = ExtractNode(p.Next, stack);
-            var x3 = ExtractNode(p.Next, stack);
-            Log(()=>$"Pick up: {x1.Value} {x2.Value} {x3.Value}", 10);
+            var x1 = ExtractNodes(p.Next, 3);
+            // var x2 = ExtractNode(p.Next, stack);
+            // var x3 = ExtractNode(p.Next, stack);
+            Log(()=>$"Pick up: {x1.Value} {x1.Next.Value} {x1.Next.Next.Value}", 10);
             var destination = (p.Value - 1) ;
             if (destination == 0)
                 destination = stackPointers.Count;
-            while (destination == x1.Value || destination == x2.Value || destination == x3.Value)
+            while (destination == x1.Value || destination == x1.Next.Value || destination == x1.Next.Next.Value)
             {
                 destination--;
                 if (destination == 0)
@@ -134,9 +132,26 @@ namespace AdventofCode.AoC_2020
             Log(()=>$"destination: {destination}", 10);
 
             var destNode = stackPointers[destination];
-            destNode.AddAfter(x1);
-            x1.AddAfter(x2);
-            x2.AddAfter(x3);
+            destNode.AddListAfter(x1);
+            // node.AddAfter(x2);
+            // x2.AddAfter(x3);
+        }
+
+        private MyLinkedListNode<int> ExtractNodes(MyLinkedListNode<int> node, int count)
+        {
+            var res = node;
+            var before = res.Prev;
+            var after = node;
+            for (int i = 0; i < count; i++)
+                after = after.Next;
+            var last = after.Prev;
+            before.Next = after;
+            after.Prev = before;
+            last.Next = null;
+            return res;
+
+
+
         }
 
         private static string GetCupString(MyLinkedList<int> stack, MyLinkedListNode<int> p)
@@ -194,12 +209,6 @@ namespace AdventofCode.AoC_2020
                 }
             }
         }
-
-        // private void AddAfter(MyLinkedListNode<T> node, MyLinkedListNode<T> next)
-        // {
-        //     node.Next = next;
-        //     next.Prev = node;
-        // }
     }
 
     internal class MyLinkedListNode<T>
@@ -223,6 +232,17 @@ namespace AdventofCode.AoC_2020
             Next = x1;
             x1.Prev = this;
 
+        }
+
+        public void AddListAfter(MyLinkedListNode<T> node)
+        {
+            var last = node;
+            while (last.Next != null)
+                last = last.Next;
+            Next.Prev = last;
+            last.Next = Next;
+            node.Prev = this;
+            Next = node;
         }
     }
 }
