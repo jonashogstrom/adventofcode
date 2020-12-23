@@ -42,7 +42,7 @@ namespace AoCStats
             _handleExcludes = handleExcludes;
             _x_suffix = (handleExcludes ? "_X" : "") + (_excludeZero ? "" : "_0");
 
-            var interval = TimeSpan.FromHours(5*24);
+            var interval = TimeSpan.FromHours(5 * 24);
             if (year == DateTime.Now.Year)
             {
                 interval = TimeSpan.FromMinutes(15);
@@ -71,9 +71,10 @@ namespace AoCStats
                 DeriveMoreStats(leaderboard);
                 ParseGlobalBoards(leaderboard, year);
 
-                Log($"Generating new html for {_settings[_leaderBoardId + "_name"]}/{_year}{(_excludeZero ? 'X':' ')} ({_leaderBoardId})");
+                var excludeZeroIndicator = (_excludeZero ? " ex-0" : "");
+                Log($"Generating new html for {_settings[_leaderBoardId + "_name"]}/{_year}{excludeZeroIndicator} ({_leaderBoardId})");
                 var modified = GenerateHtml(leaderboard);
-                if (updatedData || modified)
+                if (modified)
                     UploadStatistics();
             }
         }
@@ -380,7 +381,7 @@ namespace AoCStats
             scripts["Daily Position chart"] = logDailyPosGraphScript;
 
 
-            var logTimeStar2 = InitLog("Time to complete second star", leaderboard.HighestDay, false, "",new []{"* => **"});
+            var logTimeStar2 = InitLog("Time to complete second star", leaderboard.HighestDay, false, "", new[] { "* => **" });
 
             foreach (var p in leaderboard.OrderedPlayers)
             {
@@ -389,12 +390,19 @@ namespace AoCStats
                     logTimeStar2.Append(AddStartOfRowAndNameCell(p));
                     for (int day = 0; day < leaderboard.HighestDay; day++)
                     {
-                        var pos = leaderboard.Players.Where(x => x.TimeToCompleteStar2[day].HasValue).OrderBy(x => x.TimeToCompleteStar2[day].Value).ToList().IndexOf(p);
+                        var star2Order = leaderboard.Players.Where(x => x.TimeToCompleteStar2[day].HasValue).OrderBy(x => x.TimeToCompleteStar2[day].Value).ThenBy(player => player.Id).ToList();
+                        var pos = star2Order.IndexOf(p);
+                        // handle ties for the medals.
+                        while (pos > 0 && star2Order[pos - 1].TimeToCompleteStar2[day] == p.TimeToCompleteStar2[day])
+                            pos--;
                         var medal = GetMedalClass(pos);
 
                         if (p.TimeToCompleteStar2[day].HasValue)
                         {
-                            logTimeStar2.Append(Cell(p.TimeToCompleteStar2[day].Value, medal, p.Flyoverhint(day)));
+                            if (p.TimeToCompleteStar2[day] == TimeSpan.MaxValue)
+                                logTimeStar2.Append(Cell("---", 999, false, medal, p.Flyoverhint(day)));
+                            else
+                                logTimeStar2.Append(Cell(p.TimeToCompleteStar2[day].Value, medal, p.Flyoverhint(day)));
                         }
                         else
                         {
@@ -411,10 +419,10 @@ namespace AoCStats
             tabs["09-Time *2"] = logTimeStar2;
 
             var tobiiScore = InitLog("Leaderboard/TobiiScore (accumulated score)", leaderboard.HighestDay, true);
-            
+
 
             var tobiiPos = 0;
-            foreach (var p in leaderboard.Players.OrderByDescending(p => p.Stars).ThenBy(p => p.AccumulatedTobiiScoreTotal).ThenBy(p=>p.LastStar))
+            foreach (var p in leaderboard.Players.OrderByDescending(p => p.Stars).ThenBy(p => p.AccumulatedTobiiScoreTotal).ThenBy(p => p.LastStar).ThenBy(p => p.Id))
             {
                 tobiiPos++;
                 if (!_excludeZero || p.TotalScore > 0)
@@ -504,19 +512,24 @@ namespace AoCStats
                 scriptContent.AppendLine(scripts[k].ToString());
 
             html = html.Replace("$(SCRIPT)", scriptContent.ToString());
-            var identical = false;
+            var changed = false;
             if (File.Exists(_htmlFileName))
             {
                 var oldHtml = File.ReadAllText(_htmlFileName, Encoding.UTF8);
                 var part1 = oldHtml.Split(new[] { "<!-- timestamps -->" }, StringSplitOptions.RemoveEmptyEntries)[0];
 
                 var html2 = html.Substring(0, Math.Min(html.Length, part1.Length));
-                identical = part1 != html2;
+                changed = part1 != html2;
             }
 
 
-            if (!File.Exists(_htmlFileName) || identical)
+            if (!File.Exists(_htmlFileName) || changed)
             {
+                if (File.Exists(_htmlFileName))
+                {
+                    File.Delete(_htmlFileName + ".bak");
+                    File.Move(_htmlFileName, _htmlFileName + ".bak");
+                }
                 File.WriteAllText(_htmlFileName, html, Encoding.UTF8);
                 return true;
             }
@@ -688,6 +701,8 @@ namespace AoCStats
                     }
 
                     player.TimeToCompleteStar2[day] = player.TimeToComplete[day][1] - player.TimeToComplete[day][0];
+                    if (player.TimeToCompleteStar2[day] < TimeSpan.FromSeconds(10))
+                        player.TimeToCompleteStar2[day] = TimeSpan.MaxValue;
                 }
 
                 for (int star = 0; star < 2; star++)
@@ -777,12 +792,12 @@ namespace AoCStats
             JObject json;
             try
             {
-                json = (JObject) JsonConvert.DeserializeObject(text);
+                json = (JObject)JsonConvert.DeserializeObject(text);
             }
             catch (Exception e)
             {
                 File.Delete(_jsonFileName);
-                Log($"Failed to parse json: "+e.Message);
+                Log($"Failed to parse json: " + e.Message);
                 return null;
             }
 
@@ -893,7 +908,7 @@ namespace AoCStats
         private string _x_suffix;
         private bool _excludeZero;
 
-        private string TableHeader(int colPos, int tableid, string header, string alt = "", string alignment="left")
+        private string TableHeader(int colPos, int tableid, string header, string alt = "", string alignment = "left")
         {
             var content = header;
             if (alt != "")
@@ -905,13 +920,13 @@ namespace AoCStats
         private StringBuilder InitLog(string name, int highestDay, bool colForStar = true, string description = "", string[] starheader = null)
         {
             if (starheader == null)
-                starheader = new[] {"*", "**"};
+                starheader = new[] { "*", "**" };
             var starCols = colForStar ? 2 : 1;
             //            var randomid = _r.Next();
             tableid++;
             var colPos = 0;
             var log = new StringBuilder($"<h1>{name}</h1><div style=\"overflow-x:auto;\"> <table id=\"table_{tableid}\"><tr>");
-            log.AppendLine(TableHeader(colPos++, tableid, name + (string.IsNullOrEmpty(description)?"":$"<br><small>{description}</small>")));
+            log.AppendLine(TableHeader(colPos++, tableid, name + (string.IsNullOrEmpty(description) ? "" : $"<br><small>{description}</small>")));
             foreach (var s in _metacolumns)
                 log.AppendLine(TableHeader(colPos++, tableid, s));
             log.AppendLine(TableHeader(colPos++, tableid, "L", "Local score", "right"));
@@ -921,7 +936,7 @@ namespace AoCStats
             for (int day = 0; day < highestDay; day++)
                 for (int star = 0; star < starCols; star++)
                 {
-                    var stars = starheader [star];
+                    var stars = starheader[star];
                     string cellContent = "";
                     if (ExcludeDay(day))
                         cellContent += "<p style=\"color:red\">";

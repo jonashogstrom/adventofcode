@@ -45,6 +45,9 @@ namespace AoCStats
                 // David Lozzi
                 new LeaderboardParser().GenerateReport(1030369, new[] { 2020 }, false, forceLoad);
 
+                // Linus
+                new LeaderboardParser().GenerateReport(382101, new[] { 2020 }, false, forceLoad);
+
 
                 // tobii with all participants
                 //new LeaderboardParser().GenerateReport(371692, new[] { 2020, 2019, 2018 }, false, false);
