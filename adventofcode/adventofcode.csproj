@@ -104,6 +104,7 @@
     <Compile Include="AoC_2020\Day20.cs" />
     <Compile Include="AoC_2020\Day21.cs" />
     <Compile Include="AoC_2020\Day22.cs" />
+    <Compile Include="AoC_2020\Day23.cs" />
     <Compile Include="AoC_2020\DayTemplate.cs" />
     <Compile Include="AoC_2020\DayTemplate2.cs" />
     <Compile Include="utils\GenCoord.cs" />
@@ -200,6 +201,8 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2020\Day23_test.txt" />
+    <EmbeddedResource Include="AoC_2020\Day23.txt" />
     <EmbeddedResource Include="AoC_2020\Day22_test.txt" />
     <EmbeddedResource Include="AoC_2020\Day22.txt" />
     <EmbeddedResource Include="AoC_2020\Day21_test.txt" />
