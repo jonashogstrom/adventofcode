@@ -61,7 +61,7 @@ namespace AdventofCode.AoC_2020
             return (part1, part2);
         }
 
-        private static MyLinkedList<int> InitStack(string source, out Dictionary<int, MyLinkedListNode<int>> stackPointers, int endValue)
+        private static MyLinkedList<int> InitStack(string source, out MyLinkedListNode<int>[] stackPointers, int endValue)
         {
             var ints = source.ToCharArray().Select(c => int.Parse(c.ToString())).ToArray();
             var stack = new MyLinkedList<int>(ints);
@@ -74,7 +74,7 @@ namespace AdventofCode.AoC_2020
                 last.AddAfter(new MyLinkedListNode<int>(i));
                 last = last.Next;
             }
-            stackPointers = new Dictionary<int, MyLinkedListNode<int>>();
+            stackPointers = new MyLinkedListNode<int>[endValue+1];
 
             var p = stack.First;
             var temp = p;
@@ -95,7 +95,7 @@ namespace AdventofCode.AoC_2020
             return stack;
         }
 
-        private static long CalculateResult(Dictionary<int, MyLinkedListNode<int>> stackPointers)
+        private static long CalculateResult(MyLinkedListNode<int>[] stackPointers)
         {
             var s = 0L;
             var xx = stackPointers[1];
@@ -110,29 +110,29 @@ namespace AdventofCode.AoC_2020
         }
 
         private void MakeMove(MyLinkedList<int> stack, MyLinkedListNode<int> p,
-            Dictionary<int, MyLinkedListNode<int>> stackPointers, int i)
+            MyLinkedListNode<int>[] stackPointers, int i)
         {
-            Log(()=>"", 10);
-            Log(()=>$"-- Move {i} --", 10);
-
-            Log(()=> GetCupString(stack, p), 10);
+            // Log(()=>"", 10);
+            // Log(()=>$"-- Move {i} --", 10);
+            //
+            // Log(()=> GetCupString(stack, p), 10);
             var x1 = ExtractNodes(p.Next, 3);
-            // var x2 = ExtractNode(p.Next, stack);
-            // var x3 = ExtractNode(p.Next, stack);
-            Log(()=>$"Pick up: {x1.Value} {x1.Next.Value} {x1.Next.Next.Value}", 10);
+            var x2 = x1.Next;
+            var x3 = x2.Next;
+            // Log(()=>$"Pick up: {x1.Value} {x1.Next.Value} {x1.Next.Next.Value}", 10);
             var destination = (p.Value - 1) ;
             if (destination == 0)
-                destination = stackPointers.Count;
-            while (destination == x1.Value || destination == x1.Next.Value || destination == x1.Next.Next.Value)
+                destination = stackPointers.Length-1;
+            while (destination == x1.Value || destination == x2.Value || destination == x3.Value)
             {
                 destination--;
                 if (destination == 0)
-                    destination = stackPointers.Count;
+                    destination = stackPointers.Length-1;
             }
-            Log(()=>$"destination: {destination}", 10);
+            // Log(()=>$"destination: {destination}", 10);
 
             var destNode = stackPointers[destination];
-            destNode.AddListAfter(x1);
+            destNode.AddListAfter(x1, x3);
             // node.AddAfter(x2);
             // x2.AddAfter(x3);
         }
@@ -147,7 +147,7 @@ namespace AdventofCode.AoC_2020
             var last = after.Prev;
             before.Next = after;
             after.Prev = before;
-            last.Next = null;
+//            last.Next = null;
             return res;
 
 
@@ -234,11 +234,11 @@ namespace AdventofCode.AoC_2020
 
         }
 
-        public void AddListAfter(MyLinkedListNode<T> node)
+        public void AddListAfter(MyLinkedListNode<T> node, MyLinkedListNode<T> last)
         {
-            var last = node;
-            while (last.Next != null)
-                last = last.Next;
+            // var last = node;
+            // while (last.Next != null)
+            //     last = last.Next;
             Next.Prev = last;
             last.Next = Next;
             node.Prev = this;

@@ -21,6 +21,11 @@ namespace AdventofCode
 
         public static readonly Coord[] Directions4 = { N, E, S, W };
         public static readonly Coord[] Directions8 = { N, NE, E, SE, S, SW, W, NW };
+        public static readonly hexdirection[] HexNeighbours =
+        {
+            hexdirection.sw, hexdirection.w, hexdirection.nw, 
+            hexdirection.ne, hexdirection.e, hexdirection.se, 
+        };
 
         public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
         {
@@ -200,5 +205,10 @@ namespace AdventofCode
         {
             return Math.Abs(x) + Math.Abs(y) + Math.Abs(z);
         }
+    }
+
+    public enum hexdirection
+    {
+        nw, ne, e, se, sw, w
     }
 }
