@@ -21,10 +21,10 @@ namespace AdventofCode
 
         public static readonly Coord[] Directions4 = { N, E, S, W };
         public static readonly Coord[] Directions8 = { N, NE, E, SE, S, SW, W, NW };
-        public static readonly hexdirection[] HexNeighbours =
+        public static readonly HexDirection[] HexNeighbors =
         {
-            hexdirection.sw, hexdirection.w, hexdirection.nw, 
-            hexdirection.ne, hexdirection.e, hexdirection.se, 
+            HexDirection.sw, HexDirection.w, HexDirection.nw, 
+            HexDirection.ne, HexDirection.e, HexDirection.se, 
         };
 
         public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
@@ -138,6 +138,48 @@ namespace AdventofCode
             return new Coord(Row + coord.Row * count, Col + coord.Col * count);
         }
 
+        public Coord HexMove(HexDirection hexDirection)
+        {
+            if (hexDirection == HexDirection.e)
+                return Move(E);
+            if (hexDirection == HexDirection.w)
+                return Move(W);
+
+            if (Y % 2 == 0)
+            {
+                switch (hexDirection)
+                {
+                    case HexDirection.nw:
+                        return Move(N);
+                    case HexDirection.ne:
+                        return Move(NE);
+                    case HexDirection.sw:
+                        return Move(S);
+                    case HexDirection.se:
+                        return Move(SE);
+                    default:
+                        throw new Exception();
+                }
+
+            }
+            else
+            {
+                switch (hexDirection)
+                {
+                    case HexDirection.nw:
+                        return Move(NW);
+                    case HexDirection.ne:
+                        return Move(N);
+                    case HexDirection.sw:
+                        return Move(SW);
+                    case HexDirection.se:
+                        return Move(S);
+                    default:
+                        throw new Exception();
+                }
+            }
+        }
+
         public int Dist(Coord pos)
         {
             return Math.Abs(Row - pos.Row) + Math.Abs(Col - pos.Col); 
@@ -207,7 +249,7 @@ namespace AdventofCode
         }
     }
 
-    public enum hexdirection
+    public enum HexDirection
     {
         nw, ne, e, se, sw, w
     }

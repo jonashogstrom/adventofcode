@@ -701,7 +701,7 @@ namespace AoCStats
                     }
 
                     player.TimeToCompleteStar2[day] = player.TimeToComplete[day][1] - player.TimeToComplete[day][0];
-                    if (player.TimeToCompleteStar2[day] < TimeSpan.FromSeconds(10))
+                    if (player.TimeToCompleteStar2[day] < TimeSpan.FromSeconds(10) && day != 24)
                         player.TimeToCompleteStar2[day] = TimeSpan.MaxValue;
                 }
 
