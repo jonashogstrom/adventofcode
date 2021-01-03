@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Windows.Forms.VisualStyles;
+using System.Numerics;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -30,51 +30,36 @@ namespace AdventofCode.AoC_2020
 
             var sw = Stopwatch.StartNew();
 
+            var intValues = GetIntInput(source);
+            var doorPublicKey = intValues[1];
+            var cardPublicKey = intValues[0];
+
             LogAndReset("Parse", sw);
-            var ints = GetIntInput(source);
-            var cardpub = ints[0];
-            var doorpub = ints[1];
-            var cardLoop = FindKeyLoop(cardpub);
-            var doorLoop = FindKeyLoop(doorpub);
-
-            part1 = Transform(cardLoop, doorpub);
-            Assert.That(Transform(doorLoop, cardpub), Is.EqualTo(part1));
-
+            var cardLoop = FindLoopSize(cardPublicKey, 7);
+            part1 = Transform(cardLoop, doorPublicKey);
             LogAndReset("*1", sw);
 
-            LogAndReset("*2", sw);
+            var doorLoop = FindLoopSize(doorPublicKey, 7);
+            Assert.That(Transform(doorLoop, cardPublicKey), Is.EqualTo(part1));
             return (part1, part2);
+        }
+
+        private long FindLoopSize(int publicKey, int subjectNumber)
+        {
+            var loopCounter = 0L;
+            var temp = 1L;
+            while (true)
+            {
+                temp = (temp * subjectNumber) % 20201227;
+                loopCounter++;
+                if (temp == publicKey)
+                    return loopCounter;
+            }
         }
 
         private long Transform(long loopSize, int subjectNumber)
         {
-            var temp = 1L;
-            for (int i = 0; i < loopSize; i++)
-            {
-                temp = (temp * subjectNumber) % 20201227;
-            }
-
-            return temp;
-
-        }
-
-        private long FindKeyLoop(int publicKey)
-        {
-            var res = 0L;
-            var temp = 1L;
-            while (true)
-            {
-                temp = (temp * 7) % 20201227;
-                res++;
-                if (temp == publicKey)
-                    return res;
-
-            }
+            return (long)BigInteger.ModPow(subjectNumber, loopSize, 20201227);
         }
     }
 }
-
-// var comp = new IntCodeComputer(source[0]);
-// comp.Execute();
-// var part1 = (int)comp.LastOutput;
-// return (part1, 0);
