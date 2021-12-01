@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2021
@@ -14,8 +15,8 @@ namespace AdventofCode.AoC_2021
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(-1, null, "Day1_test.txt")]
-        [TestCase(-1, null, "Day1.txt")]
+        [TestCase(7, 5, "Day1_test.txt")]
+        [TestCase(1521, 1543, "Day1.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
@@ -28,9 +29,20 @@ namespace AdventofCode.AoC_2021
             Part1Type part1 = 0;
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
-
+            var ints = GetIntInput(source);
             LogAndReset("Parse", sw);
+
+            for (int i = 1; i < ints.Length; i++)
+                if (ints[i] > ints[i - 1])
+                    part1++;
+
             LogAndReset("*1", sw);
+
+            
+            for (int i = 3; i < ints.Length; i++)
+                if (ints[i] > ints[i - 3])
+                    part2++;
+
             LogAndReset("*2", sw);
             return (part1, part2);
         }
