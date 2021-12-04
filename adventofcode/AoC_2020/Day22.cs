@@ -14,7 +14,6 @@ namespace AdventofCode.AoC_2020
     [TestFixture]
     class Day22 : TestBaseClass<Part1Type, Part2Type>
     {
-        private bool _skip1;
         private int _gameindex;
         public bool Debug { get; set; }
 
