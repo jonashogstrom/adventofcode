@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace AdventofCode
 {
@@ -61,6 +62,51 @@ namespace AdventofCode
         {
             return new Coord(y, x);
         }
+
+        private int GetDir(int v1, int v2)
+        {
+            return v1.CompareTo(v2);
+        }
+
+        public List<Coord> PathTo(Coord c2, bool inclusive = true)
+        {
+            var rDir = c2.Row.CompareTo(Row);
+            var cDir = c2.Col.CompareTo(Col);
+            var res = new List<Coord>();
+
+            var rDist = Math.Abs(Row - c2.Row);
+            var cDist = Math.Abs(Col - c2.Col);
+            if (rDist != 0 && cDist != 0 && rDist != cDist)
+                throw new Exception($"Path is not a multiple of 45 degrees! {this} => {c2} (rDist: {rDist}, rDist: {cDist})");
+            var steps = Math.Max(rDist, cDist)+1;
+            for (int s = 0; s < steps; s++)
+            {
+                if (inclusive || (s > 1 && s < steps - 1))
+                {
+                    var c = Col + s * cDir;
+                    var r = Row + s * rDir;
+                    res.Add(new Coord(r, c));
+                }
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// Sample Coord strings supported: "x, y", "(x y)", "x;y"
+        /// Supported caracters: (, ;)
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static Coord Parse(string s)
+        {
+            var parts=s.Split(new []{'(', ',', ' ', ';',')'}, StringSplitOptions.RemoveEmptyEntries );
+            if (parts.Length != 2)
+                throw new Exception("Invalid coord string: " + s);
+            return new Coord(int.Parse(parts[1]), int.Parse(parts[0]));
+        }
+
         private bool Equals(Coord other)
         {
             return Row == other.Row && Col == other.Col;

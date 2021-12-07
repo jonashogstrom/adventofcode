@@ -1,10 +1,7 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using AdventofCode.AoC_2020;
 using NUnit.Framework;
 
@@ -79,11 +76,9 @@ namespace AdventofCode.AoC_2021
 
     internal class Board
     {
-        private Dictionary<int, Coord> _dic = new Dictionary<int, Coord>();
+        private readonly Dictionary<int, Coord> _dic = new Dictionary<int, Coord>();
         private int[] _colCount = new int[5];
-        private int[] _colSum = new int[5];
         private int[] _rowCount = new int[5];
-        private int[] _rowSum = new int[5];
         private bool _bingo;
         private int _boardScore;
         private int _totalMarked;
@@ -101,9 +96,7 @@ namespace AdventofCode.AoC_2021
                     _dic[number] = new Coord(row, col);
                     _totalSum += number;
                 }
-
             }
-
         }
 
         public bool Bingo => _bingo;
@@ -115,8 +108,6 @@ namespace AdventofCode.AoC_2021
             {
                 _colCount[pos.Col]++;
                 _rowCount[pos.Row]++;
-                _colSum[pos.Col] += num;
-                _rowSum[pos.Row] += num;
                 _totalMarked += num;
                 if (_colCount[pos.Col] == 5)
                 {

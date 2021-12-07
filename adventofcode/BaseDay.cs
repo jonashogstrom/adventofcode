@@ -187,10 +187,10 @@ namespace AdventofCode
             var ok2 = GetStatus(actual2, exp2);
 
             if (actual1.HasValue)
-                Log($"Calculated Part1 [{ok1}]: {actual1} ");
+                Log($"Calculated Part1 [{ok1}]: {actual1} ", -1);
 
             if (actual2.HasValue)
-                Log($"Calculated Part2 [{ok2}]: {actual2}");
+                Log($"Calculated Part2 [{ok2}]: {actual2}", -1);
 
             var time = _startTime.ToString("yyyy-MM-dd_HH-mm-ss");
             var filename =
@@ -238,7 +238,7 @@ namespace AdventofCode
         protected void LogAndReset(string label, Stopwatch sw)
         {
             sw.Stop();
-            Log($"{label}: {FormatTimeSpan(sw.Elapsed)}");
+            Log($"{label}: {FormatTimeSpan(sw.Elapsed)}", -1);
             sw.Restart();
         }
         protected void LogMidTime(string label, Stopwatch sw)
@@ -264,8 +264,8 @@ namespace AdventofCode
             sw.Start();
             var res = DoComputeWithTimer(source);
             sw.Stop();
-            Log(() => $"Total Time: {FormatTimeSpan(sw.Elapsed)}");
-            Log("Completed:" + (_startTime - DateTime.Today.AddHours(6)));
+            Log(() => $"Total Time: {FormatTimeSpan(sw.Elapsed)}", -1);
+            Log("Completed:" + (_startTime - DateTime.Today.AddHours(6)), -1);
             return res;
         }
 
