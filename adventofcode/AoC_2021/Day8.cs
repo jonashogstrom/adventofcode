@@ -62,7 +62,6 @@ namespace AdventofCode.AoC_2021
         private int ParseLine(string line)
         {
             Dictionary<char, HashSet<char>> candidates = new Dictionary<char, HashSet<char>>();
-            Dictionary<char, HashSet<char>> reverseCandidates = new Dictionary<char, HashSet<char>>();
 
             var segmentsUsed = new Dictionary<int, List<char>>();
             segmentsUsed[0] = new List<char>() { 'A', 'B', 'C', 'E', 'F', 'G' };
@@ -76,12 +75,6 @@ namespace AdventofCode.AoC_2021
             segmentsUsed[8] = new List<char>() { 'A', 'B', 'C', 'D', 'E', 'F', 'G' };
             segmentsUsed[9] = new List<char>() { 'A', 'B', 'C', 'D', 'F', 'G' };
 
-            foreach (var c in _allSegments)
-            {
-                reverseCandidates[c] = new HashSet<char>(_allChars);
-
-            }
-
             foreach (var c in _allChars)
             {
                 candidates[c] = new HashSet<char>(_allSegments);
@@ -90,64 +83,37 @@ namespace AdventofCode.AoC_2021
             var parts = line.Split('|');
             var unique = parts[0].Trim().Split(' ');
             var output = parts[1].Trim().Split(' ');
-            var charsInOne = new List<char>();
-            var charsInSeven = new List<char>();
-            var fiveCount = new DicWithDefault<char, int>(0);
             foreach (var value in unique.OrderBy(x => x.Length))
             {
                 if (value.Length == 2) // must be 1
                 {
-                    EliminateCandidates(value, candidates, reverseCandidates, segmentsUsed[1]);
+                    EliminateCandidates(value, candidates, segmentsUsed[1]);
                     Elim2(value, candidates, segmentsUsed[1]);
-                    charsInOne.AddRange(value);
-                    //                    Elim2(value, candidates, segmentsUsed[1]);
                 }
 
                 if (value.Length == 3) // must be 7
                 {
-                    EliminateCandidates(value, candidates, reverseCandidates, segmentsUsed[7]);
-                    var uniqueFor7 = candidates.Where(x => x.Value.Count == 1).Single().Value;
-                    Elim2(value, candidates, uniqueFor7);
-                    charsInSeven.AddRange(value);
-
-                    //                    Elim2(value, candidates, segmentsUsed[7]);
+                    EliminateCandidates(value, candidates, segmentsUsed[7]);
+                    Elim2(value, candidates, segmentsUsed[7]);
                 }
 
                 if (value.Length == 4) // must be 4
                 {
-                    EliminateCandidates(value, candidates, reverseCandidates, segmentsUsed[4]);
-                    var newInFour = new List<char>();
-                    foreach (var x in value)
-                        if (!charsInOne.Contains(x))
-                            newInFour.Add(x);
-                    var uniqueForFour = candidates[newInFour[0]];
-                    Elim2(value, candidates, uniqueForFour);
+                    EliminateCandidates(value, candidates, segmentsUsed[4]);
+
+                    Elim2(value, candidates, segmentsUsed[4]);
                 }
 
                 if (value.Length == 5) // must be 2, 3 or 5
                 {
                     var uniqueForFiveSegments = new List<char> { 'G', 'A', 'D' };
                     Elim2(value, candidates, uniqueForFiveSegments);
-                    foreach (var c in value)
-                        fiveCount[c]++;
-
-                    Log("five chars in : " + value);
                 }
 
                 if (value.Length == 6) // must be 0, 6, 9
                 {
                     var uniqueForSixSegments = new List<char> { 'A', 'B', 'G', 'F' };
                     Elim2(value, candidates, uniqueForSixSegments);
-                }
-            }
-
-            foreach (var k in fiveCount.Keys)
-            {
-                if (fiveCount[k] == 1)
-                {
-                    Log($"char {k} only occurs once in 5char numbers");
-                    // this must be either B or E
-                    EliminateCandidates(k.ToString(), candidates, reverseCandidates, new List<char>() { 'B', 'E' });
                 }
             }
 
@@ -212,8 +178,7 @@ namespace AdventofCode.AoC_2021
                 }
         }
 
-        private void EliminateCandidates(string value, Dictionary<char, HashSet<char>> candidates,
-            Dictionary<char, HashSet<char>> reverseCandidates, List<char> charactersUsed)
+        private void EliminateCandidates(string value, Dictionary<char, HashSet<char>> candidates, List<char> charactersUsed)
         {
             foreach (var c in value)
             {
@@ -221,14 +186,6 @@ namespace AdventofCode.AoC_2021
                 foreach (var c1 in _allSegments)
                     if (!charactersUsed.Contains(c1))
                         cand.Remove(c1);
-            }
-
-            foreach (var c in _allSegments)
-            {
-                var cand = reverseCandidates[c];
-                if (!charactersUsed.Contains(c))
-                    foreach (var c2 in value)
-                        cand.Remove(c2);
             }
         }
     }
