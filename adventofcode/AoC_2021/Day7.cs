@@ -38,47 +38,30 @@ namespace AdventofCode.AoC_2021
             var minpos = positions.Min();
             var cheapest = int.MaxValue;
 
-            for (int i = minpos + 1; i < maxpos; i++)
-            {
-                cheapest = Math.Min(cheapest, GetCost(positions, i));
-            }
-            part1 = cheapest;
-
-
             LogAndReset("*1", sw);
             var cheapest2 = int.MaxValue;
 
             for (int i = minpos + 1; i < maxpos; i++)
             {
-                cheapest2 = Math.Min(cheapest2, GetCost2(positions, i));
+                var sum2 = 0;
+                var sum1 = 0;
+                for (int p = 0; p < positions.Length; p++)
+                {
+                    var dist = Math.Abs(positions[p] - i);
+                    sum1 += dist;
+                    sum2 += ((dist + 1) * (dist)) / 2; ;
+                }
+                cheapest = Math.Min(cheapest, sum1);
+
+                cheapest2 = Math.Min(cheapest2, sum2);
             }
 
+            part1 = cheapest;
             part2 = cheapest2;
             LogAndReset("*2", sw);
 
             return (part1, part2);
         }
-
-        private int GetCost(int[] positions, int i)
-        {
-            var sum = 0;
-            for (int p = 0; p < positions.Length; p++)
-                sum += Math.Abs(positions[p] - i);
-            return sum;
-        }
-
-        private int GetCost2(int[] positions, int i)
-        {
-
-            var sum = 0;
-            for (int p = 0; p < positions.Length; p++)
-            {
-                var dist = Math.Abs(positions[p] - i);
-                sum += ((dist + 1) * (dist)) / 2; ;
-            }
-            return sum;
-        }
-
     }
 
 
