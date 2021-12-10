@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using AdventofCode.AoC_2020;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2021
@@ -38,6 +37,4 @@ namespace AdventofCode.AoC_2021
             return (part1, part2);
         }
     }
-
-
 }
