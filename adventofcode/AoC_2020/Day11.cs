@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using AdventofCode.AoC_2018;
+using AdventofCode.Utils;
 using NUnit.Framework;
 
 // not 139

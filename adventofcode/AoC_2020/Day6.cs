@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdventofCode.Utils;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
