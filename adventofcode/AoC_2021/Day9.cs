@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
+using AdventofCode.Utils;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2021
@@ -33,10 +33,8 @@ namespace AdventofCode.AoC_2021
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
 
-            var map = new SparseBuffer<int>(9);
-            for (int row = 0; row < source.Length; row++)
-                for (int col = 0; col < source[row].Length; col++)
-                    map[new Coord(row, col)] = int.Parse(source[row][col].ToString());
+            var map = source.ToSparseBuffer(9, c=>int.Parse(c.ToString()));
+
             Log(map.ToString(i => i.ToString()));
 
             var basinSizes= new List<int>();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AdventofCode.AoC_2020
+namespace AdventofCode.Utils
 {
     public class DicWithDefault<TKey, TValue>
     {

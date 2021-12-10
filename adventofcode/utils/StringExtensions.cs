@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-namespace AdventofCode.AoC_2020
+namespace AdventofCode.Utils
 {
     public static class StringExtensions
     {
@@ -25,19 +26,23 @@ namespace AdventofCode.AoC_2020
 
         public static SparseBuffer<char> ToSparseBuffer(this string[] input, char def = ' ')
         {
-            var floor = new SparseBuffer<char>(def);
+            return ToSparseBuffer<char>(input, def, c => c);
+        }
+
+        public static SparseBuffer<T> ToSparseBuffer<T>(this string[] input, T def, Func<char, T> f)
+        {
+            var floor = new SparseBuffer<T>(def);
 
             for (int row = 0; row < input.Length; row++)
             {
                 for (int col = 0; col < input[row].Length; col++)
                 {
                     var c = Coord.FromXY(col, row);
-                    floor[c] = input[row][col];
+                    floor[c] = f(input[row][col]);
                 }
             }
 
             return floor;
-
         }
     }
 }

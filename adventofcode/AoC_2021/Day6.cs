@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using AdventofCode.AoC_2020;
+using AdventofCode.Utils;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2021

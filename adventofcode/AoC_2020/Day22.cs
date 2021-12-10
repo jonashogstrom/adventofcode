@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using AdventofCode.Utils;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020

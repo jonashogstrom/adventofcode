@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace AdventofCode.AoC_2020
+namespace AdventofCode.Utils
 {
     [DebuggerDisplay("({Coords})")]
     public class GenCoord
