@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2021
@@ -18,7 +17,7 @@ namespace AdventofCode.AoC_2021
         [TestCase(10, 36, "Day12_test.txt")]
         [TestCase(19, 103, "Day12_test2.txt")]
         [TestCase(226, 3509, "Day12_test3.txt")]
-        [TestCase(4549, null, "Day12.txt")]
+        [TestCase(4549, 120535, "Day12.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -32,105 +31,72 @@ namespace AdventofCode.AoC_2021
             Part1Type part1 = 0;
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
-            // end-zg
-            var paths = new Dictionary<string, string>();
-
             var caverns = new Dictionary<string, Cavern>();
             foreach (var s in source)
             {
                 var parts = s.Split('-');
-                if (!caverns.TryGetValue(parts[0], out var c1))
-                {
-                    var name = parts[0];
-                    c1 = new Cavern() { Name = name };
-                    c1.Large = c1.Name[0] >= 'A' && c1.Name[0] <= 'Z';
-                    caverns[name] = c1;
-                }
-                if (!caverns.TryGetValue(parts[1], out var c2))
-                {
-                    var name = parts[1];
-                    c2 = new Cavern() { Name = name };
-                    c2.Large = c2.Name[0] >= 'A' && c2.Name[0] <= 'Z';
-                    caverns[name] = c2;
-                }
-                c1.Paths.Add(c2);
-                c2.Paths.Add(c1);
+                var c1 = GetCavern(caverns, parts[0]);
+                var c2 = GetCavern(caverns, parts[1]);
+
+                if (!c2.IsStart)
+                    c1.Paths.Add(c2);
+                if (!c1.IsStart)
+                    c2.Paths.Add(c1);
                 if (c1.Large && c2.Large)
                     throw new Exception("Loop warning");
             }
+
             LogAndReset("Parse", sw);
-            part1 = FindPaths(caverns, caverns["start"]);
+            part1 = FindPaths2(caverns, caverns["start"], false);
             LogAndReset("*1", sw);
-            part2 = FindPaths2(caverns, caverns["start"]);
+            part2 = FindPaths2(caverns, caverns["start"], true);
             LogAndReset("*2", sw);
 
             return (part1, part2);
         }
 
-        private long FindPaths(Dictionary<string, Cavern> caverns, Cavern start)
+        private Cavern GetCavern(Dictionary<string, Cavern> caverns, string name)
         {
-            return FindRec(caverns, start, new HashSet<Cavern>(), new List<Cavern>());
-        }
-        private long FindPaths2(Dictionary<string, Cavern> caverns, Cavern start)
-        {
-            return FindRec2(caverns, start, new HashSet<Cavern>(), new List<Cavern>(), false);
-        }
-
-        private long FindRec(Dictionary<string, Cavern> caverns, 
-            Cavern start, 
-            HashSet<Cavern> visitedSmall, List<Cavern> path)
-        {
-            if (start.Name == "end")
-                return 1;
-            var res = 0L;
-            Log($"Exploring {start.Name}");
-
-            var newVisitedSmall = visitedSmall;
-            var newPath = new List<Cavern>(path) { start };
-            if (!start.Large)
+            if (!caverns.TryGetValue(name, out var c))
             {
-                newVisitedSmall = new HashSet<Cavern>(visitedSmall);
-                newVisitedSmall.Add(start);
+                c = new Cavern() { Name = name };
+                c.Large = c.Name[0] >= 'A' && c.Name[0] <= 'Z';
+                c.IsStart = name == "start";
+                c.IsEnd = name == "end";
+                caverns[name] = c;
             }
 
-            foreach (var c in start.Paths)
-                if (c.Large || !newVisitedSmall.Contains(c))
-                {
-
-                    res += FindRec(caverns, c, newVisitedSmall, newPath);
-                }
-
-            return res;
+            return c;
         }
 
-        private long FindRec2(Dictionary<string, Cavern> caverns,
+        private long FindPaths2(Dictionary<string, Cavern> caverns, Cavern start, bool allowSecondVisit)
+        {
+            return FindRec2( start, new HashSet<Cavern>(), allowSecondVisit);
+        }
+
+        private long FindRec2(
             Cavern start,
-            HashSet<Cavern> visitedSmall, List<Cavern> path, bool visit2)
+            HashSet<Cavern> visitedSmall, bool allowSecondVisit)
         {
-            if (start.Name == "end")
+            if (start.IsEnd)
                 return 1;
             var res = 0L;
-            Log($"Exploring {start.Name}");
 
             var newVisitedSmall = visitedSmall;
-            var newPath = new List<Cavern>(path) { start };
             if (!start.Large)
             {
-                newVisitedSmall = new HashSet<Cavern>(visitedSmall);
-                newVisitedSmall.Add(start);
+                newVisitedSmall = new HashSet<Cavern>(visitedSmall) { start };
             }
 
             foreach (var c in start.Paths)
-                if ((c.Large || !newVisitedSmall.Contains(c) || !visit2)&& 
-                    c.Name != "start")
+            {
+                if ((c.Large || !newVisitedSmall.Contains(c) || allowSecondVisit) &&
+                 !c.IsStart)
                 {
-                    
-                    res += FindRec2(caverns, c, newVisitedSmall, newPath, visit2||newVisitedSmall.Contains(c));
-                }
-
+                    res += FindRec2(c, newVisitedSmall, allowSecondVisit && !newVisitedSmall.Contains(c));
+                }}
             return res;
         }
-
     }
 
     [DebuggerDisplay("{Name} ({Large})")]
@@ -138,6 +104,8 @@ namespace AdventofCode.AoC_2021
     {
         public string Name;
         public bool Large;
+        public bool IsStart;
+        public bool IsEnd;
         public List<Cavern> Paths = new List<Cavern>();
     }
 }

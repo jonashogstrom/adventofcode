@@ -11,13 +11,13 @@ namespace AdventofCode.AoC_2021
     using Part2Type = Int64;
 
     [TestFixture]
-    class Day4 : TestBaseClass<Part1Type, Part2Type>
+    class Day04 : TestBaseClass<Part1Type, Part2Type>
     {
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(4512, 1924, "Day4_test.txt")]
-        [TestCase(10680, 31892, "Day4.txt")]
+        [TestCase(4512, 1924, "Day04_test.txt")]
+        [TestCase(10680, 31892, "Day04.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             var source = GetResource(resourceName);
