@@ -123,5 +123,13 @@ namespace AdventofCode
         {
             return _board.Values.Count(x => x.Equals(c));
         }
+
+        public bool InsideBounds(Coord coord)
+        {
+            return coord.Col >= topLeft.Col &&
+                   coord.Col <= bottomRight.Col &&
+                   coord.Row >= topLeft.Row &&
+                   coord.Row <= bottomRight.Row;
+        }
     }
 }
