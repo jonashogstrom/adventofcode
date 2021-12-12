@@ -48,9 +48,9 @@ namespace AdventofCode.AoC_2021
             }
 
             LogAndReset("Parse", sw);
-            part1 = FindPaths2(caverns, caverns["start"], false);
+            part1 = FindRec( caverns["start"], new HashSet<Cavern>(), false);
             LogAndReset("*1", sw);
-            part2 = FindPaths2(caverns, caverns["start"], true);
+            part2 = FindRec( caverns["start"], new HashSet<Cavern>(), true);
             LogAndReset("*2", sw);
 
             return (part1, part2);
@@ -70,31 +70,25 @@ namespace AdventofCode.AoC_2021
             return c;
         }
 
-        private long FindPaths2(Dictionary<string, Cavern> caverns, Cavern start, bool allowSecondVisit)
-        {
-            return FindRec2( start, new HashSet<Cavern>(), allowSecondVisit);
-        }
-
-        private long FindRec2(
-            Cavern start,
-            HashSet<Cavern> visitedSmall, bool allowSecondVisit)
+        private int FindRec(Cavern start, ISet<Cavern> visitedSmall, bool allowSecondVisit)
         {
             if (start.IsEnd)
                 return 1;
-            var res = 0L;
+            var res = 0;
 
             var added = false;
-            if (!start.Large && !visitedSmall.Contains(start))
+            if (!start.Large)
             {
+                var oldCount = visitedSmall.Count;
                 visitedSmall.Add(start); 
-                added = true;
+                added = visitedSmall.Count != oldCount;
             }
 
             foreach (var c in start.Paths)
             {
                 if (c.Large || !visitedSmall.Contains(c) || allowSecondVisit)
                 {
-                    res += FindRec2(c, visitedSmall, allowSecondVisit && !visitedSmall.Contains(c));
+                    res += FindRec(c, visitedSmall, allowSecondVisit && !visitedSmall.Contains(c));
                 }}
 
             if (added)
