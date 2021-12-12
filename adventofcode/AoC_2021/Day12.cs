@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2021
@@ -82,19 +83,25 @@ namespace AdventofCode.AoC_2021
                 return 1;
             var res = 0L;
 
-            var newVisitedSmall = visitedSmall;
-            if (!start.Large)
+            var added = false;
+            if (!start.Large && !visitedSmall.Contains(start))
             {
-                newVisitedSmall = new HashSet<Cavern>(visitedSmall) { start };
+                visitedSmall.Add(start); 
+                added = true;
             }
 
             foreach (var c in start.Paths)
             {
-                if ((c.Large || !newVisitedSmall.Contains(c) || allowSecondVisit) &&
-                 !c.IsStart)
+                if (c.Large || !visitedSmall.Contains(c) || allowSecondVisit)
                 {
-                    res += FindRec2(c, newVisitedSmall, allowSecondVisit && !newVisitedSmall.Contains(c));
+                    res += FindRec2(c, visitedSmall, allowSecondVisit && !visitedSmall.Contains(c));
                 }}
+
+            if (added)
+            {
+                visitedSmall.Remove(start); 
+            }
+
             return res;
         }
     }
