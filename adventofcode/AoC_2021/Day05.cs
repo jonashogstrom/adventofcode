@@ -22,6 +22,8 @@ namespace AdventofCode.AoC_2021
         [TestCase(5197, 18605, "Day05.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
+            LogLevel = resourceName.Contains("test") ? 20 : -1;
+
             var source = GetResource(resourceName);
             var res = ComputeWithTimer(source);
             DoAsserts(res, exp1, exp2, resourceName);
@@ -32,7 +34,7 @@ namespace AdventofCode.AoC_2021
             Part1Type part1 = 0;
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
-            List<(Coord c1, Coord c2)> data = new List<(Coord, Coord)>();
+            List<(Coord c1, Coord c2, bool diagonal)> data = new List<(Coord, Coord, bool)>();
             if (source.Length < 20)
                 LogLevel = 20;
             foreach (var s in source)
@@ -40,43 +42,40 @@ namespace AdventofCode.AoC_2021
                 var parts = s.Split(' ');
                 var c1 = Coord.Parse(parts[0]);
                 var c2 = Coord.Parse(parts[2]);
-                data.Add((c1, c2));
+                var diagonal = c1.Col != c2.Col && c1.Row != c2.Row;
+                data.Add((c1, c2, diagonal));
             }
 
             LogAndReset("Parse", sw);
 
             var board1 = new SparseBuffer<int>();
-            foreach (var coords in data)
+            // draw the straight lines
+            foreach (var coords in data.Where(d => !d.diagonal))
             {
-                if (coords.c1.Col == coords.c2.Col || coords.c1.Row == coords.c2.Row)
-                {
-                    DrawLine(coords.c1, coords.c2, board1);
-                }
+                DrawLine(coords.c1, coords.c2, board1);
             }
             Log(board1.ToString(i => i.ToString()), 20);
             part1 = GetBoardValue(board1);
             LogAndReset("*1", sw);
 
-            var board2 = new SparseBuffer<int>();
-            foreach (var coords in data)
+            // draw the diagonal lines
+            foreach (var coords in data.Where(d => d.diagonal))
             {
-                DrawLine(coords.c1, coords.c2, board2);
+                DrawLine(coords.c1, coords.c2, board1);
             }
-            part2 = GetBoardValue(board2);
-            Log(board2.ToString(i => i.ToString()), 20);
+            part2 = GetBoardValue(board1);
+            Log(board1.ToString(i => i.ToString()), 20);
             LogAndReset("*2", sw);
 
-
-            // inte 18629;
             return (part1, part2);
         }
 
-        private static long GetBoardValue(SparseBuffer<int> board1)
+        private static long GetBoardValue(SparseBuffer<int> board)
         {
             var res = 0;
-            foreach (var k in board1.Keys)
+            foreach (var k in board.Keys)
             {
-                if (board1[k] >= 2)
+                if (board[k] >= 2)
                     res++;
             }
 
@@ -85,8 +84,8 @@ namespace AdventofCode.AoC_2021
 
         private void DrawLine(Coord c1, Coord c2, SparseBuffer<int> board)
         {
-            Log($"Drawing line {c1} -> {c2}", 20);
-            foreach(var c in c1.PathTo(c2))
+            Log(() => $"Drawing line {c1} -> {c2}", 20);
+            foreach (var c in c1.PathTo(c2))
                 board[c]++;
         }
     }

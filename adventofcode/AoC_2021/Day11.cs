@@ -44,15 +44,15 @@ namespace AdventofCode.AoC_2021
 
             var gen = 0;
             map = source.ToSparseBuffer(9, c => int.Parse(c.ToString()));
-            var videoGenerator = new VideoGen<int>("Day11.mp4", map.Width, map.Height, ValueToColor);
+//            var videoGenerator = new VideoGen<int>("Day11.mp4", map.Width, map.Height, ValueToColor);
             var expCount = map.Keys.Count();
             while (Evolve(map) != expCount)
             {
                 gen++;
-                videoGenerator.AddSparseMap(map);
+//                videoGenerator.AddSparseMap(map);
             }
 
-            videoGenerator.Flush();
+            //videoGenerator.Flush();
             part2 = gen + 1;
             LogAndReset("*2", sw);
 

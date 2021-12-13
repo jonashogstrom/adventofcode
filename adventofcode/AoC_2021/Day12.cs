@@ -48,9 +48,9 @@ namespace AdventofCode.AoC_2021
             }
 
             LogAndReset("Parse", sw);
-            part1 = FindRec( caverns["start"], new HashSet<Cavern>(), false);
+            part1 = FindRec(caverns["start"], new HashSet<Cavern>(), false);
             LogAndReset("*1", sw);
-            part2 = FindRec( caverns["start"], new HashSet<Cavern>(), true);
+            part2 = FindRec(caverns["start"], new HashSet<Cavern>(), true);
             LogAndReset("*2", sw);
 
             return (part1, part2);
@@ -80,7 +80,7 @@ namespace AdventofCode.AoC_2021
             if (!start.Large)
             {
                 var oldCount = visitedSmall.Count;
-                visitedSmall.Add(start); 
+                visitedSmall.Add(start);
                 added = visitedSmall.Count != oldCount;
             }
 
@@ -89,11 +89,12 @@ namespace AdventofCode.AoC_2021
                 if (c.Large || !visitedSmall.Contains(c) || allowSecondVisit)
                 {
                     res += FindRec(c, visitedSmall, allowSecondVisit && !visitedSmall.Contains(c));
-                }}
+                }
+            }
 
             if (added)
             {
-                visitedSmall.Remove(start); 
+                visitedSmall.Remove(start);
             }
 
             return res;
