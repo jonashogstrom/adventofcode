@@ -127,6 +127,9 @@
     <Compile Include="AoC_2021\Day10.cs" />
     <Compile Include="AoC_2021\Day11.cs" />
     <Compile Include="AoC_2021\Day12.cs" />
+    <Compile Include="AoC_2021\Day13.cs" />
+    <Compile Include="AoC_2021\Day14.cs" />
+    <Compile Include="AoC_2021\Day15.cs" />
     <Compile Include="AoC_2021\DayTemplate.cs" />
     <Compile Include="AoC_2021\Day05.cs" />
     <Compile Include="AoC_2021\Day04.cs" />
@@ -134,10 +137,12 @@
     <Compile Include="AoC_2021\Day02.cs" />
     <Compile Include="AoC_2021\Day01.cs" />
     <Compile Include="AoC_2021\VideoGen.cs" />
+    <Compile Include="utils\CoordL.cs" />
     <Compile Include="utils\GenCoord.cs" />
     <Compile Include="utils\DicWithDefault.cs" />
     <Compile Include="AoC_2020\OtherStuff.cs" />
     <Compile Include="AoC_2020\Passport.cs" />
+    <Compile Include="utils\SparseBufferL.cs" />
     <Compile Include="utils\StringExtensions.cs" />
     <Compile Include="utils\EnumerableExt.cs" />
     <Compile Include="AoC_2019\IntCodeComputer.cs" />
@@ -228,6 +233,13 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2021\Day15_test .txt" />
+    <EmbeddedResource Include="AoC_2021\Day15.txt" />
+    <EmbeddedResource Include="AoC_2021\Day14_test.txt" />
+    <EmbeddedResource Include="AoC_2021\Day14.txt" />
+    <EmbeddedResource Include="AoC_2021\Day13_large.txt" />
+    <EmbeddedResource Include="AoC_2021\Day13_test.txt" />
+    <EmbeddedResource Include="AoC_2021\Day13.txt" />
     <EmbeddedResource Include="AoC_2021\Day12_test2.txt" />
     <EmbeddedResource Include="AoC_2021\Day12_test3.txt" />
     <EmbeddedResource Include="AoC_2021\Day12_test.txt" />

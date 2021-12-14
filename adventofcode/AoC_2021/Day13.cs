@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
 using AdventofCode.Utils;
 using NUnit.Framework;
 
@@ -18,6 +16,7 @@ namespace AdventofCode.AoC_2021
 
         [Test]
         [TestCase(17, null, "Day13_test.txt")]
+        [TestCase(17, null, "Day13_large.txt")]
         [TestCase(669, null, "Day13.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
@@ -33,10 +32,10 @@ namespace AdventofCode.AoC_2021
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
             var g = source.AsGroups();
-            var paper = new SparseBuffer<char>('.');
+            var paper = new SparseBufferL<char>('.');
             foreach (var s in g.First())
             {
-                var c = Coord.Parse(s);
+                var c = CoordL.Parse(s);
                 paper[c] = '#';
             }
             LogAndReset("Parse", sw);
@@ -48,33 +47,31 @@ namespace AdventofCode.AoC_2021
             LogAndReset("*1", sw);
             foreach (var f in instructions.Skip(1))
             {
-                 paper = Fold(f, paper);
+                paper = Fold(f, paper);
             }
-            Log(paper.ToString(c=>c.ToString()));
+//            Log(paper.ToString(c => c.ToString()));
 
             LogAndReset("*2", sw);
 
             return (part1, part2);
         }
 
-        private SparseBuffer<char> Fold(string s, SparseBuffer<char> paper)
+        private SparseBufferL<char> Fold(string s, SparseBufferL<char> paper)
         {
             var parts = s.Split(new[] { ' ', '=' });
-            var val = int.Parse(parts[3]);
-            Func<Coord, Coord> foldFunc;
-            if (parts[2] == "x")
-                foldFunc = c => new Coord(c.Row, c.Col < val ? c.Col : 2*val - c.Col);
-            else
-            {
-                foldFunc = c => new Coord(c.Row < val ? c.Row : 2*val - c.Row, c.Col);
-            }
+            var val = long.Parse(parts[3]);
 
-            var newPaper = new SparseBuffer<char>('.');
-            foreach (var k in paper.Keys)
+            Func<CoordL, CoordL> foldFunc;
+            if (parts[2] == "x")
+                foldFunc = c => new CoordL(c.Row, c.Col < val ? c.Col : 2 * val - c.Col);
+            else
+                foldFunc = c => new CoordL(c.Row < val ? c.Row : 2 * val - c.Row, c.Col);
+
+            var newPaper = new SparseBufferL<char>('.');
+            foreach (var k in paper.Keys.ToArray())
             {
                 var newCoord = foldFunc(k);
                 newPaper[newCoord] = paper[k];
-
             }
 
             return newPaper;

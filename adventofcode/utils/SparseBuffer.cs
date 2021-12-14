@@ -131,5 +131,15 @@ namespace AdventofCode
                    coord.Row >= topLeft.Row &&
                    coord.Row <= bottomRight.Row;
         }
+
+        public void RemoveKey(Coord coord)
+        {
+            _board.Remove(coord);
+            if (coord.X == topLeft.X || coord.Y == topLeft.Y)
+                topLeft = Coord.FromXY(Keys.Select(k=>k.X).Min(), Keys.Select(k=>k.Y).Min());
+            if (coord.X == bottomRight.X || coord.Y == bottomRight.Y)
+                bottomRight = Coord.FromXY(Keys.Select(k => k.X).Max(), Keys.Select(k => k.Y).Max());
+
+        }
     }
 }
