@@ -44,5 +44,10 @@ namespace AdventofCode.Utils
 
             return floor;
         }
+
+        public static long ParseBin(this string s)
+        {
+            return Convert.ToInt64(s, 2);
+        }
     }
 }

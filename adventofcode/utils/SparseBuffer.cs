@@ -141,5 +141,10 @@ namespace AdventofCode
                 bottomRight = Coord.FromXY(Keys.Select(k => k.X).Max(), Keys.Select(k => k.Y).Max());
 
         }
+
+        public bool HasKey(Coord coord)
+        {
+            return _board.ContainsKey(coord);
+        }
     }
 }
