@@ -17,6 +17,7 @@ namespace AdventofCode.AoC_2021
     class Day19 : TestBaseClass<Part1Type, Part2Type>
     {
         private List<AxisAngleRotation3D> _rotations = new List<AxisAngleRotation3D>();
+        private List<Coord3d> _globalOffsets = new List<Coord3d>();
         public bool Debug { get; set; }
 
         public Day19()
@@ -27,8 +28,8 @@ namespace AdventofCode.AoC_2021
         [Test]
         [TestCase(6, null, "Day19_test2.txt", 6)]
         [TestCase(3, null, "Day19_test2_tiny.txt", 2)]
-        [TestCase(79, null, "Day19_test.txt", 12)]
-        [TestCase(-1, null, "Day19.txt", 12)]
+        [TestCase(79, 3621, "Day19_test.txt", 12)]
+        [TestCase(367, null, "Day19.txt", 12)]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName, int overlapCount)
         {
             OverlapCount = overlapCount;
@@ -74,6 +75,9 @@ namespace AdventofCode.AoC_2021
 
             part1 = scanners.First().Coords.Count;
             LogAndReset("*1", sw);
+            for (int i=0; i<_globalOffsets.Count; i++)
+            for (int j = 0; j < _globalOffsets.Count; j++)
+                part2 = Math.Max(part2, _globalOffsets[i].Distance(_globalOffsets[j]));
             LogAndReset("*2", sw);
 
             return (part1, part2);
@@ -131,7 +135,10 @@ namespace AdventofCode.AoC_2021
                 if (translatedCoords.Contains(c))
                     matchCount++;
                 if (matchCount >= OverlapCount)
+                {
+                    _globalOffsets.Add(offset);
                     return new MatchRes(matchCount, translatedCoords.ToList());
+                }
             }
 
             return new MatchRes(matchCount, new List<Coord3d>());

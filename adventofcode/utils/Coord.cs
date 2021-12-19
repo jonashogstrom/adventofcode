@@ -315,6 +315,13 @@ namespace AdventofCode
                 throw new Exception("Bad math!");
             return res;
         }
+
+        public long Distance(Coord3d c)
+        {
+            return Math.Abs(x - c.x) +
+                   Math.Abs(y - c.y) +
+                   Math.Abs(z - c.z);
+        }
     }
 
     public enum HexDirection
