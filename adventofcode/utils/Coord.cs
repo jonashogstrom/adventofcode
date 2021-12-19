@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Media.Media3D;
 
 namespace AdventofCode
 {
@@ -234,6 +235,7 @@ namespace AdventofCode
         }
     }
 
+    [DebuggerDisplay("{x}, {y}, {z}")]
     public class Coord3d
     {
         public Coord3d(int x, int y, int z)
@@ -289,6 +291,29 @@ namespace AdventofCode
         public int absValue()
         {
             return Math.Abs(x) + Math.Abs(y) + Math.Abs(z);
+        }
+
+        public static Coord3d Parse(string s)
+        {
+            var p = s.Split(',');
+            var c = new Coord3d(int.Parse(p[0]), int.Parse(p[1]), int.Parse(p[2]));
+            return c;
+        }
+
+        public Coord3d Rotate(AxisAngleRotation3D rotation)
+        {
+
+            var rt3d = new RotateTransform3D
+            {
+                Rotation = rotation
+            };
+
+            var newP = rt3d.Value.Transform(new Point3D(x, y, z));
+
+            var res = new Coord3d((int)Math.Round(newP.X), (int)Math.Round(newP.Y), (int)Math.Round(newP.Z));
+            if (Math.Abs(res.x) + Math.Abs(res.y) + Math.Abs(res.z) != Math.Abs(x) + Math.Abs(y) + Math.Abs(z))
+                throw new Exception("Bad math!");
+            return res;
         }
     }
 
