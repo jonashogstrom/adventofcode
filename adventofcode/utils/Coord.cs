@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Windows.Media.Media3D;
 
 namespace AdventofCode
@@ -13,7 +14,7 @@ namespace AdventofCode
         public static Coord S = new Coord(1, 0);
         public static Coord W = new Coord(0, -1);
         public static Coord Origin = new Coord(0, 0);
-        public static Coord[] NSWE = new[]{N, S, W, E};
+        public static Coord[] NSWE = new[] { N, S, W, E };
 
         public static Coord NW = N.Move(W);
         public static Coord NE = N.Move(E);
@@ -24,8 +25,8 @@ namespace AdventofCode
         public static readonly Coord[] Directions8 = { N, NE, E, SE, S, SW, W, NW };
         public static readonly HexDirection[] HexNeighbors =
         {
-            HexDirection.sw, HexDirection.w, HexDirection.nw, 
-            HexDirection.ne, HexDirection.e, HexDirection.se, 
+            HexDirection.sw, HexDirection.w, HexDirection.nw,
+            HexDirection.ne, HexDirection.e, HexDirection.se,
         };
 
         public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
@@ -78,7 +79,7 @@ namespace AdventofCode
             var cDist = Math.Abs(Col - c2.Col);
             if (rDist != 0 && cDist != 0 && rDist != cDist)
                 throw new Exception($"Path is not a multiple of 45 degrees! {this} => {c2} (rDist: {rDist}, cDist: {cDist})");
-            var steps = Math.Max(rDist, cDist)+1;
+            var steps = Math.Max(rDist, cDist) + 1;
             for (int s = 0; s < steps; s++)
             {
                 if (inclusive || (s > 1 && s < steps - 1))
@@ -99,7 +100,7 @@ namespace AdventofCode
         /// <exception cref="Exception"></exception>
         public static Coord Parse(string s)
         {
-            var parts=s.Split(new []{'(', ',', ' ', ';',')'}, StringSplitOptions.RemoveEmptyEntries );
+            var parts = s.Split(new[] { '(', ',', ' ', ';', ')' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2)
                 throw new Exception("Invalid coord string: " + s);
             return new Coord(int.Parse(parts[1]), int.Parse(parts[0]));
@@ -142,7 +143,7 @@ namespace AdventofCode
         }
         public Coord RotateCCWDegrees(int degrees)
         {
-            if (degrees%90 != 0)
+            if (degrees % 90 != 0)
                 throw new Exception("can only rotate even 90 degrees");
             var res = this;
             for (var i = 0; i < degrees / 90; i++)
@@ -152,7 +153,7 @@ namespace AdventofCode
 
         public Coord RotateCWDegrees(int degrees)
         {
-            if (degrees%90 != 0)
+            if (degrees % 90 != 0)
                 throw new Exception("can only rotate even 90 degrees");
             var res = this;
             for (var i = 0; i < degrees / 90; i++)
@@ -226,7 +227,7 @@ namespace AdventofCode
 
         public int Dist(Coord pos)
         {
-            return Math.Abs(Row - pos.Row) + Math.Abs(Col - pos.Col); 
+            return Math.Abs(Row - pos.Row) + Math.Abs(Col - pos.Col);
         }
 
         public override string ToString()
@@ -238,6 +239,46 @@ namespace AdventofCode
     [DebuggerDisplay("{x}, {y}, {z}")]
     public class Coord3d
     {
+        private static List<AxisAngleRotation3D> _rotations = new List<AxisAngleRotation3D>();
+
+        static Coord3d()
+        {
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(1, 0, 0), 0));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 90));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 180));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(0, 1, 0), -90));
+
+            var a = 0.5774;
+            var b = 0.7071;
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(0, 0, 1), 90));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(a, a, a), 120));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(b, b, 0), 180));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(-a, -a, a), 120));
+
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(0, 0, -1), 90));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(-a, a, -a), 120));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(-b, b, 0), 180));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(a, -a, -a), 120));
+
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(1, 0, 0), 90));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(a, a, -a), 120));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(0, b, -b), 180));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(a, -a, a), 120));
+
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(1, 0, 0), 180));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(b, 0, -b), 180));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(0, 0, 1), 180));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(b, 0, b), 180));
+
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(-1, 0, 0), 90));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(-a, a, a), 120));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(0, b, b), 180));
+            _rotations.Add(new AxisAngleRotation3D(new Vector3D(-a, -a, -a), 120));
+        }
+
+
+        public static IEnumerable<AxisAngleRotation3D> AllRotations => _rotations;
+
         public Coord3d(int x, int y, int z)
         {
             this.x = x;
@@ -255,7 +296,7 @@ namespace AdventofCode
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Coord3d) obj);
+            return Equals((Coord3d)obj);
         }
 
         public override int GetHashCode()
@@ -280,7 +321,7 @@ namespace AdventofCode
 
         public Coord3d Move(int x, int y, int z)
         {
-            return new Coord3d(this.x + x, this.y+y, this.z+z);
+            return new Coord3d(this.x + x, this.y + y, this.z + z);
         }
 
         public Coord3d Move(Coord3d v)
