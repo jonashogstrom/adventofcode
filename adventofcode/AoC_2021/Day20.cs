@@ -16,7 +16,7 @@ namespace AdventofCode.AoC_2021
 
         [Test]
         [TestCase(35, 3351, "Day20_test.txt")]
-        [TestCase(35, 3351, "Day20_test2.txt")]
+        [TestCase(36, 7178, "Day20_test2.txt")]
         [TestCase(5483, 18732, "Day20.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
@@ -39,10 +39,11 @@ namespace AdventofCode.AoC_2021
             for (int gen = 1; gen <= 50; gen++)
             {
                 var def = img.Default == 0 ? enhance[0] : enhance[511];
+                
                 img = Evolve(enhance, img, def);
                 var pixelCount = img.Keys.Count(c => img[c] == 1);
-                Log($"Gen {gen} pixelcount:" + pixelCount);
-                Log(img.ToString(i => i == 1 ? "#" : "."));
+                Log($"Gen {gen} pixel count: {pixelCount}");
+                Log(img.ToString(i => i == 1 ? "#" : "."), 1);
                 if (gen == 2)
                 {
                     part1 = pixelCount;
@@ -52,7 +53,6 @@ namespace AdventofCode.AoC_2021
 
             part2 = img.Keys.Count(c => img[c] == 1);
             LogAndReset("*2", sw);
-            // not 20330 
             return (part1, part2);
         }
 
