@@ -13,6 +13,10 @@ namespace AdventofCode
         private Coord bottomRight = new Coord(0, 0);
         private readonly T _def;
         private readonly Dictionary<Coord, T> _board = new Dictionary<Coord, T>();
+        public int Top => topLeft.Y;
+        public int Bottom => bottomRight.Y;
+        public int Left => topLeft.X;
+        public int Right => bottomRight.X;
 
         public SparseBuffer(T def = default)
         {
@@ -59,7 +63,12 @@ namespace AdventofCode
             sb.AppendLine("     ╔" + new string('═', Width * cellWidth) + '╗');
             for (int y = topLeft.Y; y <= bottomRight.Y; y++)
             {
-                sb.Append($"{Math.Abs(y):D4} ║");
+                if (y < 0)
+                    sb.Append($"{y:D3} ║");
+                else
+                {
+                    sb.Append($"{y:D4} ║");
+                }
                 for (int x = topLeft.X; x <= bottomRight.X; x++)
                 {
                     sb.Append(func(Get(x, y), Coord.FromXY(x, y)));
@@ -68,7 +77,7 @@ namespace AdventofCode
                 sb.Append('║');
                 sb.AppendLine();
             }
-            sb.AppendLine("     ╚" + new string('═', Width*cellWidth) + '╝');
+            sb.AppendLine("     ╚" + new string('═', Width * cellWidth) + '╝');
 
             return sb.ToString();
         }
@@ -77,6 +86,7 @@ namespace AdventofCode
         public int Height => bottomRight.Y - topLeft.Y + 1;
 
         public IEnumerable<Coord> Keys => _board.Keys;
+        public T Default => _def;
 
         public string ToString(Func<T, string> func)
         {
@@ -136,7 +146,7 @@ namespace AdventofCode
         {
             _board.Remove(coord);
             if (coord.X == topLeft.X || coord.Y == topLeft.Y)
-                topLeft = Coord.FromXY(Keys.Select(k=>k.X).Min(), Keys.Select(k=>k.Y).Min());
+                topLeft = Coord.FromXY(Keys.Select(k => k.X).Min(), Keys.Select(k => k.Y).Min());
             if (coord.X == bottomRight.X || coord.Y == bottomRight.Y)
                 bottomRight = Coord.FromXY(Keys.Select(k => k.X).Max(), Keys.Select(k => k.Y).Max());
 

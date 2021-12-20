@@ -120,8 +120,8 @@
     <Compile Include="AoC_2020\Day25.cs" />
     <Compile Include="AoC_2020\DayTemplate.cs" />
     <Compile Include="AoC_2020\DayTemplate2.cs" />
-    <Compile Include="AoC_2021\Day6.cs" />
-    <Compile Include="AoC_2021\Day7.cs" />
+    <Compile Include="AoC_2021\Day06.cs" />
+    <Compile Include="AoC_2021\Day07.cs" />
     <Compile Include="AoC_2021\Day8.cs" />
     <Compile Include="AoC_2021\Day9.cs" />
     <Compile Include="AoC_2021\Day10.cs" />
@@ -134,6 +134,7 @@
     <Compile Include="AoC_2021\Day17.cs" />
     <Compile Include="AoC_2021\Day18.cs" />
     <Compile Include="AoC_2021\Day19.cs" />
+    <Compile Include="AoC_2021\Day20.cs" />
     <Compile Include="AoC_2021\DayTemplate.cs" />
     <Compile Include="AoC_2021\Day05.cs" />
     <Compile Include="AoC_2021\Day04.cs" />
@@ -237,6 +238,9 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2021\Day20_test2.txt" />
+    <EmbeddedResource Include="AoC_2021\Day20_test.txt" />
+    <EmbeddedResource Include="AoC_2021\Day20.txt" />
     <EmbeddedResource Include="AoC_2021\Day19_test2_tiny.txt" />
     <EmbeddedResource Include="AoC_2021\Day19_test2.txt" />
     <EmbeddedResource Include="AoC_2021\Day19.txt" />
@@ -269,10 +273,10 @@
     <EmbeddedResource Include="AoC_2021\Day9.txt" />
     <EmbeddedResource Include="AoC_2021\Day8_test.txt" />
     <EmbeddedResource Include="AoC_2021\Day8.txt" />
-    <EmbeddedResource Include="AoC_2021\Day7_test.txt" />
-    <EmbeddedResource Include="AoC_2021\Day7.txt" />
-    <EmbeddedResource Include="AoC_2021\Day6_test.txt" />
-    <EmbeddedResource Include="AoC_2021\Day6.txt" />
+    <EmbeddedResource Include="AoC_2021\Day07_test.txt" />
+    <EmbeddedResource Include="AoC_2021\Day07.txt" />
+    <EmbeddedResource Include="AoC_2021\Day06_test.txt" />
+    <EmbeddedResource Include="AoC_2021\Day06.txt" />
     <EmbeddedResource Include="AoC_2021\Day05_test.txt" />
     <EmbeddedResource Include="AoC_2021\Day05.txt" />
     <EmbeddedResource Include="AoC_2021\Day04_test.txt" />
