@@ -17,11 +17,9 @@ namespace AdventofCode.AoC_2021
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(-1, null, "Day16_test.txt")]
+        
         [TestCase(934, 912901337844, "Day16.txt")]
         [TestCase(6, null, "D2FE28")]
-        [TestCase(-1, null, "38006F45291200")]
-        [TestCase(-1, null, "EE00D40C823060")]
         [TestCase(16, null, "8A004A801A8002F478")]
         [TestCase(12, null, "620080001611562C8802118E34")]
         [TestCase(23, null, "C0015000016115A2E0802F182340")]
@@ -47,7 +45,6 @@ F600BC2D8F produces 0, because 5 is not greater than 15.
 9C0141080250320F1802104A08 produces 1, because 1 + 3 = 2 * 2.
          */
 
-        [TestCase(-1, null, "Day16.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             //LogLevel = resourceName.Contains("test") ? 20 : -1;

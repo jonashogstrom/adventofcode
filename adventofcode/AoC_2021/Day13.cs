@@ -16,7 +16,7 @@ namespace AdventofCode.AoC_2021
 
         [Test]
         [TestCase(17, null, "Day13_test.txt")]
-        [TestCase(17, null, "Day13_large.txt")]
+        [TestCase(18968, null, "Day13_large.txt")]
         [TestCase(669, null, "Day13.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {

@@ -11,15 +11,15 @@ namespace AdventofCode.AoC_2021
     using Part2Type = Int64;
 
     [TestFixture]
-    class Day8 : TestBaseClass<Part1Type, Part2Type>
+    class Day08 : TestBaseClass<Part1Type, Part2Type>
     {
         private List<char> _allChars = new List<char> { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
         private List<char> _allSegments = new List<char> { 'A', 'B', 'C', 'D', 'E', 'F', 'G' };
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(26, 61229, "Day8_test.txt")]
-        [TestCase(543, 994266, "Day8.txt")]
+        [TestCase(26, 61229, "Day08_test.txt")]
+        [TestCase(543, 994266, "Day08.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
