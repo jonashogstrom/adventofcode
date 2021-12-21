@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Windows.Forms;
+using Accord.Collections;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2021
@@ -15,7 +18,7 @@ namespace AdventofCode.AoC_2021
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(739785, null, "Day21_test.txt")]
+        [TestCase(739785, 444356092776315, "Day21_test.txt")]
         [TestCase(752247, null, "Day21.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
@@ -31,8 +34,10 @@ namespace AdventofCode.AoC_2021
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
             var players = new List<Player>();
-            players.Add(new Player(int.Parse(source[0].Split(' ').Last())));
-            players.Add(new Player(int.Parse(source[1].Split(' ').Last())));
+            var p1InitPos = int.Parse(source[0].Split(' ').Last());
+            var p2InitPos = int.Parse(source[1].Split(' ').Last());
+            players.Add(new Player(p1InitPos));
+            players.Add(new Player(p2InitPos));
             LogAndReset("Parse", sw);
 
             int i = 0;
@@ -50,10 +55,10 @@ namespace AdventofCode.AoC_2021
                     p.Move(ref dice);
                     diceRolls++;
                 }
-            
+
                 p.Score += p.Pos;
                 s += $" and moves to space {p.Pos} for a total score of {p.Score}";
-                Log(s);
+                Log(s,30);
                 if (p.IsWinner)
                 {
                     part1 = players[(i + 1) % players.Count].Score * diceRolls;
@@ -62,14 +67,92 @@ namespace AdventofCode.AoC_2021
                 i++;
             }
 
+            var players2 = new List<Player2>();
+            players2.Add(new Player2(p1InitPos));
+            players2.Add(new Player2(p2InitPos));
 
+            var states = new Dictionary<string, GameState>();
 
+            var queue = new PriorityQueue<GameState>(1000000);
+            var winnerCount = new[] { 0L, 0L };
+            var initState = new GameState()
+            {
+                Players = players2.ToArray(),
+                Roll = 0,
+                StateCount = 1
+            };
+            queue.Enqueue(initState, 0);
+            states[GetStateString(initState.Players, initState.Roll)] = initState;
+
+            while (queue.Any())
+            {
+                var statenode = queue.Dequeue();
+                var state = statenode.Value;
+
+                var playerInTurnIndex = state.Roll / 3;
+
+                var playerInTurn = state.Players[playerInTurnIndex];
+                var newPlayers = playerInTurn.DiracMove();
+                foreach (var p in newPlayers)
+                {
+                    if (state.Roll % 3 == 2)
+                        p.Score += p.Pos;
+
+                    if (p.IsWinner)
+                    {
+                        winnerCount[playerInTurnIndex] += state.StateCount;
+                    }
+                    else
+                    {
+                        var playersCopy = (Player2[])state.Players.Clone();
+                        playersCopy[playerInTurnIndex] = p;
+
+                        var newRoll = (state.Roll + 1) % 6;
+                        var stateString = GetStateString(playersCopy, newRoll);
+                        if (!states.TryGetValue(stateString, out var newState))
+                        {
+                            newState = new GameState()
+                            {
+                                Players = playersCopy,
+                                Roll = newRoll,
+                                StateCount = state.StateCount
+                            };
+                            states[stateString] = newState;
+                            queue.Enqueue(newState,
+                                (newState.Players[0].Score + newState.Players[1].Score) * 10 + newState.Roll);
+                        }
+                        else
+                        {
+                            newState.StateCount += state.StateCount;
+                        }
+                    }
+                }
+            }
+
+            part2 = winnerCount.Max();
             LogAndReset("*1", sw);
             LogAndReset("*2", sw);
 
             return (part1, part2);
         }
+
+        public static string GetStateString(Player2[] players, int roll)
+        {
+            return $"P1:{players[0].Pos}|{players[0].Score} P2:{players[1].Pos}|{players[1].Score} Roll:{roll}";
+        }
     }
+    internal class GameState
+    {
+        public Player2[] Players { get; set; }
+        public int Roll { get; set; }
+        public long StateCount { get; set; }
+
+        public override string ToString()
+        {
+            return StateCount + " - " + Day21.GetStateString(Players, Roll);
+        }
+    }
+
 
     internal class Player
     {
@@ -95,7 +178,7 @@ namespace AdventofCode.AoC_2021
     {
         public int Pos { get; private set; }
         public int Score { get; set; }
-        public bool IsWinner => Score >= 1000;
+        public bool IsWinner => Score >=21;
 
         public Player2(int initPos)
         {
@@ -108,9 +191,9 @@ namespace AdventofCode.AoC_2021
         }
         public IEnumerable<Player2> DiracMove()
         {
-            yield return new Player2(newPos(1));
-            yield return new Player2(newPos(2));
-            yield return new Player2(newPos(3));
+            yield return new Player2(newPos(1)) { Score = Score };
+            yield return new Player2(newPos(2)) { Score = Score };
+            yield return new Player2(newPos(3)) { Score = Score };
         }
     }
 }
