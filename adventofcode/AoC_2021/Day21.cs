@@ -19,7 +19,7 @@ namespace AdventofCode.AoC_2021
 
         [Test]
         [TestCase(739785, 444356092776315, "Day21_test.txt")]
-        [TestCase(752247, null, "Day21.txt")]
+        [TestCase(752247, 221109915584112, "Day21.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;

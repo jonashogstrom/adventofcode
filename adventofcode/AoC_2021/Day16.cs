@@ -100,7 +100,6 @@ F600BC2D8F produces 0, because 5 is not greater than 15.
             if (pktType == 4)
             {
                 // value packet
-                var x = 0;
                 var temp =  data.Consume(5);
                 var valueStr = temp.Substring(1, 4);
 

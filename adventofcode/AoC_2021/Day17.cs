@@ -38,9 +38,6 @@ namespace AdventofCode.AoC_2021
             var r = new Rect(x1, y1, x2, y2);
             LogAndReset("Parse", sw);
 
-
-            var bestyVel = int.MinValue;
-
             var minXVelocity = 1;
             var xSum = 1;
             while (xSum < r.Left)
