@@ -137,6 +137,9 @@
     <Compile Include="AoC_2021\Day20.cs" />
     <Compile Include="AoC_2021\Day21.cs" />
     <Compile Include="AoC_2021\Day22.cs" />
+    <Compile Include="AoC_2021\Day23.cs" />
+    <Compile Include="AoC_2021\Day24.cs" />
+    <Compile Include="AoC_2021\Day25.cs" />
     <Compile Include="AoC_2021\DayTemplate.cs" />
     <Compile Include="AoC_2021\Day05.cs" />
     <Compile Include="AoC_2021\Day04.cs" />
@@ -240,6 +243,11 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2021\Day25_test.txt" />
+    <EmbeddedResource Include="AoC_2021\Day25.txt" />
+    <EmbeddedResource Include="AoC_2021\Day24.txt" />
+    <EmbeddedResource Include="AoC_2021\Day23.txt" />
+    <EmbeddedResource Include="AoC_2021\Day23_test.txt" />
     <EmbeddedResource Include="AoC_2021\Day22_test3.txt" />
     <EmbeddedResource Include="AoC_2021\Day22_test2.txt" />
     <EmbeddedResource Include="AoC_2021\Day22.txt" />

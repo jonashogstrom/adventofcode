@@ -34,8 +34,9 @@ namespace AdventofCode.AoC_2021
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
 
-            var world1 = new DicWithDefault<Coord3d, bool>(false);
             var maxRange = new[] { int.MinValue, int.MaxValue };
+            var range50 = new[] { -50, 50 };
+            var world1 = new HashSet<Cuboid>() { new Cuboid(false, range50, range50, range50) };
             var world2 = new HashSet<Cuboid>() { new Cuboid(false, maxRange, maxRange, maxRange) };
 
             foreach (var s in source)
@@ -45,22 +46,13 @@ namespace AdventofCode.AoC_2021
                 var yRange = new int[] { int.Parse(p[5]), int.Parse(p[6]) };
                 var zRange = new int[] { int.Parse(p[8]), int.Parse(p[9]) };
                 var state = p[0][1] == 'n';
-                ProcessStep(world1, xRange, yRange, zRange, state, -50, 50);
                 var c = new Cuboid(state, xRange, yRange, zRange);
-                foreach (var x in world2.ToList())
-                    if (x.State != c.State)
-                    {
-                        if (x.Overlaps(c))
-                        {
-                            world2.Remove(x);
-                            foreach (var newX in x.Split(c).ToList())
-                                world2.Add(newX);
-                        }
-                    }
+                ProcessCuboid(world1, c);
+                ProcessCuboid(world2, c);
             }
 
 
-            part1 = world1.Keys.Count();
+            part1 = world1.Where(c => c.State).Sum(c => c.Size);
             part2 = world2.Where(c => c.State).Sum(c => c.Size);
 
             LogAndReset("Parse", sw);
@@ -70,6 +62,21 @@ namespace AdventofCode.AoC_2021
             return (part1, part2);
         }
 
+        private static void ProcessCuboid(HashSet<Cuboid> world2, Cuboid c)
+        {
+            foreach (var x in world2.ToList())
+                if (x.State != c.State)
+                {
+                    if (x.Overlaps(c))
+                    {
+                        world2.Remove(x);
+                        foreach (var newX in x.Split7(c).ToList())
+                            world2.Add(newX);
+                    }
+                }
+        }
+
+        // naive solution that works for *1
         private void ProcessStep(DicWithDefault<Coord3d, bool> world, int[] xRange, int[] yRange, int[] zRange,
             bool @on, int minRange, int maxRange)
         {
@@ -84,7 +91,6 @@ namespace AdventofCode.AoC_2021
                             world[c] = false;
                     }
         }
-
     }
 
     internal class Cuboid
@@ -99,7 +105,6 @@ namespace AdventofCode.AoC_2021
         {
             return r[1] - r[0] + 1;
         }
-
 
         public Cuboid(bool state, int[] xRange, int[] yRange, int[] zRange)
         {
@@ -138,7 +143,65 @@ namespace AdventofCode.AoC_2021
                             yield return newCuboid;
                         }
                     }
+        }
 
+        public IEnumerable<Cuboid> Split7(Cuboid cuboid)
+        {
+            var restCuboid = this;
+
+            if (cuboid.YRange[1] < restCuboid.YRange[1]) // yield the area above
+            {
+                yield return new Cuboid(State, restCuboid.XRange, new[] { cuboid.YRange[1] + 1, restCuboid.YRange[1] },
+                    restCuboid.ZRange);
+                restCuboid = new Cuboid(State, restCuboid.XRange, new[] { restCuboid.YRange[0], cuboid.YRange[1] },
+                    restCuboid.ZRange);
+            }
+
+            if (cuboid.YRange[0] > restCuboid.YRange[0]) // yield the area below
+            {
+                yield return new Cuboid(State, restCuboid.XRange, new[] { restCuboid.YRange[0], cuboid.YRange[0] - 1 },
+                    restCuboid.ZRange);
+                restCuboid = new Cuboid(State, restCuboid.XRange, new[] { cuboid.YRange[0], restCuboid.YRange[1] },
+                    restCuboid.ZRange);
+            }
+
+            // ======================================
+
+            if (cuboid.XRange[1] < restCuboid.XRange[1]) // yield the left
+            {
+                yield return new Cuboid(State, new[] { cuboid.XRange[1] + 1, restCuboid.XRange[1] }, restCuboid.YRange,
+                    restCuboid.ZRange);
+                restCuboid = new Cuboid(State, new[] { restCuboid.XRange[0], cuboid.XRange[1] }, restCuboid.YRange,
+                    restCuboid.ZRange);
+            }
+
+            if (cuboid.XRange[0] > restCuboid.XRange[0]) // yield the right
+            {
+                yield return new Cuboid(State, new[] { restCuboid.XRange[0], cuboid.XRange[0] - 1 }, restCuboid.YRange,
+                    restCuboid.ZRange);
+                restCuboid = new Cuboid(State, new[] { cuboid.XRange[0], restCuboid.XRange[1] }, restCuboid.YRange,
+                    restCuboid.ZRange);
+            }
+
+            // ======================================
+
+            if (cuboid.ZRange[1] < restCuboid.ZRange[1]) // yield the front
+            {
+                yield return new Cuboid(State, restCuboid.XRange, restCuboid.YRange,
+                    new int[] { cuboid.ZRange[1] + 1, restCuboid.ZRange[1] });
+                restCuboid = new Cuboid(State, restCuboid.XRange, restCuboid.YRange,
+                    new int[] { restCuboid.ZRange[0], cuboid.ZRange[1] });
+            }
+
+            if (cuboid.ZRange[0] > restCuboid.ZRange[0]) // yield the back
+            {
+                yield return new Cuboid(State, restCuboid.XRange, restCuboid.YRange,
+                    new int[] { restCuboid.ZRange[0], cuboid.ZRange[0] - 1 });
+                restCuboid = new Cuboid(State, restCuboid.XRange, restCuboid.YRange,
+                    new int[] { cuboid.ZRange[0], restCuboid.ZRange[1] });
+            }
+
+            yield return new Cuboid(cuboid.State, restCuboid.XRange, restCuboid.YRange, restCuboid.ZRange);
         }
 
         private IEnumerable<int[]> CreateSplitRanges(int[] mainRange, int[] r2)
