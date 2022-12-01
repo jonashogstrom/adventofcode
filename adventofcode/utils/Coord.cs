@@ -68,7 +68,13 @@ namespace AdventofCode
         {
             return v1.CompareTo(v2);
         }
-
+        /// <summary>
+        /// Return a list of coordinates from current pos to target pos (c2) as long as the path is either NSWE or a 45 degree angle
+        /// </summary>
+        /// <param name="c2"></param>
+        /// <param name="inclusive"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public IEnumerable<Coord> PathTo(Coord c2, bool inclusive = true)
         {
             var rDir = c2.Row.CompareTo(Row);

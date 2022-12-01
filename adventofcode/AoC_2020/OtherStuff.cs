@@ -15,7 +15,6 @@ namespace AdventofCode.AoC_2020
         {
             var c = new Cache<BigInteger, int>();
             var count = 500;
-//            var x = fibb(count);
             var fib = c.Do(fibb, count);
 
             Console.WriteLine(fib);

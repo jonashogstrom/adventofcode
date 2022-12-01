@@ -147,6 +147,8 @@
     <Compile Include="AoC_2021\Day02.cs" />
     <Compile Include="AoC_2021\Day01.cs" />
     <Compile Include="AoC_2021\VideoGen.cs" />
+    <Compile Include="AoC_2022\Day01.cs" />
+    <Compile Include="AoC_2022\DayTemplate.cs" />
     <Compile Include="utils\CoordL.cs" />
     <Compile Include="utils\GenCoord.cs" />
     <Compile Include="utils\DicWithDefault.cs" />
@@ -243,6 +245,8 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2022\Day01_test.txt" />
+    <EmbeddedResource Include="AoC_2022\Day01.txt" />
     <EmbeddedResource Include="AoC_2021\Day25_test.txt" />
     <EmbeddedResource Include="AoC_2021\Day25.txt" />
     <EmbeddedResource Include="AoC_2021\Day24.txt" />

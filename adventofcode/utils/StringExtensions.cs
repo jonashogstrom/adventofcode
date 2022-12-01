@@ -6,6 +6,11 @@ namespace AdventofCode.Utils
 {
     public static class StringExtensions
     {
+        /// <summary>
+        /// Splits a list of strings into groups separated by empty strings
+        /// </summary>
+        /// <param name="strings"></param>
+        /// <returns></returns>
         public static IEnumerable<IList<string>> AsGroups(this IEnumerable<string> strings)
         {
             var group = new List<string>();
@@ -23,6 +28,12 @@ namespace AdventofCode.Utils
             }
 
             yield return group;
+        }
+
+        public static IEnumerable<int> AsInt(this IEnumerable<string> strings)
+        {
+            foreach (var s in strings)
+                yield return int.Parse(s);
         }
 
         public static SparseBuffer<char> ToSparseBuffer(this ICollection<string> input, char def = ' ')
@@ -47,6 +58,11 @@ namespace AdventofCode.Utils
             return floor;
         }
 
+        /// <summary>
+        /// Parses a binary number into a long
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static long ParseBin(this string s)
         {
             return Convert.ToInt64(s, 2);

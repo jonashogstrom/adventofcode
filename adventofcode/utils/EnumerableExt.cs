@@ -67,6 +67,13 @@ namespace AdventofCode
             yield return (last, count);
 
         }
+
+        /// <summary>
+        /// if the input is [a, b, c, d] the result will be [(a,b), (b,c), (c,d)]
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static IEnumerable<(T, T)> AsPairs<T>(this IEnumerable<T> s)
         {
             var prev = default(T);
@@ -79,6 +86,7 @@ namespace AdventofCode
                 prev = x;
             }
         }
+
 
         public static IEnumerable<int> groupSizes<T>(this IEnumerable<T> s) where T : IEquatable<T>
         {
@@ -100,6 +108,13 @@ namespace AdventofCode
             yield return count;
         }
     }
+
+
+    /// <summary>
+    /// Caches recursive computations. The recursive func needs to take a cache as its second parameter.
+    /// </summary>
+    /// <typeparam name="TRes"></typeparam>
+    /// <typeparam name="TParam1"></typeparam>
 
     public class Cache<TRes, TParam1>
     {
