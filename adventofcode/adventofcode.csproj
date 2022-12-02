@@ -1,200 +1,36 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{394503E3-6BA1-4D11-A7F0-7770B6244158}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>AdventofCode</RootNamespace>
-    <AssemblyName>adventofcode</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net48</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
+    <AssemblyTitle>adventofcode</AssemblyTitle>
+    <Product>adventofcode</Product>
+    <Copyright>Copyright ©  2018</Copyright>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <Prefer32Bit>true</Prefer32Bit>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accord, Version=3.8.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Accord.3.8.0\lib\net462\Accord.dll</HintPath>
-    </Reference>
-    <Reference Include="Accord.Video, Version=3.8.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Accord.Video.3.8.0\lib\net462\Accord.Video.dll</HintPath>
-    </Reference>
-    <Reference Include="Accord.Video.FFMPEG.x64, Version=3.8.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=AMD64">
-      <HintPath>..\packages\Accord.Video.FFMPEG.x64.3.8.0\lib\net462\Accord.Video.FFMPEG.x64.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Accord" Version="3.8.0" />
+    <PackageReference Include="Accord.Video" Version="3.8.0" />
+    <PackageReference Include="Accord.Video.FFMPEG.x64" Version="3.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="PresentationCore" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AoC_2019\Day14.cs" />
-    <Compile Include="AoC_2019\Day1.cs" />
-    <Compile Include="AoC_2019\Day10.cs" />
-    <Compile Include="AoC_2019\Day11.cs" />
-    <Compile Include="AoC_2019\Day13.cs" />
-    <Compile Include="AoC_2019\Day15.cs" />
-    <Compile Include="AoC_2019\Day16.cs" />
-    <Compile Include="AoC_2019\Day17.cs" />
-    <Compile Include="AoC_2019\Day18.cs" />
-    <Compile Include="AoC_2019\Day19.cs" />
-    <Compile Include="AoC_2019\Day2.cs" />
-    <Compile Include="AoC_2019\Day20.cs" />
-    <Compile Include="AoC_2019\Day3.cs" />
-    <Compile Include="AoC_2019\Day4.cs" />
-    <Compile Include="AoC_2019\Day5.cs" />
-    <Compile Include="AoC_2019\Day6.cs" />
-    <Compile Include="AoC_2019\Day7.cs" />
-    <Compile Include="AoC_2019\Day8.cs" />
-    <Compile Include="AoC_2019\Day9.cs" />
-    <Compile Include="AoC_2019\Day12.cs" />
-    <Compile Include="AoC_2019\Day21.cs" />
-    <Compile Include="AoC_2019\Day22.cs" />
-    <Compile Include="AoC_2019\Day23.cs" />
-    <Compile Include="AoC_2019\Day24.cs" />
-    <Compile Include="AoC_2019\Day25.cs" />
-    <Compile Include="AoC_2019\DayTemplate.cs" />
-    <Compile Include="AoC_2019\DayTemplate2.cs" />
-    <Compile Include="AoC_2020\Comp.cs" />
-    <Compile Include="AoC_2020\Day1.cs" />
-    <Compile Include="AoC_2020\Day2.cs" />
-    <Compile Include="AoC_2020\Day3.cs" />
-    <Compile Include="AoC_2020\Day4.cs" />
-    <Compile Include="AoC_2020\Day5.cs" />
-    <Compile Include="AoC_2020\Day6.cs" />
-    <Compile Include="AoC_2020\Day7.cs" />
-    <Compile Include="AoC_2020\Day8.cs" />
-    <Compile Include="AoC_2020\Day9.cs" />
-    <Compile Include="AoC_2020\Day10.cs" />
-    <Compile Include="AoC_2020\Day11.cs" />
-    <Compile Include="AoC_2020\Day12.cs" />
-    <Compile Include="AoC_2020\Day13.cs" />
-    <Compile Include="AoC_2020\Day14.cs" />
-    <Compile Include="AoC_2020\Day15.cs" />
-    <Compile Include="AoC_2020\Day16.cs" />
-    <Compile Include="AoC_2020\Day17.cs" />
-    <Compile Include="AoC_2020\Day18.cs" />
-    <Compile Include="AoC_2020\Day19.cs" />
-    <Compile Include="AoC_2020\Day20.cs" />
-    <Compile Include="AoC_2020\Day21.cs" />
-    <Compile Include="AoC_2020\Day22.cs" />
-    <Compile Include="AoC_2020\Day23.cs" />
-    <Compile Include="AoC_2020\Day24.cs" />
-    <Compile Include="AoC_2020\Day25.cs" />
-    <Compile Include="AoC_2020\DayTemplate.cs" />
-    <Compile Include="AoC_2020\DayTemplate2.cs" />
-    <Compile Include="AoC_2021\Day06.cs" />
-    <Compile Include="AoC_2021\Day07.cs" />
-    <Compile Include="AoC_2021\Day08.cs" />
-    <Compile Include="AoC_2021\Day09.cs" />
-    <Compile Include="AoC_2021\Day10.cs" />
-    <Compile Include="AoC_2021\Day11.cs" />
-    <Compile Include="AoC_2021\Day12.cs" />
-    <Compile Include="AoC_2021\Day13.cs" />
-    <Compile Include="AoC_2021\Day14.cs" />
-    <Compile Include="AoC_2021\Day15.cs" />
-    <Compile Include="AoC_2021\Day16.cs" />
-    <Compile Include="AoC_2021\Day17.cs" />
-    <Compile Include="AoC_2021\Day18.cs" />
-    <Compile Include="AoC_2021\Day19.cs" />
-    <Compile Include="AoC_2021\Day20.cs" />
-    <Compile Include="AoC_2021\Day21.cs" />
-    <Compile Include="AoC_2021\Day22.cs" />
-    <Compile Include="AoC_2021\Day23.cs" />
-    <Compile Include="AoC_2021\Day24.cs" />
-    <Compile Include="AoC_2021\Day25.cs" />
-    <Compile Include="AoC_2021\DayTemplate.cs" />
-    <Compile Include="AoC_2021\Day05.cs" />
-    <Compile Include="AoC_2021\Day04.cs" />
-    <Compile Include="AoC_2021\Day03.cs" />
-    <Compile Include="AoC_2021\Day02.cs" />
-    <Compile Include="AoC_2021\Day01.cs" />
-    <Compile Include="AoC_2021\VideoGen.cs" />
-    <Compile Include="AoC_2022\Day01.cs" />
-    <Compile Include="AoC_2022\Day02.cs" />
-    <Compile Include="AoC_2022\DayTemplate.cs" />
-    <Compile Include="utils\CoordL.cs" />
-    <Compile Include="utils\GenCoord.cs" />
-    <Compile Include="utils\DicWithDefault.cs" />
-    <Compile Include="AoC_2020\OtherStuff.cs" />
-    <Compile Include="AoC_2020\Passport.cs" />
-    <Compile Include="utils\SparseBufferL.cs" />
-    <Compile Include="utils\StringExtensions.cs" />
-    <Compile Include="utils\EnumerableExt.cs" />
-    <Compile Include="AoC_2019\IntCodeComputer.cs" />
-    <Compile Include="utils\SparseBuffer.cs" />
-    <Compile Include="BaseDay.cs" />
-    <Compile Include="utils\Coord.cs" />
-    <Compile Include="AoC_2018\Day1.cs" />
-    <Compile Include="AoC_2018\Day10.cs" />
-    <Compile Include="AoC_2018\Day11.cs" />
-    <Compile Include="AoC_2018\Day12.cs" />
-    <Compile Include="AoC_2018\Day13.cs" />
-    <Compile Include="AoC_2018\Day14.cs" />
-    <Compile Include="AoC_2018\Day15.cs" />
-    <Compile Include="AoC_2018\Day16.cs" />
-    <Compile Include="AoC_2018\Day17.cs" />
-    <Compile Include="AoC_2018\Day18.cs" />
-    <Compile Include="AoC_2018\Day19.cs" />
-    <Compile Include="AoC_2018\Day2.cs" />
-    <Compile Include="AoC_2018\Day20.cs" />
-    <Compile Include="AoC_2015\Day2015_01.cs" />
-    <Compile Include="AoC_2018\Day21.cs" />
-    <Compile Include="AoC_2018\Day22.cs" />
-    <Compile Include="AoC_2018\Day23.cs" />
-    <Compile Include="AoC_2018\Day24.cs" />
-    <Compile Include="AoC_2018\Day25.cs" />
-    <Compile Include="AoC_2018\Day3.cs" />
-    <Compile Include="AoC_2018\Day4.cs" />
-    <Compile Include="AoC_2018\Day5.cs" />
-    <Compile Include="AoC_2018\Day6.cs" />
-    <Compile Include="AoC_2018\Day7.cs" />
-    <Compile Include="AoC_2018\Day8.cs" />
-    <Compile Include="AoC_2018\Day9.cs" />
-    <Compile Include="AoC_2016\Day2016_01.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AoC_2018\day1.txt" />
@@ -431,16 +267,4 @@
     <EmbeddedResource Include="AoC_2019\Day8.txt" />
     <EmbeddedResource Include="AoC_2019\Day8_test.txt" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.11.0\build\NUnit.props'))" />
-    <Error Condition="!Exists('..\packages\Accord.3.8.0\build\Accord.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Accord.3.8.0\build\Accord.targets'))" />
-    <Error Condition="!Exists('..\packages\Accord.Video.FFMPEG.x64.3.8.0\build\Accord.Video.FFMPEG.x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Accord.Video.FFMPEG.x64.3.8.0\build\Accord.Video.FFMPEG.x64.targets'))" />
-  </Target>
-  <Import Project="..\packages\Accord.3.8.0\build\Accord.targets" Condition="Exists('..\packages\Accord.3.8.0\build\Accord.targets')" />
-  <Import Project="..\packages\Accord.Video.FFMPEG.x64.3.8.0\build\Accord.Video.FFMPEG.x64.targets" Condition="Exists('..\packages\Accord.Video.FFMPEG.x64.3.8.0\build\Accord.Video.FFMPEG.x64.targets')" />
 </Project>
