@@ -16,7 +16,7 @@ namespace AdventofCode.AoC_2022
 
         [Test]
         [TestCase(157, 70, "Day03_test.txt")]
-        [TestCase(7716, null, "Day03.txt")]
+        [TestCase(7716, 2973, "Day03.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -31,24 +31,13 @@ namespace AdventofCode.AoC_2022
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
             LogAndReset("Parse", sw);
-            var dupes = "";
             var sum = 0;
             foreach (var r in source)
             {
-                var dupe = ' ';
-                for (int i = 0; i < r.Length / 2; i++)
-                {
-                    var item = r[i];
-                    for (int j = r.Length / 2; j < r.Length; j++)
-                    {
-                        if (item == r[j])
-                        {
-                            dupe = item;
-                            break;
-                        }
-                    }
-                }
-                Assert.True(dupe != ' ');
+                var p1 = r.Substring(0, r.Length / 2);
+                var p2 = r.Substring(r.Length / 2);
+                var dupes = FindDupes(p1, p2);
+                var dupe = dupes.Single();
                 var value = GetVal(dupe);
                 Log($"{r} => {dupe} => {value}");
                 sum += value;
@@ -58,18 +47,23 @@ namespace AdventofCode.AoC_2022
             part1 = sum;
             LogAndReset("*1", sw);
 
-            var group = new List<string>();
             sum = 0;
-            foreach (var r in source)
+            IEnumerable<char> temp = null;
+            for (var i=0; i<source.Length; i++)
             {
-                group.Add(r);
-                if (group.Count == 3)
+                if (temp == null)
+                    temp = source[i];
+                else
                 {
-                    var badge = SolvePart2(group);
+                    temp = FindDupes(temp, source[i]);
+                }
+                if (i%3==2)
+                {
+                    var badge = temp.Single();
                     var value = GetVal(badge);
                     Log($"group => {badge} => {value}");
                     sum += value;
-                    group.Clear();
+                    temp = null;
                 }
             }
 
@@ -79,10 +73,9 @@ namespace AdventofCode.AoC_2022
             return (part1, part2);
         }
 
-        private char SolvePart2(List<string> group)
+        private IEnumerable<char> FindDupes(IEnumerable<char> s1, IEnumerable<char> s2)
         {
-            var dupes = group[0].ToHashSet().Intersect(group[1].ToHashSet()).Intersect(group[2].ToHashSet());
-            return dupes.Single();
+            return s1.Intersect(s2);
         }
 
         private int GetVal(char dupe)
