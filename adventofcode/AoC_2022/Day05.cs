@@ -28,8 +28,6 @@ namespace AdventofCode.AoC_2022
 
         protected override (Part1Type part1, Part2Type part2) DoComputeWithTimer(string[] source)
         {
-            Part1Type part1 = "";
-            Part2Type part2 = "";
             var sw = Stopwatch.StartNew();
             var parts = source.AsGroups().ToList();
             var ops = new List<List<int>>();
@@ -49,7 +47,7 @@ namespace AdventofCode.AoC_2022
             {
                 MoveCrates(stacks, op[0], op[1], op[2]);
             }
-            part1 = string.Join("", stacks.Select(s=>s.Peek()));
+            var part1 = new string(stacks.Select(s=>s.Peek()).ToArray());
             LogAndReset("*1", sw);
 
             stacks = ParseMap(parts);
@@ -57,7 +55,7 @@ namespace AdventofCode.AoC_2022
             {
                 MoveCrates9001(stacks, op[0], op[1], op[2]);
             }
-            part2 = string.Join("", stacks.Select(s => s.Peek()));
+            var part2 = new string(stacks.Select(s => s.Peek()).ToArray());
             LogAndReset("*2", sw);
 
             return (part1, part2);
@@ -103,18 +101,3 @@ namespace AdventofCode.AoC_2022
         }
     }
 }
-
-
-/*
- * 
- *
-    [D]    
-[N] [C]    
-[Z] [M] [P]
- 1   2   3 
-
-move 1 from 2 to 1
-move 3 from 1 to 3
-move 2 from 2 to 1
-move 1 from 1 to 2
-*/
