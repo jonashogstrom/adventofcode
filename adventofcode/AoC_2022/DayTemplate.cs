@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace AdventofCode.AoC_2022
 {
+    // to use string-types, change baseclass to TestBaseClass2 and remove a bunch of ? in the methods below
     using Part1Type = Int64;
     using Part2Type = Int64;
 

@@ -173,23 +173,27 @@ namespace AdventofCode
         #endregion
     }
 
-    class TestBaseClass<T, S> : BaseBaseDay
-            where S : struct
-            where T : struct
+    class TestBaseClass<T, S> : TestBaseClass2<Nullable<T>, Nullable<S>>
+        where S : struct
+        where T : struct
+    {
+    }
+
+    class TestBaseClass2<T, S> : BaseBaseDay
     {
         private DateTime _startTime;
 
-        protected void DoAsserts((T? part1, S? part2) actual, T? exp1, S? exp2, string name = "")
+        protected void DoAsserts((T part1, S part2) actual, T exp1, S exp2, string name = "")
         {
             var (actual1, actual2) = actual;
 
             var ok1 = GetStatus(actual1, exp1);
             var ok2 = GetStatus(actual2, exp2);
 
-            if (actual1.HasValue)
+            if (actual1 != null)
                 Log($"Calculated Part1 [{ok1}]: {actual1} ", -1);
 
-            if (actual2.HasValue)
+            if (actual2 != null)
                 Log($"Calculated Part2 [{ok2}]: {actual2}", -1);
 
             var time = _startTime.ToString("yyyy-MM-dd_HH-mm-ss");
@@ -199,20 +203,20 @@ namespace AdventofCode
 
             File.WriteAllText(filename, _log.ToString());
 
-            if (actual1.HasValue && exp1.HasValue)
+            if (actual1 != null && exp1 != null)
                 Assert.That(actual1, Is.EqualTo(exp1), "Incorrect value for Part 1");
 
-            if (actual2.HasValue && exp2.HasValue)
-                Assert.That(actual2, Is.EqualTo(exp2.Value), "Incorrect value for Part 2");
+            if (actual2 != null && exp2 != null)
+                Assert.That(actual2, Is.EqualTo(exp2), "Incorrect value for Part 2");
         }
 
-        private string GetStatus(T? actual, T? expected)
+        private string GetStatus(T actual, T expected)
         {
-            if (expected.HasValue)
+            if (expected!= null)
             {
-                if (actual.HasValue)
+                if (actual != null)
                 {
-                    return actual.Value.Equals(expected.Value) ? "OK" : "XX";
+                    return actual.Equals(expected) ? "OK" : "XX";
                 }
 
                 return "  ";
@@ -220,13 +224,13 @@ namespace AdventofCode
 
             return "__";
         }
-        private string GetStatus(S? actual, S? expected)
+        private string GetStatus(S actual, S expected)
         {
-            if (expected.HasValue)
+            if (expected != null)
             {
-                if (actual.HasValue)
+                if (actual != null)
                 {
-                    return actual.Value.Equals(expected.Value) ? "OK" : "XX";
+                    return actual.Equals(expected) ? "OK" : "XX";
                 }
 
                 return "  ";
@@ -257,7 +261,7 @@ namespace AdventofCode
             return $"{ts.Ticks / 10}us";
         }
 
-        protected (T? part1, S? part2) ComputeWithTimer(string[] source)
+        protected (T part1, S part2) ComputeWithTimer(string[] source)
         {
             _startTime = DateTime.Now;
             var sw = new Stopwatch();
@@ -269,7 +273,7 @@ namespace AdventofCode
             return res;
         }
 
-        protected virtual (T? part1, S? part2) DoComputeWithTimer(string[] source)
+        protected virtual (T part1, S part2) DoComputeWithTimer(string[] source)
         {
             throw new NotImplementedException();
         }
