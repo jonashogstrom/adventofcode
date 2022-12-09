@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -15,7 +16,7 @@ namespace AdventofCode.AoC_2022
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(13, 1, "Day09_test.txt")]
+        [TestCase(null, 1, "Day09_test.txt")]
         [TestCase(null, 36, "Day09_test2.txt")]
         [TestCase(6376, null, "Day09.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
@@ -31,12 +32,20 @@ namespace AdventofCode.AoC_2022
             Part1Type part1 = 0;
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
-            var headPos = new Coord(0, 0);
-            var tailPos = new Coord(0, 0);
+            // var prev = new Coord(0, 0);
+            // var k.Pos = new Coord(0, 0);
 
             var visited = new SparseBuffer<bool>();
-            visited[tailPos] = true;
             var stepCounter = 0;
+            var ropeLength = 10;
+            var knots = new List<Knot>();
+            knots.Add(new Knot(Coord.Origin, 'H'));
+            for (int x = 1; x < ropeLength; x++)
+            {
+                knots.Add(new Knot(Coord.Origin, x.ToString()[0]));
+            }
+            visited[knots.Last().Pos] = true;
+
             foreach (var instr in source)
             {
                 var parts = instr.Split(' ');
@@ -44,70 +53,109 @@ namespace AdventofCode.AoC_2022
                 var dist = int.Parse(parts[1]);
                 for (var i = 0; i < dist; i++)
                 {
-                    headPos = headPos.Move(dir);
-                    if (headPos == tailPos)
+                    knots[0].Pos = knots[0].Pos.Move(dir);
+                    var prev = knots[0].Pos;
+                    foreach (var k in knots.Skip(1))
                     {
-                        // covers
-                    }
-                    else if (headPos.Dist(tailPos) <= 1)
-                    {
-                        // adjacent
-                    }
-                    else if (headPos.GenAdjacent8().Contains(tailPos))
-                    {
-                        // no action -- corners
-                    }
-                    else if (tailPos.X == headPos.X || tailPos.Y == headPos.Y)
-                    {
-                        tailPos = tailPos.Move(dir);
-                        Log("MoveTail " + Coord.trans2NESW[dir]);
-                    }
-                    else // need to move diagonally
-                    {
-                        if (tailPos.IsNorthOf(headPos)) // above
+                        if (prev == k.Pos)
                         {
-                            if (tailPos.IsWestOf(headPos)) // north east
-                            {
-                                tailPos = tailPos.Move(Coord.SE);
-                                Log("MoveTail SE");
-                            }
-
+                            // covers
+                        }
+                        else if (prev.Dist(k.Pos) <= 1)
+                        {
+                            // adjacent
+                        }
+                        else if (prev.GenAdjacent8().Contains(k.Pos))
+                        {
+                            // no action -- corners
+                        }
+                        else if (k.Pos.Y == prev.Y )
+                        {
+                            if (k.Pos.IsWestOf(prev))
+                                k.Pos = k.Pos.Move(Coord.E);
+                            else 
+                                k.Pos = k.Pos.Move(Coord.W);
+                        } 
+                        else if (k.Pos.X == prev.X)
+                        {
+                            if (k.Pos.IsNorthOf(prev))
+                                k.Pos = k.Pos.Move(Coord.S);
                             else
+                                k.Pos = k.Pos.Move(Coord.N);
+                        }
+                        else // need to move diagonally
+                        {
+                            if (k.Pos.IsNorthOf(prev)) // above
                             {
-                                tailPos = tailPos.Move(Coord.SW);
-                                Log("MoveTail SW");
+                                if (k.Pos.IsWestOf(prev)) // north east
+                                {
+                                    k.Pos = k.Pos.Move(Coord.SE);
+                                }
+
+                                else
+                                {
+                                    k.Pos = k.Pos.Move(Coord.SW);
+                                }
+                            }
+                            else // below
+                            {
+                                if (k.Pos.IsWestOf(prev)) // South east
+                                    k.Pos = k.Pos.Move(Coord.NE);
+                                else
+                                {
+                                    k.Pos = k.Pos.Move(Coord.NW);
+                                }
                             }
                         }
-                        else // below
-                        {
-                            if (tailPos.IsWestOf(headPos)) // South east
-                                tailPos = tailPos.Move(Coord.NE);
-                            else
-                            {
-                                tailPos = tailPos.Move(Coord.NW);
-                            }
-                        }
+                        prev = k.Pos;
                     }
 
-                    var map = new SparseBuffer<char>('.');
-                    map[Coord.Origin] = 's';
-                    map[tailPos] = 'T';
-                    map[headPos] = 'H';
+                    visited[knots.Last().Pos] = true;
                     stepCounter++;
+                    if (instr == "R 17")
+                        LogMap(visited, knots, stepCounter, instr);
+                }
 
-                    Log("======= step: " + stepCounter + " - " + instr);
-                    Log(map.ToString(c=>c.ToString()));
-
-
-                    visited[tailPos] = true;
+                LogMap(visited, knots, stepCounter, instr);
+                if (instr == "R 17")
+                {
+                    Log("here");
                 }
             }
             LogAndReset("Parse", sw);
-            part1 = visited.Keys.Count();
+            part2 = visited.Keys.Count();
             LogAndReset("*1", sw);
             LogAndReset("*2", sw);
 
             return (part1, part2);
+        }
+
+        private void LogMap(SparseBuffer<bool> visited, List<Knot> knots, int stepCounter, string instr)
+        {
+            var map = new SparseBuffer<char>('.');
+            foreach (var x in visited.Keys)
+                map[x] = '#';
+
+            map[Coord.Origin] = 's';
+            foreach (var k in knots.Skip(0).Reverse())
+            {
+                map[k.Pos] = k.Name;
+            }
+
+            Log("======= step: " + stepCounter + " - " + instr);
+            Log(map.ToString(c => c.ToString()));
+        }
+    }
+
+    internal class Knot
+    {
+        public Coord Pos { get; set; }
+        public char Name { get; }
+
+        public Knot(Coord pos, char name)
+        {
+            Pos = pos;
+            Name = name;
         }
     }
 }

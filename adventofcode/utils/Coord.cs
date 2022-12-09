@@ -33,6 +33,12 @@ namespace AdventofCode
         {
             {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'},
         };
+
+        public static readonly Dictionary<Coord, string> trans28Dir = new Dictionary<Coord, string>()
+        {
+            {N, "N"}, {S, "S"}, {E, "E"}, {W, "W"},
+        };
+
         public static readonly Dictionary<Coord, char> trans2Arrow = new Dictionary<Coord, char>()
         {
             {N, 'v'}, {S, '^'}, {E, '>'}, {W, '<'},
@@ -63,6 +69,10 @@ namespace AdventofCode
         {
             return new Coord(y, x);
         }
+
+        public bool IsNorthOf(Coord c) => this.Y < c.Y;
+        public bool IsWestOf(Coord c) => this.X < c.X;
+
 
         private int GetDir(int v1, int v2)
         {
