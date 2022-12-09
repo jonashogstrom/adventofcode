@@ -19,7 +19,7 @@ namespace AdventofCode.AoC_2022
         [TestCase(13, 1, "Day09_test.txt")]
         [TestCase(null, 36, "Day09_test2.txt")]
         [TestCase(null, null, "Day09_testjay1.txt")]
-        [TestCase(6376, 2607, "Day09.txt")]
+        //[TestCase(6376, 2607, "Day09.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -39,7 +39,6 @@ namespace AdventofCode.AoC_2022
             LogAndReset("Parse", sw);
             knots1.Add(new Knot(Coord.Origin, 'H'));
             knots1.Add(new Knot(Coord.Origin, 'T'));
-
             part1 = MakeMoves(source, knots1);
 
             LogAndReset("*1", sw);
@@ -74,76 +73,23 @@ namespace AdventofCode.AoC_2022
                 var dist = int.Parse(parts[1]);
                 for (var i = 0; i < dist; i++)
                 {
-                    knots[0].Pos = knots[0].Pos.Move(dir);
-                    var prev = knots[0].Pos;
+                    var head = knots.First();
+                    head.Pos = head.Pos.Move(dir);
+                    var prev = head.Pos;
                     foreach (var k in knots.Skip(1))
                     {
-                        if (prev == k.Pos)
+                        if (!prev.Equals(k.Pos) && !prev.GenAdjacent8().Contains(k.Pos))
                         {
-                            // covers
+                            k.Pos = k.Pos.Move1Toward(prev);
                         }
-                        else if (prev.Dist(k.Pos) <= 1)
-                        {
-                            // adjacent
-                        }
-                        else if (prev.GenAdjacent8().Contains(k.Pos))
-                        {
-                            // no action -- corners
-                        }
-                        else if (k.Pos.Y == prev.Y)
-                        {
-                            if (k.Pos.IsWestOf(prev))
-                                k.Pos = k.Pos.Move(Coord.E);
-                            else
-                                k.Pos = k.Pos.Move(Coord.W);
-                        }
-                        else if (k.Pos.X == prev.X)
-                        {
-                            if (k.Pos.IsNorthOf(prev))
-                                k.Pos = k.Pos.Move(Coord.S);
-                            else
-                                k.Pos = k.Pos.Move(Coord.N);
-                        }
-                        else // need to move diagonally
-                        {
-                            if (k.Pos.IsNorthOf(prev)) // above
-                            {
-                                if (k.Pos.IsWestOf(prev)) // north east
-                                {
-                                    k.Pos = k.Pos.Move(Coord.SE);
-                                }
-
-                                else
-                                {
-                                    k.Pos = k.Pos.Move(Coord.SW);
-                                }
-                            }
-                            else // below
-                            {
-                                if (k.Pos.IsWestOf(prev)) // South east
-                                    k.Pos = k.Pos.Move(Coord.NE);
-                                else
-                                {
-                                    k.Pos = k.Pos.Move(Coord.NW);
-                                }
-                            }
-                        }
-
                         prev = k.Pos;
                     }
 
                     visited[knots.Last().Pos] = true;
                     stepCounter++;
-                    if (instr == "R 17" && Debug)
-                        LogMap(visited, knots, stepCounter, instr, instrCounter);
                 }
 
-                if (Debug)
-                    LogMap(visited, knots, stepCounter, instr, instrCounter);
-                if (visited.Keys.Count() > 1)
-                {
-                    Log("here");
-                }
+                LogMap(visited, knots, stepCounter, instr, instrCounter);
             }
 
             return visited.Keys.Count();
@@ -162,8 +108,9 @@ namespace AdventofCode.AoC_2022
                 map[k.Pos] = k.Name;
             }
 
-            Log($"======= Instr: {instr} (#{instrCounter}) - step {stepCounter}" );
-            Log(map.ToString(c => c.ToString()));
+            Log("=======");
+            Log($"Instr: {instr} (#{instrCounter}) - step {stepCounter} Head: {knots.First().Pos}");
+            Log(() => map.ToString(c => c.ToString()));
         }
     }
 
