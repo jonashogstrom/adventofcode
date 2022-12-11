@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Windows.Media.Media3D;
+using Accord.Collections;
 
 namespace AdventofCode
 {
@@ -31,12 +32,13 @@ namespace AdventofCode
 
         public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
         {
-            {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'},
+            {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'}, 
         };
 
         public static readonly Dictionary<Coord, string> trans28Dir = new Dictionary<Coord, string>()
         {
             {N, "N"}, {S, "S"}, {E, "E"}, {W, "W"},
+            {NE, "NE"}, {SE, "SE"}, {NW, "NW"}, {SW, "SW"},
         };
 
         public static readonly Dictionary<Coord, char> trans2Arrow = new Dictionary<Coord, char>()
@@ -249,6 +251,25 @@ namespace AdventofCode
         public override string ToString()
         {
             return $"{nameof(Row)}: {Row}, {nameof(Col)}: {Col}";
+        }
+
+        public Coord Move1Toward(Coord target)
+        {
+            var xDir = Clamp(target.X - X, -1, 1);
+            var yDir = Clamp(target.Y - Y, -1, 1);
+            return new Coord(Y + yDir, X + xDir);
+        }
+
+        private int Clamp(int v, int min, int max)
+        {
+            if (v < min) return min;
+            if (v > max) return max;
+            return v;
+        }
+
+        public bool OnSameLine(Coord other)
+        {
+            return X == other.X || Y == other.Y;
         }
     }
 

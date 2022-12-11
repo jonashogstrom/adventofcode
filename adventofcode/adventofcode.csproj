@@ -29,6 +29,17 @@
     <None Remove="AoC_2022\Day06_test.txt" />
     <None Remove="AoC_2022\Day07.txt" />
     <None Remove="AoC_2022\Day07_test.txt" />
+    <None Remove="AoC_2022\Day08.txt" />
+    <None Remove="AoC_2022\Day08_test.txt" />
+    <None Remove="AoC_2022\Day09.txt" />
+    <None Remove="AoC_2022\Day09_test.txt" />
+    <None Remove="AoC_2022\Day09_test2.txt" />
+    <None Remove="AoC_2022\Day09_testjay1.txt" />
+    <None Remove="AoC_2022\Day10.txt" />
+    <None Remove="AoC_2022\Day10_test.txt" />
+    <None Remove="AoC_2022\Day10_test_small.txt" />
+    <None Remove="AoC_2022\Day11.txt" />
+    <None Remove="AoC_2022\Day11_test.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Accord" Version="3.8.0" />
@@ -94,7 +105,18 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2022\Day11_test.txt" />
+    <EmbeddedResource Include="AoC_2022\Day11.txt" />
+    <EmbeddedResource Include="AoC_2022\Day10_test_small.txt" />
+    <EmbeddedResource Include="AoC_2022\Day10_test.txt" />
+    <EmbeddedResource Include="AoC_2022\Day10.txt" />
+    <EmbeddedResource Include="AoC_2022\Day09_testjay1.txt" />
+    <EmbeddedResource Include="AoC_2022\Day09_test2.txt" />
+    <EmbeddedResource Include="AoC_2022\Day09_test.txt" />
+    <EmbeddedResource Include="AoC_2022\Day09.txt" />
+    <EmbeddedResource Include="AoC_2022\Day08.txt" />
     <EmbeddedResource Include="AoC_2022\Day07.txt" />
+    <EmbeddedResource Include="AoC_2022\Day08_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day07_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day06_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day06.txt" />
