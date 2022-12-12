@@ -74,21 +74,25 @@ namespace AdventofCode.AoC_2022
             part1 = sum;
             LogAndReset("*1", sw);
             var line = "";
-            for (int i = 0; i < 240; i++)
+            if (registerXHistory.Count >= 240)
             {
-                var crtPos = i % 40;
-                var regx = registerXHistory[i];
-                if (regx >= crtPos - 1 && regx <= crtPos + 1)
-                    line += "#";
-                else
+                for (int i = 0; i < 240; i++)
                 {
-                    line += ".";
-                }
 
-                if ((i + 1) % 40 == 0)
-                {
-                    Log(line, -1);
-                    line = "";
+                    var crtPos = i % 40;
+                    var regx = registerXHistory[i];
+                    if (regx >= crtPos - 1 && regx <= crtPos + 1)
+                        line += "#";
+                    else
+                    {
+                        line += ".";
+                    }
+
+                    if ((i + 1) % 40 == 0)
+                    {
+                        Log(line, -1);
+                        line = "";
+                    }
                 }
             }
 

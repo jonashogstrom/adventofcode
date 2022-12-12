@@ -9,13 +9,13 @@ namespace AdventofCode.AoC_2022
     using Part2Type = Int64;
 
     [TestFixture]
-    class DayXXX : TestBaseClass<Part1Type, Part2Type>
+    class Day13 : TestBaseClass<Part1Type, Part2Type>
     {
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(9999999, null, "DayXXX_test.txt")]
-        [TestCase(9999999, null, "DayXXX.txt")]
+        [TestCase(9999999, null, "Day13_test.txt")]
+        [TestCase(9999999, null, "Day13.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
