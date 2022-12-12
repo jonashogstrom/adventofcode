@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using AdventofCode.Utils;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 
 namespace AdventofCode.AoC_2022
 {
@@ -37,73 +34,49 @@ namespace AdventofCode.AoC_2022
             var sw = Stopwatch.StartNew();
             var monkeys = ParseInput(source);
             LogAndReset("Parse", sw);
-            for (int i = 0; i < 20; i++)
-            {
-                Log($"Round {i + 1}");
-                foreach (var m in monkeys)
-                {
-                    m.ExecuteTurn(monkeys, value=>value/3);
-                }
 
-                foreach (var m in monkeys)
-                {
-                    Log($"{string.Join(", ", m.Items)}");
-
-                }
-            }
-
-            foreach (var m in monkeys)
-            {
-                Log($"{m.Inspections}");
-            }
-
-            var activity = monkeys.Select(m => m.Inspections).OrderByDescending(v => v).ToArray();
-
-            part1 = activity[0] * activity[1];
-
+            ExecuteRounds(monkeys, 20, true);
+            part1 = CalculateActivity(monkeys);
             LogAndReset("*1", sw);
 
-
             monkeys = ParseInput(source);
-            var x = 1;
-            foreach (var fac in monkeys.Select(m => m.TestDiv).Distinct())
-                x = x * fac;
-
-
-            for (int i = 0; i < 10000; i++)
-            {
-                //                Log($"Round {i + 1}");
-                foreach (var m in monkeys)
-                {
-                    m.ExecuteTurn(monkeys, value => value % x);
-
-                }
-
-
-                // foreach (var m in monkeys)
-                // {
-                //     Log($"{string.Join(", ", m.Items)}");
-                //
-                // }
-            }
-
-            foreach (var m in monkeys)
-            {
-                Log($"{m.Inspections}");
-            }
-
-            activity = monkeys.Select(m => m.Inspections).OrderByDescending(v => v).ToArray();
-            part2= activity[0] * activity[1];
-            
-
+            ExecuteRounds(monkeys, 10000, false);
+            part2 = CalculateActivity(monkeys);
             LogAndReset("*2", sw);
 
             return (part1, part2);
         }
 
+        private static long CalculateActivity(List<Monkey> monkeys)
+        {
+            long part1;
+            var activity = monkeys.Select(m => m.Inspections).OrderByDescending(v => v).ToArray();
+
+            part1 = activity[0] * activity[1];
+            return part1;
+        }
+
+        private void ExecuteRounds(List<Monkey> monkeys, int rounds, bool reduceStress)
+        {
+            for (int i = 0; i < rounds; i++)
+            {
+                Log($"Round {i + 1}");
+                foreach (var m in monkeys)
+                {
+                    m.ExecuteTurn(monkeys, reduceStress);
+                }
+
+                foreach (var m in monkeys)
+                {
+                    Log(()=>$"{string.Join(", ", m.Items)}");
+                }
+            }
+        }
+
         private static List<Monkey> ParseInput(string[] source)
         {
             var monkeys = new List<Monkey>();
+            var factors = new HashSet<int>();
             foreach (var desc in source.AsGroups())
             {
                 var m = new Monkey();
@@ -134,7 +107,14 @@ namespace AdventofCode.AoC_2022
                 m.TestDiv = int.Parse(desc[3].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[3]);
                 m.TrueMonkey = int.Parse(desc[4].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[5]);
                 m.FalseMonkey = int.Parse(desc[5].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[5]);
+                factors.Add(m.TestDiv);
             }
+
+            var magicReducer = 1;
+            foreach (var m in factors)
+                magicReducer *= m;
+            foreach (var m in monkeys)
+                m.MagicReducer = magicReducer;
 
             return monkeys;
         }
@@ -148,7 +128,7 @@ namespace AdventofCode.AoC_2022
         public int TestDiv { get; set; }
         public int FalseMonkey { get; set; }
 
-        public void ExecuteTurn(List<Monkey> monkeys, Func<long, long> reduceStress)
+        public void ExecuteTurn(List<Monkey> monkeys, bool reduceStress)
         {
             while (Items.Any())
             {
@@ -156,7 +136,10 @@ namespace AdventofCode.AoC_2022
                 var item = Items.Dequeue();
 
                 item = Operation(item);
-                item = reduceStress(item);
+                if (reduceStress)
+                    item = item / 3;
+
+                item = item % MagicReducer;
 
                 if (item % TestDiv == 0)
                     monkeys[TrueMonkey].Items.Enqueue(item);
@@ -167,5 +150,6 @@ namespace AdventofCode.AoC_2022
 
         public long Inspections { get; set; }
         public string OperationStr { get; set; }
+        public int MagicReducer { get; set; }
     }
 }
