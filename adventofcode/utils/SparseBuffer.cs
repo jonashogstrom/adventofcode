@@ -9,8 +9,9 @@ namespace AdventofCode
 {
     public class SparseBuffer<T>
     {
-        private Coord topLeft = new Coord(0, 0);
-        private Coord bottomRight = new Coord(0, 0);
+        private static Coord Origin = new Coord(0, 0);
+        private Coord topLeft = Origin;
+        private Coord bottomRight = Origin;
         private readonly T _def;
         private readonly Dictionary<Coord, T> _board = new Dictionary<Coord, T>();
         public int Top => topLeft.Y;
@@ -21,6 +22,13 @@ namespace AdventofCode
         public SparseBuffer(T def = default)
         {
             _def = def;
+        }
+
+        public SparseBuffer(T def, Coord origin)
+        {
+            _def = def;
+            topLeft = origin;
+            bottomRight = origin;
         }
 
         public T this[Coord coord]

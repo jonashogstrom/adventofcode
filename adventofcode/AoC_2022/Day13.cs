@@ -52,36 +52,34 @@ namespace AdventofCode.AoC_2022
             LogAndReset("Parse", sw);
 
             var sum = 0;
+            var correctPackages = new List<int>();
             for (int i = 0; i < packetPairs.Count(); i++)
             {
                 Log($"== Pair {i + 1} ==");
                 var packetPair = packetPairs[i];
                 if (ComparePackets(packetPair))
+                {
                     sum += i + 1;
-
+                    correctPackages.Add(i + 1);
+                }
             }
-            // solve part 1 here
 
+            Log("Correctly ordered package pairs: " + string.Join(", ", correctPackages), -1);
 
             part1 = sum;
             LogAndReset("*1", sw);
-
+            // Solution for part2
             var allPackets = new List<Packet>();
             foreach (var s in source)
                 if (!string.IsNullOrEmpty(s))
                     allPackets.Add(ParsePacketList(s, 0));
             allPackets.Add(ParsePacketList("[[2]]", 0, true));
             allPackets.Add(ParsePacketList("[[6]]", 0, true));
-            allPackets.Sort((packet1, packet2) =>
-            {
-
-                return ComparePackets2(packet1, packet2).Value ? -1 : 1;
-            });
+            allPackets.Sort((packet1, packet2) => ComparePackets2(packet1, packet2).Value ? -1 : 1);
             var res = 1;
             for (int i = 0; i < allPackets.Count; i++)
                 if (allPackets[i].IsDividerPackage)
                     res *= i + 1;
-
             part2 = res;
             LogAndReset("*2", sw);
 

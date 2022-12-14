@@ -44,6 +44,8 @@
     <None Remove="AoC_2022\Day12_test.txt" />
     <None Remove="AoC_2022\Day13.txt" />
     <None Remove="AoC_2022\Day13_test.txt" />
+    <None Remove="AoC_2022\Day14.txt" />
+    <None Remove="AoC_2022\Day14_test.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Accord" Version="3.8.0" />
@@ -109,8 +111,10 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2022\Day14.txt" />
     <EmbeddedResource Include="AoC_2022\Day13.txt" />
     <EmbeddedResource Include="AoC_2022\Day12.txt" />
+    <EmbeddedResource Include="AoC_2022\Day14_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day13_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day12_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day11_test.txt" />
