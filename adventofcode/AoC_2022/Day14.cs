@@ -18,7 +18,7 @@ namespace AdventofCode.AoC_2022
 
         [Test]
         [TestCase(24, 93, "Day14_test.txt")]
-        [TestCase(674, null, "Day14.txt")]
+        [TestCase(674, 24958, "Day14.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -51,7 +51,7 @@ namespace AdventofCode.AoC_2022
             }
 
             map[sourceOfSand] = '+';
-            Log(map.ToString(c => c.ToString()));
+            Log(map.ToString(c => c.ToString()),-1);
             LogAndReset("Parse", sw);
 
             var count = 0;
@@ -63,9 +63,8 @@ namespace AdventofCode.AoC_2022
                 Log(() => map.ToString(c => c.ToString()));
             }
 
-
-
             part1 = count;
+            Log(map.ToString(c => c.ToString()), -1);
             // solve part 1 here
 
             LogAndReset("*1", sw);
@@ -73,22 +72,32 @@ namespace AdventofCode.AoC_2022
             var maxDepth = map.Bottom + 2;
             while (true)
             {
-                if (!Pour2(map, sourceOfSand, maxDepth, sourceOfSand))
+                if (!Pour(map, sourceOfSand, maxDepth))
                     break;
                 count++;
                 Log(() => map.ToString(c => c.ToString()));
             }
             // solve part 2 here
             part2 = count;
+            Log(map.ToString(c => c.ToString()), -1);
 
             LogAndReset("*2", sw);
 
             return (part1, part2);
         }
-        private bool Pour(SparseBuffer<char> map, Coord sandPos)
+        private bool Pour(SparseBuffer<char> map, Coord sandPos, int maxDepth = -1)
         {
+            if (map[sandPos] == 'O')
+                return false;
             while (true)
             {
+                if (maxDepth != -1 && sandPos.Y == maxDepth - 1)
+                {
+                    map[sandPos.Move(Coord.S)] = '-';
+                    map[sandPos.Move(Coord.SE)] = '-';
+                    map[sandPos.Move(Coord.SW)] = '-';
+                }
+
                 if (sandPos.Row > map.Bottom)
                     return false;
                 if (map[sandPos.Move(Coord.S)] == '.')
