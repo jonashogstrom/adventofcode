@@ -317,6 +317,7 @@ namespace AdventofCode
 
         public static IEnumerable<AxisAngleRotation3D> AllRotations => _rotations;
         public int Max => new[] { x, y, z }.Max();
+        public int Min => new[] { x, y, z }.Min();
 
         public Coord3d(int x, int y, int z)
         {
@@ -405,7 +406,7 @@ namespace AdventofCode
             yield return Move(0, 0, -1);
         }
 
-        public bool IsInside(int min, int max)
+        public bool IsInsideCube(int min, int max)
         {
             return x <= max && x >= min &&
                    y <= max && y >= min &&

@@ -34,28 +34,22 @@ namespace AdventofCode.AoC_2022
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
             var droplets = new HashSet<Coord3d>();
-            var max = -1;
-            foreach (var s in source)
+            foreach (var c in source.Select(Coord3d.Parse))
             {
-                var c = Coord3d.Parse(s);
                 droplets.Add(c);
-                max = Math.Max(max, c.Max);
             }
             
-
             LogAndReset("Parse", sw);
 
-            var sum = droplets.Sum(d => d.Neighbors6().Count(n => !droplets.Contains(n)));
+            part1 = droplets.Sum(d => d.Neighbors6().Count(n => !droplets.Contains(n)));
 
-            part1 = sum;
             LogAndReset("*1", sw);
-
 
             var outsideCoords = new HashSet<Coord3d>();
             var q = new Queue<Coord3d>();
             // pick a coordinate outside the droplets
-            var boundingBoxMax = max + 1;
-            var boundingBoxMin = -1;
+            var boundingBoxMax = droplets.Select(d => d.Max).Max() + 1;
+            var boundingBoxMin = droplets.Select(d => d.Min).Min() - 1;
             var start = new Coord3d(boundingBoxMax, boundingBoxMax, boundingBoxMax);
             q.Enqueue(start);
             outsideCoords.Add(start);
@@ -65,7 +59,7 @@ namespace AdventofCode.AoC_2022
                 var c = q.Dequeue();
                 foreach (var n in c.Neighbors6())
                 {
-                    if (n.IsInside(boundingBoxMin, boundingBoxMax) && !outsideCoords.Contains(n) && !droplets.Contains(n))
+                    if (n.IsInsideCube(boundingBoxMin, boundingBoxMax) && !outsideCoords.Contains(n) && !droplets.Contains(n))
                     {
                         outsideCoords.Add(n);
                         q.Enqueue(n);
@@ -77,11 +71,6 @@ namespace AdventofCode.AoC_2022
             LogAndReset("*2", sw);
 
             return (part1, part2);
-        }
-
-        private int CountFreeSides(Coord3d c, HashSet<Coord3d> droplets)
-        {
-            return c.Neighbors6().Count(n => !droplets.Contains(n));
         }
     }
 }
