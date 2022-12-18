@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Windows.Media.Media3D;
 using Accord.Collections;
@@ -32,7 +33,7 @@ namespace AdventofCode
 
         public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
         {
-            {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'}, 
+            {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'},
         };
 
         public static readonly Dictionary<Coord, string> trans28Dir = new Dictionary<Coord, string>()
@@ -315,6 +316,7 @@ namespace AdventofCode
 
 
         public static IEnumerable<AxisAngleRotation3D> AllRotations => _rotations;
+        public int Max => new[] { x, y, z }.Max();
 
         public Coord3d(int x, int y, int z)
         {
@@ -380,7 +382,6 @@ namespace AdventofCode
 
         public Coord3d Rotate(AxisAngleRotation3D rotation)
         {
-
             var rt3d = new RotateTransform3D
             {
                 Rotation = rotation
@@ -392,6 +393,23 @@ namespace AdventofCode
             if (Math.Abs(res.x) + Math.Abs(res.y) + Math.Abs(res.z) != Math.Abs(x) + Math.Abs(y) + Math.Abs(z))
                 throw new Exception("Bad math!");
             return res;
+        }
+
+        public IEnumerable<Coord3d> Neighbors6()
+        {
+            yield return Move(1, 0, 0);
+            yield return Move(-1, 0, 0);
+            yield return Move(0, 1, 0);
+            yield return Move(0, -1, 0);
+            yield return Move(0, 0, 1);
+            yield return Move(0, 0, -1);
+        }
+
+        public bool IsInside(int min, int max)
+        {
+            return x <= max && x >= min &&
+                   y <= max && y >= min &&
+                   z <= max && z >= min;
         }
 
         public long Distance(Coord3d c)

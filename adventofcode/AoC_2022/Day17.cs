@@ -19,7 +19,7 @@ namespace AdventofCode.AoC_2022
 
         [Test]
         [TestCase(3068, 1514285714288, "Day17_test.txt")]
-        [TestCase(3149, null, "Day17.txt")]
+        [TestCase(3149, 1553982300884, "Day17.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -36,24 +36,20 @@ namespace AdventofCode.AoC_2022
 
             var jets = source[0].AsEnumerable().Select(c => Coord.trans2Coord[c]).ToList();
 
-            var map = new SparseBuffer<char>(' ');
-
-            var jetCounter = 0;
-            for (int shapeIndex = 0; shapeIndex < 2022; shapeIndex++)
-            {
-                jetCounter = DropOnePiece(shapeIndex, map, jets, jetCounter) % jets.Count;
-            }
-
-            part1 = -map.Top;
-
+            part1 = DropAlotOfShapes(2022, jets);
 
             LogAndReset("*1", sw);
-            // solve part 2 here
-            var iterations = 2022L;
-            iterations = 1000000000000;
 
-            map = new SparseBuffer<char>(' ');
-            jetCounter = 0;
+            part2  = DropAlotOfShapes(1000000000000, jets);
+            LogAndReset("*2", sw);
+
+            return (part1, part2);
+        }
+
+        private long DropAlotOfShapes(long iterations, List<Coord> jets)
+        {
+            var map = new SparseBuffer<char>(' ');
+            var jetCounter = 0;
             var checkpoints = new Dictionary<int, (long shapeIndex, int height)>();
             var checker = 0;
             var checkerLimit = 5;
@@ -75,23 +71,20 @@ namespace AdventofCode.AoC_2022
                         var increase = height - last.height;
                         var left = iterations - shapeCounter;
                         var cycles = left / cycleSize;
-                        Log($"JetIndex: {jetIndex} cycleSize {cycleSize}, increase: {increase}", -1);
+                        Log(()=>$"JetIndex: {jetIndex} cycleSize {cycleSize}, increase: {increase}");
                         if (checker == checkerLimit)
                         {
                             shapeCounter += cycles * cycleSize;
                             skippedHeight = cycles * increase;
-                            Log($"Skipped {cycles * cycleSize} (height: {cycles * increase}) ");
+                            Log(()=>$"Skipped {cycles * cycleSize} (height: {cycles * increase}) ");
                         }
                     }
+
                     checkpoints[jetIndex] = (shapeCounter, height);
                 }
             }
 
-            part2 = -map.Top;
-            part2 += skippedHeight;
-            LogAndReset("*2", sw);
-
-            return (part1, part2);
+            return -map.Top + skippedHeight;
         }
 
         private int DropOnePiece(int shapeIndex, SparseBuffer<char> map, List<Coord> jets, int jetCounter)
