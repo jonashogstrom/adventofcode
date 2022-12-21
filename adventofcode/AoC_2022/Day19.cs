@@ -56,7 +56,7 @@ namespace AdventofCode.AoC_2022
             LogAndReset("Parse", sw);
             Parallel.ForEach(blueprints, b =>
             {
-                var res = b.QualityLevel3;
+                var res = b.QualityLevel;
                 sum1 += res;
             });
             part1 = sum1;
@@ -95,13 +95,13 @@ namespace AdventofCode.AoC_2022
             Id = id;
         }
 
-        public int QualityLevel3 => FindBestPrioQueue(24) * Id;
+        public int QualityLevel => FindBestPrioQueue(24) * Id;
 
         public int FindBestPrioQueue(int maxMinutes)
         {
             var initialState = new BotState(0, RobotCosts, null);
             initialState.BotCount[Material.ore] = 1;
-            var q = new PriorityQueue<BotState, double>(10);
+            var q = new PriorityQueue<BotState,BotState>(10, new BotComparer());
             Enqueue(q, initialState);
             var best = 0;
             var stateCounter = 0L;
@@ -149,21 +149,11 @@ namespace AdventofCode.AoC_2022
             return best;
         }
 
-        private void Enqueue(PriorityQueue<BotState, double> queue, BotState state)
+        private void Enqueue(PriorityQueue<BotState, BotState> queue, BotState state)
         {
-            queue.Enqueue(state, state.Prio);
+            queue.Enqueue(state, state);
         }
 
-        private static IEnumerable<Material> Materials
-        {
-            get
-            {
-                yield return Material.geode;
-                yield return Material.obsidian;
-                yield return Material.clay;
-                yield return Material.ore;
-            }
-        }
 
         public static Blueprint Parse(string s, Day19 parent)
         {
@@ -188,6 +178,45 @@ namespace AdventofCode.AoC_2022
         public int Id { get; }
     }
 
+    internal class BotComparer : IComparer<BotState>
+    {
+        public int Compare(BotState x, BotState y)
+        {
+            return 0;
+            if (ReferenceEquals(x, y)) return 0;
+            if (ReferenceEquals(null, y)) return 1;
+            if (ReferenceEquals(null, x)) return -1;
+
+
+            var res = x.Minute.CompareTo(y.Minute);
+            if (res == 0)
+                CompareMaterial(x, y, Material.geode);
+            if (res == 0)
+                CompareMaterial(x, y, Material.obsidian);
+            if (res == 0)
+                CompareMaterial(x, y, Material.clay);
+
+            return res;
+        }
+
+        private static void CompareMaterial(BotState x, BotState y, Material material)
+        {
+            int res;
+            res = CompareInventory(x, y, material);
+            if (res == 0)
+                res = CompareBotCount(x, y, material);
+        }
+
+        private static int CompareInventory(BotState x, BotState y, Material material)
+        {
+            return -x.BotCount[material].CompareTo(y.BotCount[material]);
+        }
+        private static int CompareBotCount(BotState x, BotState y, Material material)
+        {
+            return -x.Inventory[material].CompareTo(y.Inventory[material]);
+        }
+    }
+
     internal class BotState
     {
         private readonly Dictionary<Material, Dictionary<Material, int>> _robotCosts;
@@ -200,8 +229,10 @@ namespace AdventofCode.AoC_2022
         {
             get
             {
-                var sum = Minute < 15 ? 1 : 0;
-                sum <<= 8 + Inventory[Material.geode];
+                var x = 3 << 4;
+                x = 7 >> 4;
+                long sum = Minute < 15 ? 1 : 0;
+                sum = sum << 8 + Inventory[Material.geode];
                 sum <<= 8 + BotCount[Material.geode];
                 sum <<= 8 + Inventory[Material.obsidian];
                 sum <<= 8 + BotCount[Material.obsidian];
