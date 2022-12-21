@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Accord.Collections;
+//using Accord.Collections;
 using AdventofCode.Utils;
 using NUnit.Framework;
 
@@ -29,7 +27,7 @@ namespace AdventofCode.AoC_2022
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(33, null, "Day19_test.txt")]
+        [TestCase(33, 180, "Day19_test.txt")]
         [TestCase(9 * 1, 56 * 1, "Day19_test1.txt")]
         [TestCase(12 * 2, 62 * 2, "Day19_test2.txt")]
         [TestCase(1681, null, "Day19.txt")]
@@ -54,22 +52,23 @@ namespace AdventofCode.AoC_2022
             }
 
             LogAndReset("Parse", sw);
-            part1 = blueprints.Sum(b => b.QualityLevel3);
+            //part1 = blueprints.Sum(b => b.QualityLevel3);
             // solve part 1 here
+
             Log($"Part1 = {part1}");
             LogAndReset("*1", sw);
-            // var sum = 0;
-            // foreach (var b in blueprints.Take(3))
-            // //Parallel.ForEach(blueprints.Take(3), b =>
-            // {
-            //     var res = b.QualityLevel2;
-            //     sum += res;
-            //     Log($"Blueprint {b.Id} = {res}", -1);
-            // }
-            // //);
-            // part2 = sum;
-            //
-            // // solve part 2 here
+            var sum = 1;
+            foreach (var b in blueprints.Take(3))
+            //Parallel.ForEach(blueprints.Take(3), b =>
+            {
+                var res = b.QualityLevelStar2;
+                sum *= res;
+                Log($"Blueprint {b.Id} = {res}", -1);
+            }
+            //);
+            part2 = sum;
+
+            // solve part 2 here
 
             LogAndReset("*2", sw);
 
@@ -94,33 +93,45 @@ namespace AdventofCode.AoC_2022
         public int QualityLevel => FindBest2(24) * Id;
         public int QualityLevel2 => FindBest2(32) * Id;
         public int QualityLevel3 => FindBestPrioQueue(24) * Id;
+        public int QualityLevelStar2 => FindBestPrioQueue(32) * Id;
 
-        private int FindBestPrioQueue(int maxDays)
+        private int FindBestPrioQueue(int maxMinutes)
         {
             var initialState = new BotState(0, RobotCosts, null);
             initialState.BotCount[Material.ore] = 1;
-            var q = new PriorityQueue<BotState>(10);
+            var q = new PriorityQueue<BotState, double>(10);
             Enqueue(q, initialState);
             var best = 0;
+            var stateCounter = 0L;
             while (q.Count > 0)
             {
-
-                var state = q.Dequeue().Value;
-                if (state.Minute == maxDays)
+                stateCounter++;
+                var state = q.Dequeue();
+                if (state.MaxPossible(maxMinutes) < best)
+                {
+                    continue;
+                }
+                if (state.Minute == maxMinutes)
                 {
                     if (state.Inventory[Material.geode] > best)
                     {
                         best = state.Inventory[Material.geode];
-                        _parent.Log(() => $"Found new result for {Id}: {best}");
+                        _parent.Log(() => $"Found new result for {Id}: {best}", -1);
                     }
                 }
                 else if (state.CanBuild(Material.geode))
                 {
                     Enqueue(q, state.CreateNewState(Material.geode));
+                    if (state.CanBuild(Material.obsidian))
+                        Enqueue(q, state.CreateNewState(Material.obsidian));
                 }
                 else if (state.CanBuild(Material.obsidian))
                 {
                     Enqueue(q, state.CreateNewState(Material.obsidian));
+                    if (state.CanBuild(Material.clay))
+                        Enqueue(q, state.CreateNewState(Material.clay));
+                    // if (state.CanBuild(Material.ore))
+                    //     Enqueue(q, state.CreateNewState(Material.ore));
                 }
                 else
                 {
@@ -131,13 +142,12 @@ namespace AdventofCode.AoC_2022
 
                     Enqueue(q, state.Clone().AddBotYield());
                 }
-
             }
-
+            _parent.Log(() => $"Completed blueprint {Id} in {stateCounter} states, result: {best}");
             return best;
         }
 
-        private void Enqueue(PriorityQueue<BotState> queue, BotState state)
+        private void Enqueue(PriorityQueue<BotState, double> queue, BotState state)
         {
             queue.Enqueue(state, state.Prio);
         }
@@ -498,7 +508,7 @@ namespace AdventofCode.AoC_2022
         {
             get
             {
-                var sum = Minute < 8 ? 1 : 0;
+                var sum = Minute < 15 ? 1 : 0;
                 sum <<= 8 + Inventory[Material.geode];
                 sum <<= 8 + BotCount[Material.geode];
                 sum <<= 8 + Inventory[Material.obsidian];
@@ -510,6 +520,45 @@ namespace AdventofCode.AoC_2022
                 return sum;
             }
         }
+
+        public long MaxPossible(int maxMinutes)
+        {
+            var clayCount = Inventory[Material.clay];
+            var clayBotCount = BotCount[Material.clay];
+
+            var obsBotCost = _robotCosts[Material.obsidian][Material.clay];
+            var obsCount = Inventory[Material.obsidian];
+            var obsBotCount = BotCount[Material.obsidian];
+
+            var geodeBotCost = _robotCosts[Material.geode][Material.obsidian];
+            var geodeCount = Inventory[Material.geode];
+            var geoBotCount = BotCount[Material.geode];
+            for (int m = Minute + 1; m <= maxMinutes; m++)
+            {
+                var oldobsCount = obsCount;
+                var oldclayCount = clayCount;
+                geodeCount += geoBotCount;
+                obsCount += obsBotCount;
+                clayCount += clayBotCount;
+                if (oldobsCount >= geodeBotCost)
+                {
+                    geoBotCount++;
+                    obsCount -= geodeBotCost;
+                }
+                else if (oldclayCount >= obsBotCost)
+                {
+                    obsBotCount++;
+                    clayCount -= obsBotCost;
+                }
+                else
+                {
+                    clayBotCount++;
+                }
+            }
+
+            return geodeCount;
+        }
+
 
         // private static Dictionary<Material, int> EmptyDic()
         // {
@@ -532,7 +581,7 @@ namespace AdventofCode.AoC_2022
 
 
 
-        public BotState(int minute, Dictionary<Material, Dictionary<Material, int>> robotCosts ,BotState parent = null )
+        public BotState(int minute, Dictionary<Material, Dictionary<Material, int>> robotCosts, BotState parent = null)
         {
             _robotCosts = robotCosts;
             Minute = minute;
@@ -559,19 +608,19 @@ namespace AdventofCode.AoC_2022
             }
 
             newState.AddBotYield();
-            newState.BotCount[Material.clay]++;
+            newState.BotCount[botType]++;
             return newState;
         }
 
         private void CopyTo(DicWithDefault<Material, int> source, DicWithDefault<Material, int> target)
         {
-            foreach(var m in source.Keys)
+            foreach (var m in source.Keys)
                 target[m] = source[m];
         }
 
         public BotState Clone()
         {
-            var res = new BotState(Minute+1, _robotCosts, this);
+            var res = new BotState(Minute + 1, _robotCosts, this);
             CopyTo(BotCount, res.BotCount);
             CopyTo(Inventory, res.Inventory);
             return res;

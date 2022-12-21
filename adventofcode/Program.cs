@@ -7,6 +7,8 @@ namespace AdventofCode
     class Program
     {
 
+#if dotnet4x
+
         [STAThread]
         static void Main()
         {
@@ -71,5 +73,6 @@ namespace AdventofCode
 //            foreach(var d in Aoc_2019_days)
 //                d.Run();
         }
+#endif
     }
 }

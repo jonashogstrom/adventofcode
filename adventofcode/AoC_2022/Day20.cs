@@ -7,7 +7,6 @@ using NUnit.Framework;
 
 namespace AdventofCode.AoC_2022
 {
-    using static System.Windows.Forms.MonthCalendar;
     // not -6061
     // not -2925
 

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Resources;
 using System.Text;
-using System.Windows.Forms;
-using AdventofCode.AoC_2018;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2019

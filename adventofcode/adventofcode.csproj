@@ -3,7 +3,7 @@
     <ProjectGuid>{394503E3-6BA1-4D11-A7F0-7770B6244158}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>AdventofCode</RootNamespace>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>adventofcode</AssemblyTitle>
     <Product>adventofcode</Product>
@@ -60,20 +60,16 @@
     <None Remove="AoC_2022\Day19_test2.txt" />
     <None Remove="AoC_2022\Day20.txt" />
     <None Remove="AoC_2022\Day20_test.txt" />
+    <None Remove="AoC_2022\Day21.txt" />
+    <None Remove="AoC_2022\Day21_test.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Accord" Version="3.8.0" />
     <PackageReference Include="Accord.Video" Version="3.8.0" />
     <PackageReference Include="Accord.Video.FFMPEG.x64" Version="3.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AoC_2018\day1.txt" />
@@ -125,11 +121,13 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2022\Day21.txt" />
     <EmbeddedResource Include="AoC_2022\Day20.txt" />
     <EmbeddedResource Include="AoC_2022\Day19.txt" />
     <EmbeddedResource Include="AoC_2022\Day18.txt" />
     <EmbeddedResource Include="AoC_2022\Day17.txt" />
     <EmbeddedResource Include="AoC_2022\Day16.txt" />
+    <EmbeddedResource Include="AoC_2022\Day21_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day20_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day19_test1.txt" />
     <EmbeddedResource Include="AoC_2022\Day19_test2.txt" />

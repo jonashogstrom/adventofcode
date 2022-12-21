@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
 using Accord.Collections;
 using NUnit.Framework;
 

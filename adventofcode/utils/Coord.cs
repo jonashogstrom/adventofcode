@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Windows.Media.Media3D;
-using Accord.Collections;
 
 namespace AdventofCode
 {
@@ -277,6 +274,7 @@ namespace AdventofCode
     [DebuggerDisplay("{x}, {y}, {z}")]
     public class Coord3d
     {
+#if dotnet4x
         private static List<AxisAngleRotation3D> _rotations = new List<AxisAngleRotation3D>();
 
         static Coord3d()
@@ -316,6 +314,7 @@ namespace AdventofCode
 
 
         public static IEnumerable<AxisAngleRotation3D> AllRotations => _rotations;
+#endif
         public int Max => new[] { x, y, z }.Max();
         public int Min => new[] { x, y, z }.Min();
 
@@ -380,7 +379,7 @@ namespace AdventofCode
             var c = new Coord3d(int.Parse(p[0]), int.Parse(p[1]), int.Parse(p[2]));
             return c;
         }
-
+#if dotnet4x
         public Coord3d Rotate(AxisAngleRotation3D rotation)
         {
             var rt3d = new RotateTransform3D
@@ -395,6 +394,7 @@ namespace AdventofCode
                 throw new Exception("Bad math!");
             return res;
         }
+#endif
 
         public IEnumerable<Coord3d> Neighbors6()
         {

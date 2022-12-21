@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Media.Media3D;
-using Accord;
 using AdventofCode.Utils;
 using NUnit.Framework;
 
@@ -185,8 +182,10 @@ namespace AdventofCode.AoC_2021
         {
             Id = id;
             Beacons = beacons;
+#if dotnet4x
             foreach (var r in Coord3d.AllRotations)
                 _rotations.Add(beacons.Select(c => c.Rotate(r)).ToList());
+#endif
         }
 
     }

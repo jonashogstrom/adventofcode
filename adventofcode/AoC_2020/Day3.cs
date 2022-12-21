@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms.VisualStyles;
-using AdventofCode.AoC_2018;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Numerics;
-using System.Windows.Forms;
 using AdventofCode.Utils;
 using NUnit.Framework;
 

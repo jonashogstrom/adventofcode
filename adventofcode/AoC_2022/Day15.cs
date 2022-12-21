@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
-using Accord;
-using AdventofCode.AoC_2018;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2022

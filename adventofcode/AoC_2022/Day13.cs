@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Cryptography;
-using System.Windows.Media.Converters;
 using AdventofCode.Utils;
 using NUnit.Framework;
-using NUnit.Framework.Internal.Builders;
 
 namespace AdventofCode.AoC_2022
 {

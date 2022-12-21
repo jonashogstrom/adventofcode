@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventofCode.AoC_2019
+﻿namespace AdventofCode.AoC_2019
 {
     class Day1: BaseDay
     {

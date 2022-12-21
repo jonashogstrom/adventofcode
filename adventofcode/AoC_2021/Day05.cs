@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
-using AdventofCode.Utils;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2021

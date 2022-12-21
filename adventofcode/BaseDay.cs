@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace AdventofCode
@@ -415,8 +413,8 @@ namespace AdventofCode
                 }
 
                 Log("   " + label + " = " + value + "   ** " + (Source == InputSource.prod ? "Copied to clipboard" : ""));
-                if (Source == InputSource.prod)
-                    Clipboard.SetText(value.ToString());
+                //if (Source == InputSource.prod)
+                    //Clipboard.SetText(value.ToString());
                 _fileNameSuffix += "[  ]";
                 return true;
             }

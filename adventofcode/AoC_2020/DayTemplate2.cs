@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2020
@@ -15,11 +14,11 @@ namespace AdventofCode.AoC_2020
             var res = Compute(source);
 
             Assert.That(res.Part1, Is.EqualTo(exp1));
-            Clipboard.SetText(res.Part1.ToString());
+            //Clipboard.SetText(res.Part1.ToString());
             if (exp2.HasValue)
             {
                 Assert.That(res.Part2, Is.EqualTo(exp2.Value));
-                Clipboard.SetText(res.Part1.ToString());
+              //  Clipboard.SetText(res.Part1.ToString());
             }
         }
 
