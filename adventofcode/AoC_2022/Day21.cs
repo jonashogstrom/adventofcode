@@ -19,7 +19,7 @@ namespace AdventofCode.AoC_2022
 
         [Test]
         [TestCase(152, 301, "Day21_test.txt")]
-        [TestCase(110181395003396, null, "Day21.txt")]
+        [TestCase(110181395003396, 3721298272959, "Day21.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -177,8 +177,6 @@ namespace AdventofCode.AoC_2022
 
         public Monkey2(string name, string task)
         {
-            //Task = task;
-
             Name = name;
             var parts = task.Split(' ');
             if (parts.Length == 1)
@@ -212,8 +210,6 @@ namespace AdventofCode.AoC_2022
                 default:
                     throw new NotImplementedException();
             }
-
-
         }
 
         public void ReplaceKnownSide(Monkey2 monkey)
