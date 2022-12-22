@@ -41,7 +41,7 @@ namespace AdventofCode
 
         public static readonly Dictionary<Coord, char> trans2Arrow = new Dictionary<Coord, char>()
         {
-            {N, 'v'}, {S, '^'}, {E, '>'}, {W, '<'},
+            {N, '^'}, {S, 'v'}, {E, '>'}, {W, '<'},
         };
         public static readonly Dictionary<char, Coord> trans2Coord = new Dictionary<char, Coord>()
         {
@@ -268,6 +268,11 @@ namespace AdventofCode
         public bool OnSameLine(Coord other)
         {
             return X == other.X || Y == other.Y;
+        }
+
+        public Coord Multiply(int factor)
+        {
+            return new Coord(Row * factor, Col * factor);
         }
     }
 

@@ -3,12 +3,13 @@
     <ProjectGuid>{394503E3-6BA1-4D11-A7F0-7770B6244158}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>AdventofCode</RootNamespace>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.22621.0</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>adventofcode</AssemblyTitle>
     <Product>adventofcode</Product>
     <Copyright>Copyright ©  2018</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -62,6 +63,8 @@
     <None Remove="AoC_2022\Day20_test.txt" />
     <None Remove="AoC_2022\Day21.txt" />
     <None Remove="AoC_2022\Day21_test.txt" />
+    <None Remove="AoC_2022\Day22.txt" />
+    <None Remove="AoC_2022\Day22_test.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Accord" Version="3.8.0" />
@@ -121,12 +124,14 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2022\Day22.txt" />
     <EmbeddedResource Include="AoC_2022\Day21.txt" />
     <EmbeddedResource Include="AoC_2022\Day20.txt" />
     <EmbeddedResource Include="AoC_2022\Day19.txt" />
     <EmbeddedResource Include="AoC_2022\Day18.txt" />
     <EmbeddedResource Include="AoC_2022\Day17.txt" />
     <EmbeddedResource Include="AoC_2022\Day16.txt" />
+    <EmbeddedResource Include="AoC_2022\Day22_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day21_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day20_test.txt" />
     <EmbeddedResource Include="AoC_2022\Day19_test1.txt" />
