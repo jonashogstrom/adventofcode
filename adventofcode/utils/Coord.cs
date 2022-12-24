@@ -147,6 +147,10 @@ namespace AdventofCode
         {
             return trans2Coord[c];
         }
+        public static bool TryCharToDir(char c, out Coord dir)
+        {
+            return trans2Coord.TryGetValue(c, out dir);
+        }
 
         public char DirToNESW()
         {

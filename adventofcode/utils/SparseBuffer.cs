@@ -48,6 +48,15 @@ namespace AdventofCode
             }
         }
 
+        public void RemoveDefaults()
+        {
+            foreach (var k in Keys.ToArray())
+            {
+                if (this[k].Equals(_def))
+                    RemoveKey(k);
+            }
+        }
+
         public void Set(int x, int y, T value)
         {
             var c = Coord.FromXY(x, y);
