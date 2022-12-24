@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using ABI.Windows.ApplicationModel.Contacts.DataProvider;
-using ABI.Windows.Media.Streaming.Adaptive;
-using Accord;
-//using Accord.Collections;
-using AdventofCode.AoC_2018;
 using AdventofCode.Utils;
 using NUnit.Framework;
-using WinRT.Interop;
 
+
+// NOT 172 - too low
 namespace AdventofCode.AoC_2022
 {
     // to use string-types, change baseclass to TestBaseClass2 and remove a bunch of ? in the methods below
@@ -25,8 +19,8 @@ namespace AdventofCode.AoC_2022
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(18, null, "Day24_test.txt")]
-        [TestCase(9999999, null, "Day24.txt")]
+        [TestCase(18, 54, "Day24_test.txt")]
+        [TestCase(221, null, "Day24.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -35,7 +29,7 @@ namespace AdventofCode.AoC_2022
             DoAsserts(res, exp1, exp2, resourceName);
         }
 
-        private List<BlizzardState> _blizzardStates = new List<BlizzardState>();
+        private List<BlizzardState> _blizzardStates = new();
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
         {
@@ -72,10 +66,14 @@ namespace AdventofCode.AoC_2022
 
                 _blizzardStates.Add(newState);
             }
-            var path = FindPath(entry, new Stack<Coord>(), 0, target);
-            part1 = path;
+            var startToTarget = FindPath(entry, new Stack<Coord>(), 0, target);
+
+            part1 = startToTarget;
 
             LogAndReset("*1", sw);
+            var backagain = FindPath(target, null, startToTarget, entry);
+            var backToTarget = FindPath(entry, null, backagain, target);
+            part2 = backToTarget;
 
             // solve part 2 here
 
@@ -86,12 +84,12 @@ namespace AdventofCode.AoC_2022
 
         private int FindPath(Coord pos, Stack<Coord> path, int minute, Coord target)
         {
-            var initialMoveState = new MoveState(minute, pos, null);
-            var queue = new Queue<MoveState>();
+            var initialMoveState = new MoveStateMod(pos, minute, _blizzardStates.Count, null);
+            var queue = new Queue<MoveStateMod>();
             queue.Enqueue(initialMoveState);
             var totalBest = int.MaxValue;
             var stateCounter = 0;
-            var expStates = new Dictionary<MoveStateMod, MoveState>();
+            var exploredStates = new HashSet<MoveStateMod>();
             // {
             //     [(pos, 0)] = initialMoveState
             // };
@@ -99,14 +97,13 @@ namespace AdventofCode.AoC_2022
             while (queue.Count > 0)
             {
                 var s = queue.Dequeue();
-                var modState = new MoveStateMod(s, _blizzardStates.Count);
-                if (expStates.TryGetValue(modState, out var oldState))
-                    if (oldState.Minute < s.Minute)
-                        continue;
+                //                var modState = new MoveStateMod(s, _blizzardStates.Count);
+                if (exploredStates.Contains(s))
+                    continue;
 
-                if (stateCounter > _blizzardStates.Count*_blizzardStates.Count)
+                if (stateCounter > _blizzardStates.Count * _blizzardStates.Count)
                     Log("unexpected number of states examined");
-                expStates[modState] = s;
+                exploredStates.Add(s);
 
                 if (s.Minute == 1 && s.Pos.X == 1 && s.Pos.Y == 1)
                 {
@@ -119,16 +116,16 @@ namespace AdventofCode.AoC_2022
                 if (s.Minute >= totalBest)
                     continue;
 
-                if (s.Pos.Equals(target) )
+                if (s.Pos.Equals(target))
                 {
-                    if (s.Minute <= totalBest)
+                    if (s.Minute < totalBest)
                     {
-                        Log($"Found solution: {s.Minute}");
-                        Log($"Path = {s.Path}");
+                        Log($"Found solution: {s.Minute}", -1);
+                        Log($"Path = {s.Path}", -1);
                         var x = s;
                         while (x != null)
                         {
-                            Log($"Min: {x.Minute}, Row: {x.Pos.Row}, Col: {x.Pos.Col}");
+                            Log($"Min: {x.Minute}, Row: {x.Pos.Row}, Col: {x.Pos.Col}", -1);
                             x = x.Prev;
                         }
 
@@ -143,48 +140,15 @@ namespace AdventofCode.AoC_2022
                 var validNext = s.Pos.GenAdjacent4().Append(s.Pos).Where(x => nextBlizzardState.FreeCoords.Contains(x)).ToList();
                 foreach (var nextPos in validNext)
                 {
-                    var newMoveState = new MoveState(nextMinute, nextPos, s);
+                    var newMoveState = new MoveStateMod(nextPos, nextMinute, _blizzardStates.Count, s);
                     queue.Enqueue(newMoveState);
                 }
             }
-            Log($"States examined: {stateCounter}");
-            Log($"Highest Minute examined: {highestMinuteExamined}");
+            Log($"States examined: {stateCounter}", -1);
+            Log($"Highest Minute examined: {highestMinuteExamined}", -1);
             return totalBest;
         }
-        private int FindPath_recursive(Coord pos, Stack<Coord> path, int minute, Coord target, int best)
-        {
-
-            if (minute > best)
-            {
-                return int.MaxValue;
-            }
-
-            if (pos.Equals(target))
-            {
-                Log($"Found path of length {path.Count}");
-                return path.Count;
-            }
-
-            var mapState = _blizzardStates[minute + 1];
-            path.Push(pos);
-            var foundValidPos = false;
-            var validNext = pos.GenAdjacent4().Append(pos).Where(x => mapState.FreeCoords.Contains(x)).ToList();
-            foreach (var next in validNext)
-            {
-                foundValidPos = true;
-                var temp = FindPath_recursive(next, path, minute + 1, target, best);
-                if (temp < best)
-                    best = temp;
-            }
-            path.Pop();
-
-            if (!foundValidPos)
-                // No where to go/stay
-                return int.MaxValue;
-
-            return best;
-        }
-
+    
         private List<Blizzard> MoveBlizzards(BlizzardState blizzardState)
         {
             var newBlizzards = new List<Blizzard>();
@@ -199,83 +163,53 @@ namespace AdventofCode.AoC_2022
 
     internal class MoveStateMod
     {
-        private readonly Coord _pos;
-        private readonly int _blizzardStates;
-
-        public MoveStateMod(MoveState moveState, int blizzardCount)
+        private readonly int _blizzardState;
+        
+        public MoveStateMod(Coord pos, int minute, int blizzardCount, MoveStateMod prevState)
         {
-            _pos = moveState.Pos;
-            _blizzardStates = moveState.Minute % blizzardCount;
+            _blizzardState = minute % blizzardCount;
+            Pos = pos;
+            Minute = minute;
+            Prev = prevState;
         }
 
-        private sealed class PosBlizzardStatesEqualityComparer : IEqualityComparer<MoveStateMod>
+        protected bool Equals(MoveStateMod other)
         {
-            public bool Equals(MoveStateMod x, MoveStateMod y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return Equals(x._pos, y._pos) && x._blizzardStates == y._blizzardStates;
-            }
-
-            public int GetHashCode(MoveStateMod obj)
-            {
-                return HashCode.Combine(obj._pos, obj._blizzardStates);
-            }
+            return _blizzardState == other._blizzardState && Equals(Pos, other.Pos);
         }
 
-        //        public static IEqualityComparer<MoveStateMod> PosBlizzardStatesComparer { get; } = new PosBlizzardStatesEqualityComparer();
-    }
-
-    internal class MoveStateComparer : IComparer<MoveState>
-    {
-        public int Compare(MoveState x, MoveState y)
+        public override bool Equals(object obj)
         {
-            if (ReferenceEquals(x, y)) return 0;
-            if (ReferenceEquals(null, y)) return 1;
-            if (ReferenceEquals(null, x)) return -1;
-            var res = x.DistanceFromTarget.CompareTo(y.DistanceFromTarget);
-            if (res != 0)
-                return res;
-            res = x.Minute.CompareTo(y.Minute);
-            return res;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((MoveStateMod)obj);
         }
-    }
 
-    internal class MoveState
-    {
-        private readonly MoveState _prevState;
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_blizzardState, Pos);
+        }
+
+        public MoveStateMod Prev { get; }
         public int Minute { get; }
         public Coord Pos { get; }
-        //        public Coord Target { get; }
-        public int DistanceFromTarget { get; set; }
-
-        public MoveState(int minute, Coord pos, MoveState prevState)
-        {
-            _prevState = prevState;
-            Minute = minute;
-            Pos = pos;
-            //            Target = target;
-            //            DistanceFromTarget = pos.Dist(target);
-        }
 
         public string Path
         {
             get
             {
-                if (_prevState != null)
+                if (Prev != null)
                 {
-                    var s = _prevState.Path;
-                    if (_prevState.Pos.Equals(Pos))
+                    var s = Prev.Path;
+                    if (Prev.Pos.Equals(Pos))
                         return s + "*";
-                    return s + Coord.trans2Arrow[Pos.Subtract(_prevState.Pos)];
+                    return s + Coord.trans2Arrow[Pos.Subtract(Prev.Pos)];
                 }
                 return "";
             }
         }
 
-        public MoveState Prev  => _prevState;
     }
 
     [DebuggerDisplay("Min {Minute} Free: {FreeCoords.Count}")]
@@ -297,9 +231,9 @@ namespace AdventofCode.AoC_2022
                 Occupied[b.Coord]++;
             FreeCoords = new HashSet<Coord>();
             FreeCoords.Add(entry);
-            for (int x = 1; x < map.Width; x++)
+            for (int x = 1; x < map.Width-1; x++)
             {
-                for (int y = 1; y < map.Height; y++)
+                for (int y = 1; y < map.Height-1; y++)
                 {
                     var c = Coord.FromXY(x, y);
                     if (Occupied[c] == 0)
