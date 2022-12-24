@@ -278,6 +278,11 @@ namespace AdventofCode
         {
             return new Coord(Row * factor, Col * factor);
         }
+
+        public Coord Subtract(Coord other)
+        {
+            return Coord.FromXY(X - other.X, Y - other.Y);
+        }
     }
 
     [DebuggerDisplay("{x}, {y}, {z}")]

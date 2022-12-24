@@ -6,9 +6,12 @@ using System.Diagnostics;
 using System.Linq;
 using ABI.Windows.ApplicationModel.Contacts.DataProvider;
 using ABI.Windows.Media.Streaming.Adaptive;
+using Accord;
+//using Accord.Collections;
 using AdventofCode.AoC_2018;
 using AdventofCode.Utils;
 using NUnit.Framework;
+using WinRT.Interop;
 
 namespace AdventofCode.AoC_2022
 {
@@ -32,7 +35,7 @@ namespace AdventofCode.AoC_2022
             DoAsserts(res, exp1, exp2, resourceName);
         }
 
-        private List<MapState> _mapStates = new List<MapState>();
+        private List<BlizzardState> _blizzardStates = new List<BlizzardState>();
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
         {
@@ -54,22 +57,22 @@ namespace AdventofCode.AoC_2022
 
             var entry = map.Keys.Single(k => k.Row == 0 && map[k] == '.');
             var target = map.Keys.Single(k => k.Row == map.Bottom && map[k] == '.');
-            _mapStates.Add(new MapState(0, map, entry, blizzards));
-            _mapStates.First().GetDebugMap(entry);
+            _blizzardStates.Add(new BlizzardState(0, map, entry, target, blizzards));
+            _blizzardStates.First().GetDebugMap(entry);
 
             LogAndReset("Parse", sw);
 
             // precalculate wind-states
-            var maxDepth = 50;
-            for (int minute = 1; minute < maxDepth + 5; minute++)
+            var maxDepth = (map.Height - 2) * (map.Width - 2);
+            for (int minute = 1; minute < maxDepth; minute++)
             {
-                var newState = new MapState(minute, map, entry, MoveBlizzards(_mapStates.Last()));
+                var newState = new BlizzardState(minute, map, entry, target, MoveBlizzards(_blizzardStates.Last()));
                 Log(() => $"Minute {minute}");
                 Log(() => newState.GetDebugMap(null).ToString(c => c.ToString()));
 
-                _mapStates.Add(newState);
+                _blizzardStates.Add(newState);
             }
-            var path = FindPath(entry, new Stack<Coord>(), 0, target, maxDepth);
+            var path = FindPath(entry, new Stack<Coord>(), 0, target);
             part1 = path;
 
             LogAndReset("*1", sw);
@@ -81,9 +84,76 @@ namespace AdventofCode.AoC_2022
             return (part1, part2);
         }
 
-        private int FindPath(Coord pos, Stack<Coord> path, int minute, Coord target, int best)
+        private int FindPath(Coord pos, Stack<Coord> path, int minute, Coord target)
         {
-            //var initialMoveState = new MoveState(minute, pos);
+            var initialMoveState = new MoveState(minute, pos, null);
+            var queue = new Queue<MoveState>();
+            queue.Enqueue(initialMoveState);
+            var totalBest = int.MaxValue;
+            var stateCounter = 0;
+            var expStates = new Dictionary<MoveStateMod, MoveState>();
+            // {
+            //     [(pos, 0)] = initialMoveState
+            // };
+            var highestMinuteExamined = 0;
+            while (queue.Count > 0)
+            {
+                var s = queue.Dequeue();
+                var modState = new MoveStateMod(s, _blizzardStates.Count);
+                if (expStates.TryGetValue(modState, out var oldState))
+                    if (oldState.Minute < s.Minute)
+                        continue;
+
+                if (stateCounter > _blizzardStates.Count*_blizzardStates.Count)
+                    Log("unexpected number of states examined");
+                expStates[modState] = s;
+
+                if (s.Minute == 1 && s.Pos.X == 1 && s.Pos.Y == 1)
+                {
+                    Log("examine this state");
+                }
+                stateCounter++;
+                if (s.Minute > highestMinuteExamined)
+                    highestMinuteExamined = s.Minute;
+
+                if (s.Minute >= totalBest)
+                    continue;
+
+                if (s.Pos.Equals(target) )
+                {
+                    if (s.Minute <= totalBest)
+                    {
+                        Log($"Found solution: {s.Minute}");
+                        Log($"Path = {s.Path}");
+                        var x = s;
+                        while (x != null)
+                        {
+                            Log($"Min: {x.Minute}, Row: {x.Pos.Row}, Col: {x.Pos.Col}");
+                            x = x.Prev;
+                        }
+
+                        totalBest = s.Minute;
+                    }
+
+                    continue;
+                }
+
+                var nextMinute = s.Minute + 1;
+                var nextBlizzardState = _blizzardStates[nextMinute % _blizzardStates.Count];
+                var validNext = s.Pos.GenAdjacent4().Append(s.Pos).Where(x => nextBlizzardState.FreeCoords.Contains(x)).ToList();
+                foreach (var nextPos in validNext)
+                {
+                    var newMoveState = new MoveState(nextMinute, nextPos, s);
+                    queue.Enqueue(newMoveState);
+                }
+            }
+            Log($"States examined: {stateCounter}");
+            Log($"Highest Minute examined: {highestMinuteExamined}");
+            return totalBest;
+        }
+        private int FindPath_recursive(Coord pos, Stack<Coord> path, int minute, Coord target, int best)
+        {
+
             if (minute > best)
             {
                 return int.MaxValue;
@@ -95,14 +165,14 @@ namespace AdventofCode.AoC_2022
                 return path.Count;
             }
 
-            var mapState = _mapStates[minute + 1];
+            var mapState = _blizzardStates[minute + 1];
             path.Push(pos);
             var foundValidPos = false;
             var validNext = pos.GenAdjacent4().Append(pos).Where(x => mapState.FreeCoords.Contains(x)).ToList();
             foreach (var next in validNext)
             {
                 foundValidPos = true;
-                var temp = FindPath(next, path, minute + 1, target, best);
+                var temp = FindPath_recursive(next, path, minute + 1, target, best);
                 if (temp < best)
                     best = temp;
             }
@@ -115,10 +185,10 @@ namespace AdventofCode.AoC_2022
             return best;
         }
 
-        private List<Blizzard> MoveBlizzards(MapState mapState)
+        private List<Blizzard> MoveBlizzards(BlizzardState blizzardState)
         {
             var newBlizzards = new List<Blizzard>();
-            foreach (var k in mapState.Blizzards)
+            foreach (var k in blizzardState.Blizzards)
             {
                 var newBlizzard = k.Move();
                 newBlizzards.Add(newBlizzard);
@@ -127,7 +197,89 @@ namespace AdventofCode.AoC_2022
         }
     }
 
-    internal class MapState
+    internal class MoveStateMod
+    {
+        private readonly Coord _pos;
+        private readonly int _blizzardStates;
+
+        public MoveStateMod(MoveState moveState, int blizzardCount)
+        {
+            _pos = moveState.Pos;
+            _blizzardStates = moveState.Minute % blizzardCount;
+        }
+
+        private sealed class PosBlizzardStatesEqualityComparer : IEqualityComparer<MoveStateMod>
+        {
+            public bool Equals(MoveStateMod x, MoveStateMod y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+                if (x.GetType() != y.GetType()) return false;
+                return Equals(x._pos, y._pos) && x._blizzardStates == y._blizzardStates;
+            }
+
+            public int GetHashCode(MoveStateMod obj)
+            {
+                return HashCode.Combine(obj._pos, obj._blizzardStates);
+            }
+        }
+
+        //        public static IEqualityComparer<MoveStateMod> PosBlizzardStatesComparer { get; } = new PosBlizzardStatesEqualityComparer();
+    }
+
+    internal class MoveStateComparer : IComparer<MoveState>
+    {
+        public int Compare(MoveState x, MoveState y)
+        {
+            if (ReferenceEquals(x, y)) return 0;
+            if (ReferenceEquals(null, y)) return 1;
+            if (ReferenceEquals(null, x)) return -1;
+            var res = x.DistanceFromTarget.CompareTo(y.DistanceFromTarget);
+            if (res != 0)
+                return res;
+            res = x.Minute.CompareTo(y.Minute);
+            return res;
+        }
+    }
+
+    internal class MoveState
+    {
+        private readonly MoveState _prevState;
+        public int Minute { get; }
+        public Coord Pos { get; }
+        //        public Coord Target { get; }
+        public int DistanceFromTarget { get; set; }
+
+        public MoveState(int minute, Coord pos, MoveState prevState)
+        {
+            _prevState = prevState;
+            Minute = minute;
+            Pos = pos;
+            //            Target = target;
+            //            DistanceFromTarget = pos.Dist(target);
+        }
+
+        public string Path
+        {
+            get
+            {
+                if (_prevState != null)
+                {
+                    var s = _prevState.Path;
+                    if (_prevState.Pos.Equals(Pos))
+                        return s + "*";
+                    return s + Coord.trans2Arrow[Pos.Subtract(_prevState.Pos)];
+                }
+                return "";
+            }
+        }
+
+        public MoveState Prev  => _prevState;
+    }
+
+    [DebuggerDisplay("Min {Minute} Free: {FreeCoords.Count}")]
+    internal class BlizzardState
     {
         public int Minute { get; }
         private readonly SparseBuffer<char> _map;
@@ -135,7 +287,7 @@ namespace AdventofCode.AoC_2022
         public HashSet<Coord> FreeCoords { get; }
         public DicWithDefault<Coord, int> Occupied { get; }
 
-        public MapState(int minute, SparseBuffer<char> map, Coord entry, List<Blizzard> blizzards)
+        public BlizzardState(int minute, SparseBuffer<char> map, Coord entry, Coord exit, List<Blizzard> blizzards)
         {
             Minute = minute;
             _map = map;
@@ -154,6 +306,7 @@ namespace AdventofCode.AoC_2022
                         FreeCoords.Add(c);
                 }
             }
+            FreeCoords.Add(exit);
         }
 
         public SparseBuffer<char> GetDebugMap(Coord pos)
