@@ -52,20 +52,23 @@ namespace AdventofCode.AoC_2022
             var entry = map.Keys.Single(k => k.Row == 0 && map[k] == '.');
             var target = map.Keys.Single(k => k.Row == map.Bottom && map[k] == '.');
             _blizzardStates.Add(new BlizzardState(0, map, entry, target, blizzards));
-            _blizzardStates.First().GetDebugMap(entry);
 
             LogAndReset("Parse", sw);
 
             // precalculate wind-states
             var maxDepth = (map.Height - 2) * (map.Width - 2);
+            var current = _blizzardStates.First();
             for (int minute = 1; minute < maxDepth; minute++)
             {
-                var newState = new BlizzardState(minute, map, entry, target, MoveBlizzards(_blizzardStates.Last()));
+                var newState = new BlizzardState(minute, map, entry, target, MoveBlizzards(current));
                 Log(() => $"Minute {minute}");
                 Log(() => newState.GetDebugMap(null).ToString(c => c.ToString()));
 
                 _blizzardStates.Add(newState);
+                current = newState;
             }
+            LogAndReset("Init blizzard states", sw);
+
             var startToTarget = FindPath(entry, new Stack<Coord>(), 0, target);
 
             part1 = startToTarget;
@@ -87,7 +90,6 @@ namespace AdventofCode.AoC_2022
             var initialMoveState = new MoveStateMod(pos, minute, _blizzardStates.Count, null);
             var queue = new Queue<MoveStateMod>();
             queue.Enqueue(initialMoveState);
-            var totalBest = int.MaxValue;
             var stateCounter = 0;
             var exploredStates = new HashSet<MoveStateMod>();
             while (queue.Count > 0)
@@ -101,25 +103,19 @@ namespace AdventofCode.AoC_2022
 
                 stateCounter++;
 
-                if (s.Minute >= totalBest)
-                    continue;
-
                 if (s.Pos.Equals(target))
                 {
-                    if (s.Minute < totalBest)
+                    Log($"Found solution: {s.Minute}", -1);
+                    Log($"Path = {s.Path}", -1);
+                    Log($"States examined: {stateCounter}", -1);
+                    var x = s;
+                    while (x != null)
                     {
-                        Log($"Found solution: {s.Minute}", -1);
-                        Log($"Path = {s.Path}", -1);
-                        var x = s;
-                        while (x != null)
-                        {
-                            Log(()=>$"Min: {x.Minute}, Row: {x.Pos.Row}, Col: {x.Pos.Col}");
-                            x = x.Prev;
-                        }
-
-                        totalBest = s.Minute;
+                        Log(() => $"Min: {x.Minute}, Row: {x.Pos.Row}, Col: {x.Pos.Col}");
+                        x = x.Prev;
                     }
-                    continue;
+
+                    return s.Minute;
                 }
 
                 var nextMinute = s.Minute + 1;
@@ -131,26 +127,20 @@ namespace AdventofCode.AoC_2022
                     queue.Enqueue(newMoveState);
                 }
             }
-            Log($"States examined: {stateCounter}", -1);
-            return totalBest;
+            Log($"!!! Didn't find a solution", -1);
+            return int.MaxValue;
         }
-    
+
         private List<Blizzard> MoveBlizzards(BlizzardState blizzardState)
         {
-            var newBlizzards = new List<Blizzard>();
-            foreach (var k in blizzardState.Blizzards)
-            {
-                var newBlizzard = k.Move();
-                newBlizzards.Add(newBlizzard);
-            }
-            return newBlizzards;
+            return blizzardState.Blizzards.Select(k => k.Move()).ToList();
         }
     }
 
     internal class MoveStateMod
     {
         private readonly int _blizzardState;
-        
+
         public MoveStateMod(Coord pos, int minute, int blizzardCount, MoveStateMod prevState)
         {
             _blizzardState = minute % blizzardCount;
@@ -217,9 +207,9 @@ namespace AdventofCode.AoC_2022
                 Occupied[b.Coord]++;
             FreeCoords = new HashSet<Coord>();
             FreeCoords.Add(entry);
-            for (int x = 1; x < map.Width-1; x++)
+            for (int x = 1; x < map.Width - 1; x++)
             {
-                for (int y = 1; y < map.Height-1; y++)
+                for (int y = 1; y < map.Height - 1; y++)
                 {
                     var c = Coord.FromXY(x, y);
                     if (Occupied[c] == 0)
