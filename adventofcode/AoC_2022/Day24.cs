@@ -20,7 +20,7 @@ namespace AdventofCode.AoC_2022
 
         [Test]
         [TestCase(18, 54, "Day24_test.txt")]
-        [TestCase(221, null, "Day24.txt")]
+        [TestCase(221, 739, "Day24.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -29,7 +29,7 @@ namespace AdventofCode.AoC_2022
             DoAsserts(res, exp1, exp2, resourceName);
         }
 
-        private List<BlizzardState> _blizzardStates = new();
+        private readonly List<BlizzardState> _blizzardStates = new();
 
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
         {
@@ -71,8 +71,8 @@ namespace AdventofCode.AoC_2022
             part1 = startToTarget;
 
             LogAndReset("*1", sw);
-            var backagain = FindPath(target, null, startToTarget, entry);
-            var backToTarget = FindPath(entry, null, backagain, target);
+            var backToStart = FindPath(target, null, startToTarget, entry);
+            var backToTarget = FindPath(entry, null, backToStart, target);
             part2 = backToTarget;
 
             // solve part 2 here
@@ -90,28 +90,16 @@ namespace AdventofCode.AoC_2022
             var totalBest = int.MaxValue;
             var stateCounter = 0;
             var exploredStates = new HashSet<MoveStateMod>();
-            // {
-            //     [(pos, 0)] = initialMoveState
-            // };
-            var highestMinuteExamined = 0;
             while (queue.Count > 0)
             {
                 var s = queue.Dequeue();
-                //                var modState = new MoveStateMod(s, _blizzardStates.Count);
+
                 if (exploredStates.Contains(s))
                     continue;
 
-                if (stateCounter > _blizzardStates.Count * _blizzardStates.Count)
-                    Log("unexpected number of states examined");
                 exploredStates.Add(s);
 
-                if (s.Minute == 1 && s.Pos.X == 1 && s.Pos.Y == 1)
-                {
-                    Log("examine this state");
-                }
                 stateCounter++;
-                if (s.Minute > highestMinuteExamined)
-                    highestMinuteExamined = s.Minute;
 
                 if (s.Minute >= totalBest)
                     continue;
@@ -125,19 +113,18 @@ namespace AdventofCode.AoC_2022
                         var x = s;
                         while (x != null)
                         {
-                            Log($"Min: {x.Minute}, Row: {x.Pos.Row}, Col: {x.Pos.Col}", -1);
+                            Log(()=>$"Min: {x.Minute}, Row: {x.Pos.Row}, Col: {x.Pos.Col}");
                             x = x.Prev;
                         }
 
                         totalBest = s.Minute;
                     }
-
                     continue;
                 }
 
                 var nextMinute = s.Minute + 1;
                 var nextBlizzardState = _blizzardStates[nextMinute % _blizzardStates.Count];
-                var validNext = s.Pos.GenAdjacent4().Append(s.Pos).Where(x => nextBlizzardState.FreeCoords.Contains(x)).ToList();
+                var validNext = s.Pos.GenAdjacent4().Append(s.Pos).Where(x => nextBlizzardState.FreeCoords.Contains(x));
                 foreach (var nextPos in validNext)
                 {
                     var newMoveState = new MoveStateMod(nextPos, nextMinute, _blizzardStates.Count, s);
@@ -145,7 +132,6 @@ namespace AdventofCode.AoC_2022
                 }
             }
             Log($"States examined: {stateCounter}", -1);
-            Log($"Highest Minute examined: {highestMinuteExamined}", -1);
             return totalBest;
         }
     
