@@ -7,17 +7,17 @@ using NUnit.Framework;
 namespace AdventofCode.AoC_2022
 {
     // to use string-types, change baseclass to TestBaseClass2 and remove a bunch of ? in the methods below
-    using Part1Type = Int64;
-    using Part2Type = Int64;
+    using Part1Type = String;
+    using Part2Type = String;
 
     [TestFixture]
-    class Day25 : TestBaseClass<Part1Type, Part2Type>
+    class Day25 : TestBaseClass2<Part1Type, Part2Type>
     {
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(4890, null, "Day25_test.txt")]
-        [TestCase(33448434171005, null, "Day25.txt")]
+        [TestCase("2=-1=0", null, "Day25_test.txt")]
+        [TestCase("2---1010-0=1220-=010", null, "Day25.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -41,10 +41,9 @@ namespace AdventofCode.AoC_2022
 
 
 
-        protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
+        protected override (Part1Type part1, Part2Type part2) DoComputeWithTimer(string[] source)
         {
-            Part1Type part1 = 0;
-            Part2Type part2 = 0;
+            Part1Type part1;
             var sw = Stopwatch.StartNew();
 
             // parse input here
@@ -59,15 +58,12 @@ namespace AdventofCode.AoC_2022
                 sum += ParseSnafu(s);
 
             }
-            part1 = sum;
+            part1 = ToSnafu(sum);
             LogAndReset("*1", sw);
-            Log(ToSnafu(part1),-1);
 
             // solve part 2 here
 
-            LogAndReset("*2", sw);
-
-            return (part1, part2);
+            return (part1, null);
         }
 
         private long ParseSnafu(string s)
