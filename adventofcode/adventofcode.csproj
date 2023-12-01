@@ -52,6 +52,7 @@
     <None Remove="AoC_2022\Day16.txt" />
     <None Remove="AoC_2022\Day16_test.txt" />
     <None Remove="AoC_2022\Day17.txt" />
+    <None Remove="AoC_2022\Day17_jesper.txt" />
     <None Remove="AoC_2022\Day17_test.txt" />
     <None Remove="AoC_2022\Day18.txt" />
     <None Remove="AoC_2022\Day18_test.txt" />
@@ -72,6 +73,9 @@
     <None Remove="AoC_2022\Day24_test.txt" />
     <None Remove="AoC_2022\Day25.txt" />
     <None Remove="AoC_2022\Day25_test.txt" />
+    <None Remove="AoC_2023\Day01.txt" />
+    <None Remove="AoC_2023\Day01_test.txt" />
+    <None Remove="AoC_2023\Day01_test2.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Accord" Version="3.8.0" />
@@ -131,6 +135,7 @@
     <Content Include="AoC_2018\Day9.txt" />
     <Content Include="AoC_2018\Day9_test.txt" />
     <Content Include="AoC_2019\Day1.txt" />
+    <EmbeddedResource Include="AoC_2022\Day17_jesper.txt" />
     <EmbeddedResource Include="AoC_2022\Day25.txt" />
     <EmbeddedResource Include="AoC_2022\Day24.txt" />
     <EmbeddedResource Include="AoC_2022\Day23.txt" />
@@ -367,5 +372,8 @@
     <EmbeddedResource Include="AoC_2019\Day9_test.txt" />
     <EmbeddedResource Include="AoC_2019\Day8.txt" />
     <EmbeddedResource Include="AoC_2019\Day8_test.txt" />
+    <EmbeddedResource Include="AoC_2023\Day01.txt" />
+    <EmbeddedResource Include="AoC_2023\Day01_test2.txt" />
+    <EmbeddedResource Include="AoC_2023\Day01_test.txt" />
   </ItemGroup>
 </Project>
