@@ -20,6 +20,7 @@ namespace AdventofCode.AoC_2022
         [Test]
         [TestCase(3068, 1514285714288, "Day17_test.txt")]
         [TestCase(3149, 1553982300884, "Day17.txt")]
+        [TestCase(null, null, "Day17_jesper.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -71,12 +72,12 @@ namespace AdventofCode.AoC_2022
                         var increase = height - last.height;
                         var left = iterations - shapeCounter;
                         var cycles = left / cycleSize;
-                        Log(()=>$"JetIndex: {jetIndex} cycleSize {cycleSize}, increase: {increase}");
+                        Log(()=>$"ShapeCounter: {shapeCounter} JetIndex: {jetIndex} cycleSize {cycleSize}, increase: {increase}", -1);
                         if (checker == checkerLimit)
                         {
                             shapeCounter += cycles * cycleSize;
                             skippedHeight = cycles * increase;
-                            Log(()=>$"Skipped {cycles * cycleSize} (height: {cycles * increase}) ");
+                            Log(()=>$"Skipped {cycles * cycleSize} (height: {cycles * increase})", -1);
                         }
                     }
 

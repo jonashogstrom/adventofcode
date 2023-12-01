@@ -33,6 +33,7 @@ namespace AdventofCode.AoC_2022
             Assert.That(ParseSnafu("1==="), Is.EqualTo(63));
             Assert.That(ToSnafu(3), Is.EqualTo("1="));
             Assert.That(ToSnafu(50), Is.EqualTo("200"));
+            Assert.That(ToSnafu(2023), Is.EqualTo("1=110="));
 
             Assert.That(ParseSnafu("10"), Is.EqualTo(5));
             Assert.That(ToSnafu(12345), Is.EqualTo("1-0---0"));
