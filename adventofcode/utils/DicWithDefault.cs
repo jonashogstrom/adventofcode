@@ -44,6 +44,7 @@ namespace AdventofCode.Utils
         {
             return _dic.Values.Count(x => x.Equals(c));
         }
+        public IEnumerable<TValue> Values => _dic.Values;
     }
     public class DicWithDefaultFunc<TKey, TValue>
     {
