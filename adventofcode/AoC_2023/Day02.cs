@@ -5,8 +5,6 @@ using System.Linq;
 using AdventofCode.Utils;
 using NUnit.Framework;
 
-// part 1, not 390
-
 namespace AdventofCode.AoC_2023
 {
     // to use string-types, change baseclass to TestBaseClass2 and remove a bunch of ? in the methods below
