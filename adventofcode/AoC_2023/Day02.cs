@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using AdventofCode.utils;
 using AdventofCode.Utils;
 using NUnit.Framework;
 
@@ -18,7 +19,7 @@ namespace AdventofCode.AoC_2023
 
         [Test]
         [TestCase(8, 2286, "Day02_test.txt")]
-        [TestCase(3059, null, "Day02.txt")]
+        [TestCase(3059, 65371, "Day02.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -36,23 +37,22 @@ namespace AdventofCode.AoC_2023
             var games = new List<Game>();
             foreach (var s in source)
             {
-                var p = s.Split(new[] { ':', ';' });
-                var g = new Game(int.Parse(p[0].Split(' ').Last().Trim()));
-                foreach (var d in p.Skip(1))
+                // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+                var x = new SplitNode(s, new[] { ':', ';' }, new[] { ',' }, new []{' '});
+                var game = new Game(x.First.First.Second.i);
+                foreach (var drawNode in x.Children.Skip(1))
                 {
                     var draw = new Draw();
-                    var cubes = d.Split(',');
-                    foreach (var c in cubes)
+                    foreach (var cubeNode in drawNode.Children)
                     {
-                        var info = c.Trim().Split(" ");
-                        var count = int.Parse(info[0].Trim());
-                        var color = info[1].Trim();
+                        var count= cubeNode.First.i;
+                        var color = cubeNode.Second.Trimmed;
                         draw.cubes[color[0]] = count;
                     }
-
-                    g.draws.Add(draw);
+                    game.draws.Add(draw);
                 }
-                games.Add(g);
+
+                games.Add(game);
             }
 
 
