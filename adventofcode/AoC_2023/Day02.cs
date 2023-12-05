@@ -38,14 +38,14 @@ namespace AdventofCode.AoC_2023
             foreach (var s in source)
             {
                 // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-                var x = new SplitNode(s, new[] { ':', ';' }, new[] { ',' }, new []{' '});
-                var game = new Game(x.First.First.Second.i);
-                foreach (var drawNode in x.Children.Skip(1))
+                var x = new SplitNode(s, ':', ';', ',', ' ');
+                var game = new Game(x.First.First.First.Second.i);
+                foreach (var drawNode in x.Second.Children)
                 {
                     var draw = new Draw();
                     foreach (var cubeNode in drawNode.Children)
                     {
-                        var count= cubeNode.First.i;
+                        var count = cubeNode.First.i;
                         var color = cubeNode.Second.Trimmed;
                         draw.cubes[color[0]] = count;
                     }
@@ -87,7 +87,7 @@ namespace AdventofCode.AoC_2023
         public bool Possible(DicWithDefault<char, int> p)
         {
             var minCubes = GetMinCubes();
-            foreach(var c in p.Keys)
+            foreach (var c in p.Keys)
                 if (p[c] < minCubes[c])
                     return false;
             return true;
@@ -103,10 +103,10 @@ namespace AdventofCode.AoC_2023
         {
             var minCubes = new DicWithDefault<char, int>();
             foreach (var d in draws)
-            foreach (var color in d.cubes.Keys)
-            {
-                minCubes[color] = Math.Max(minCubes[color], d.cubes[color]);
-            }
+                foreach (var color in d.cubes.Keys)
+                {
+                    minCubes[color] = Math.Max(minCubes[color], d.cubes[color]);
+                }
 
             return minCubes;
         }
