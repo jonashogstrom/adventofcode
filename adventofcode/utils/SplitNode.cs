@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AdventofCode.utils;
+namespace AdventofCode;
 
 public class SplitNode
 {
@@ -25,6 +25,7 @@ public class SplitNode
     public SplitNode Second => Children[1];
     public SplitNode Third => Children[2];
     public SplitNode Last => Children.Last();
+    public long l => long.Parse(Trimmed);
 
     public SplitNode(string raw, params char[] splits)
     {
@@ -32,10 +33,15 @@ public class SplitNode
         ParseSplits(raw, splits.Select(c=>new[]{c}).ToArray());
     }
 
-    public SplitNode(string raw, params char[][] splits)
+    private SplitNode(string raw, int dummy, char[][] splits)
     {
         this.raw = raw;
         ParseSplits(raw, splits);
+    }
+
+    public static SplitNode Create(string raw, char[] split1)
+    {
+        return new SplitNode(raw, -1, new char[][] { split1 });
     }
 
     private void ParseSplits(string raw, char[][] splits)
@@ -44,7 +50,7 @@ public class SplitNode
         {
             foreach (var part in raw.Split(splits.First(), StringSplitOptions.RemoveEmptyEntries))
             {
-                _children.Add(new SplitNode(part, splits.Skip(1).ToArray()));
+                _children.Add(new SplitNode(part, -1, splits.Skip(1).ToArray()));
             }
         }
     }

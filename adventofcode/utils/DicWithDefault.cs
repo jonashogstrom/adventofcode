@@ -45,6 +45,11 @@ namespace AdventofCode.Utils
             return _dic.Values.Count(x => x.Equals(c));
         }
         public IEnumerable<TValue> Values => _dic.Values;
+
+        public void RemoveKey(TKey c)
+        {
+            _dic.Remove(c);
+        }
     }
     public class DicWithDefaultFunc<TKey, TValue>
     {
