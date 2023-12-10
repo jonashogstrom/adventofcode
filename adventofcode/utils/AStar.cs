@@ -21,7 +21,7 @@ public class AStar
             if (current.Equals(target))
                 break;
 
-            foreach(var next in graph.neighbors(current))
+            foreach (var next in graph.neighbors(current))
             {
                 var new_cost = cost_so_far[current] + graph.cost(current, next);
                 if (!cost_so_far.TryGetValue(next, out var cost) || new_cost < cost)
@@ -50,9 +50,11 @@ public class AStar
 
 public class Graph
 {
-    private readonly IEnumerable<Coord> _empty = new Coord[]{};
+    private readonly IEnumerable<Coord> _empty = new Coord[] { };
     private readonly Dictionary<(Coord from, Coord to), long> _cost = new();
     private readonly Dictionary<Coord, List<Coord>> _edges = new();
+    public int EdgeCount => _edges.Count;
+
     public IEnumerable<Coord> neighbors(Coord coord)
     {
         if (_edges.TryGetValue(coord, out var neighbours))
@@ -83,5 +85,12 @@ public class Graph
     public long estimatedCost(Coord from, Coord to)
     {
         return from.Dist(to);
+    }
+
+    public bool HasEdge(Coord p1, Coord p2)
+    {
+
+        if (_edges.TryGetValue(p1, out var edges) && edges.Contains(p2)) return true;
+        return false;
     }
 }

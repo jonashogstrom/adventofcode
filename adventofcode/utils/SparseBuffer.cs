@@ -103,6 +103,16 @@ namespace AdventofCode
         public IEnumerable<Coord> Keys => _board.Keys;
         public T Default => _def;
 
+        public IEnumerable<Coord> AllKeysInMap
+        {
+            get
+            {
+                for (int x = this.Left; x <= this.Right; x++)
+                    for (int y = this.Top; y <= this.Bottom; y++)
+                        yield return new Coord(y, x);
+            }
+        }
+
         public string ToString(Func<T, string> func)
         {
             return ToString((v, c) => func(v));
