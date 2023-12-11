@@ -39,11 +39,17 @@ namespace AdventofCode
             }
             set
             {
-                _board[coord] = value;
-                if (coord.X < topLeft.X || coord.Y < topLeft.Y)
-                    topLeft = Coord.FromXY(Math.Min(topLeft.X, coord.X), Math.Min(topLeft.Y, coord.Y));
-                if (coord.X > bottomRight.X || coord.Y > bottomRight.Y)
-                    bottomRight = Coord.FromXY(Math.Max(bottomRight.X, coord.X), Math.Max(bottomRight.Y, coord.Y));
+                if (value.Equals(_def))
+                    _board.Remove(coord);
+                else
+                {
+                    _board[coord] = value;
+                    if (coord.X < topLeft.X || coord.Y < topLeft.Y)
+                        topLeft = Coord.FromXY(Math.Min(topLeft.X, coord.X), Math.Min(topLeft.Y, coord.Y));
+                    if (coord.X > bottomRight.X || coord.Y > bottomRight.Y)
+                        bottomRight = Coord.FromXY(Math.Max(bottomRight.X, coord.X), Math.Max(bottomRight.Y, coord.Y));
+
+                }
 
             }
         }

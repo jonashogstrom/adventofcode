@@ -119,7 +119,6 @@ namespace AdventofCode.AoC_2023
 
                     while (p.X >= 0)
                     {
-                        
                         if (visited.Contains(p) && g.HasEdge(p, p.Move(Coord.S)))
                             edgeCounter++;
                         p = p.Move(Coord.W);

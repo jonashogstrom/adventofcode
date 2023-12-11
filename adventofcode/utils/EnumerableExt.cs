@@ -56,7 +56,7 @@ namespace AdventofCode
                 if (!t.Equals(last))
                 {
                     if (count > 0)
-                        yield return (last,count);
+                        yield return (last, count);
                     count = 0;
                 }
 
@@ -87,6 +87,23 @@ namespace AdventofCode
             }
         }
 
+        public static IEnumerable<(T, T)> AsCombinations<T>(this IEnumerable<T> s)
+        {
+            var count = 0;
+            foreach (var x in s)
+            {
+                count++;
+                foreach (var y in s.Skip(count))
+                    yield return (x, y);
+            }
+        }
+
+        public static IEnumerable<(T, T)> AsCombinations<T>(this List<T> s)
+        {
+            for (int i = 0; i < s.Count; i++)
+                for (int j = i + 1; j < s.Count; j++)
+                    yield return (s[i], s[j]);
+        }
 
         public static IEnumerable<int> groupSizes<T>(this IEnumerable<T> s) where T : IEquatable<T>
         {
@@ -118,7 +135,7 @@ namespace AdventofCode
 
     public class Cache<TRes, TParam1>
     {
-        private readonly Dictionary<(Func<TParam1, Cache<TRes, TParam1>, TRes>, TParam1), TRes> _cache = 
+        private readonly Dictionary<(Func<TParam1, Cache<TRes, TParam1>, TRes>, TParam1), TRes> _cache =
             new Dictionary<(Func<TParam1, Cache<TRes, TParam1>, TRes>, TParam1), TRes>();
         public TRes Do(Func<TParam1, Cache<TRes, TParam1>, TRes> f, TParam1 param1)
         {
