@@ -263,3 +263,5 @@ adventofcode/leaderboard_*.json
 adventofcode/settings.txt
 AoCStats/settings.txt
 *.json
+
+/adventofcode/AoC_2023/Day??.txt
