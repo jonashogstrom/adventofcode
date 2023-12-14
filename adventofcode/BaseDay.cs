@@ -198,6 +198,7 @@ namespace AdventofCode
             var filename =
                 $"{this.GetType().FullName}_{time}_[{ok1}]_[{ok2}]_{Path.GetFileNameWithoutExtension(name)}.log";
             filename = filename.Replace("*", "_");
+            filename = filename.Replace("?", "_");
 
             File.WriteAllText(filename, _log.ToString());
 

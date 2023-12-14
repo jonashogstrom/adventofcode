@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using Windows.System.Update;
 using ABI.Windows.Devices.SmartCards;
-using AdventofCode.utils;
 using AdventofCode.Utils;
 using NUnit.Framework;
 

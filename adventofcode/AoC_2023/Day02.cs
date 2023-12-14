@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using AdventofCode.utils;
 using AdventofCode.Utils;
 using NUnit.Framework;
 

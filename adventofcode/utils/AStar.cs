@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AdventofCode.utils;
+namespace AdventofCode.Utils;
 
 public class AStar
 {

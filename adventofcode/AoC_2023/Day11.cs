@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Windows.Gaming.Input;
-using Accord;
 using AdventofCode.Utils;
 using NUnit.Framework;
 
@@ -55,37 +53,30 @@ namespace AdventofCode.AoC_2023
 
         private long ComputeDistance(SparseBuffer<char> map, int factor)
         {
-            var filledRows = map.Keys.Select(k => k.Row).ToHashSet();
-            var filledCols = map.Keys.Select(k => k.Col).ToHashSet();
-            var galaxies = new List<Coord>();
+            var galaxies = map.Keys;
+            var filledRows = galaxies.Select(k => k.Row).ToHashSet();
+            var filledCols = galaxies.Select(k => k.Col).ToHashSet();
 
-            var sum = 0;
-            var rowSpacing = new List<int>();
-            for (int r = 0; r<=map.Bottom; r++)
+            var rowSpacing = CalculateExpansion(factor, filledRows, map.Bottom);
+            var colSpacing = CalculateExpansion(factor, filledCols, map.Right);
+
+            var expandedGalaxies = galaxies.Select(x => new Coord(x.Row + rowSpacing[x.Row], x.Col + colSpacing[x.Col])).ToList();
+
+            return expandedGalaxies.AsCombinations().Sum(g => (long)g.Item1.Dist(g.Item2));
+        }
+
+        private static List<int> CalculateExpansion(int factor, HashSet<int> filled, int max)
+        {
+            var accumulatedExpansion = 0;
+            var expansion = new List<int>();
+            for (int i = 0; i <= max; i++)
             {
-                if (!filledRows.Contains(r))
-                    sum += factor - 1;
-                rowSpacing.Add(sum);
+                if (!filled.Contains(i))
+                    accumulatedExpansion += factor - 1;
+                expansion.Add(accumulatedExpansion);
             }
 
-            sum = 0;
-            var colSpacing = new List<int>();
-            for (int c = 0; c <= map.Right; c++)
-            {
-                if (!filledCols.Contains(c))
-                    sum += factor - 1;
-                colSpacing.Add(sum);
-            }
-
-            foreach (var x in map.Keys)
-            {
-                galaxies.Add(x.Move(new Coord(rowSpacing[x.Row], colSpacing[x.Col])));
-            }
-
-            var dist = 0L;
-            foreach (var x in galaxies.AsCombinations())
-                dist += x.Item1.Dist(x.Item2);
-            return dist;
+            return expansion;
         }
     }
 }

@@ -135,8 +135,7 @@ namespace AdventofCode
 
     public class Cache<TRes, TParam1>
     {
-        private readonly Dictionary<(Func<TParam1, Cache<TRes, TParam1>, TRes>, TParam1), TRes> _cache =
-            new Dictionary<(Func<TParam1, Cache<TRes, TParam1>, TRes>, TParam1), TRes>();
+        private readonly Dictionary<(Func<TParam1, Cache<TRes, TParam1>, TRes>, TParam1), TRes> _cache = new();
         public TRes Do(Func<TParam1, Cache<TRes, TParam1>, TRes> f, TParam1 param1)
         {
             if (_cache.TryGetValue((f, param1), out var res))
@@ -146,5 +145,46 @@ namespace AdventofCode
             return res;
         }
     }
+    public class Cache2<TRes, TParam1>
+    {
+        private readonly Func<TParam1, Cache2<TRes, TParam1>, TRes> _f;
+
+        public Cache2(Func<TParam1, Cache2<TRes, TParam1>, TRes> f)
+        {
+            _f = f;
+        }
+
+        private readonly Dictionary<TParam1, TRes> _cache = new();
+        public TRes Do(TParam1 param1)
+        {
+            if (_cache.TryGetValue(param1, out var res))
+                return res;
+            res = _f(param1, this);
+            _cache[param1] = res;
+            return res;
+        }
+    }
+
+    public class Cache22<TRes, TParam1, TParam2>
+    {
+        private readonly Func<TParam1, TParam2, Cache22<TRes, TParam1, TParam2>, TRes> _f;
+
+        public Cache22(Func<TParam1, TParam2, Cache22<TRes, TParam1, TParam2>, TRes> f)
+        {
+            _f = f;
+        }
+
+        private readonly Dictionary<(TParam1, TParam2), TRes> _cache = new();
+        public TRes Do(TParam1 param1, TParam2 param2)
+        {
+            if (_cache.TryGetValue((param1, param2), out var res))
+                return res;
+            res = _f(param1, param2, this);
+            _cache[(param1, param2)] = res;
+            return res;
+        }
+    }
+
+
 
 }
