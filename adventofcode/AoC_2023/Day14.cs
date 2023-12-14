@@ -19,7 +19,7 @@ namespace AdventofCode.AoC_2023
 
         [Test]
         [TestCase(136, 64, "Day14_test.txt")]
-        [TestCase(108641, 95467, "Day14.txt")]
+        [TestCase(108641, 84328, "Day14.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -48,7 +48,7 @@ namespace AdventofCode.AoC_2023
             //
             var loads = new List<long>();
 
-            var iteration = -1;
+            var iteration = 0;
             var cycle = -1;
             while (true)
             {
@@ -60,18 +60,19 @@ namespace AdventofCode.AoC_2023
                 TiltMapE(map);
                 var load = CalculateLoad(map);
                 loads.Add(load);
-                iteration++;
                 Log($"Round: {iteration}, load: {load}", -1);
                 if (FindCycle(loads, out cycle))
                     break;
+                iteration++;
             }
             var max = 1000000000;
-            var skipcycles = max / cycle;
+            var skipCycles = max / cycle;
 
-            var part2Pos = max - skipcycles * cycle -1;
+            var part2Pos = max - skipCycles * cycle -1;
+            while (part2Pos + cycle < loads.Count)
+                part2Pos += cycle;
+
             part2 = loads[part2Pos];
-
-            //part2 = CalculateLoad(map);
 
             LogAndReset("*2", sw);
 
