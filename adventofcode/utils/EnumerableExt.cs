@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using AdventofCode.Utils;
-using NUnit.Framework;
 
 namespace AdventofCode
 {
@@ -97,6 +96,31 @@ namespace AdventofCode
                     yield return (x, y);
             }
         }
+
+        public static bool FindCycle<T>(this ICollection<T> items, out int cycle, int minCycleLen = 2, int maxCycleLen = Int32.MaxValue)
+            where T : IEquatable<T>
+        {
+            var max = Math.Min(items.Count/2, maxCycleLen);
+            for (var len = minCycleLen; len < max; len++)
+            {
+                var ok = true;
+                for (var j = 0; j < len; j++)
+                    if (!items.ElementAt(items.Count - 1 - j).Equals(items.ElementAt(items.Count - 1 - j - len)))
+                    {
+                        ok = false;
+                        break;
+                    }
+                if (ok)
+                {
+                    cycle = len;
+                    return true;
+                }
+            }
+
+            cycle = -1;
+            return false;
+        }
+
 
         public static IEnumerable<(T, T)> AsCombinations<T>(this List<T> s)
         {

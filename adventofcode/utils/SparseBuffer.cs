@@ -123,6 +123,10 @@ namespace AdventofCode
         {
             return ToString((v, c) => func(v));
         }
+        public string ToString()
+        {
+            return ToString((v, c) => v.ToString());
+        }
 
         private Coord Reuse(Coord coord, int x, int y)
         {
@@ -186,6 +190,24 @@ namespace AdventofCode
         public bool HasKey(Coord coord)
         {
             return _board.ContainsKey(coord);
+        }
+
+        public void AddBorders(T c)
+        {
+            var top = Top - 1;
+            var left = Left - 1;
+            var right = Right + 1;
+            var bottom = Bottom + 1;
+            for (var row = top; row <= bottom; row++)
+            {
+                this[new Coord(row, left)] = c;
+                this[new Coord(row, right)] = c;
+            }
+            for (var col = left; col <= right; col++)
+            {
+                this[new Coord(top, col)] = c;
+                this[new Coord(right, col)] = c;
+            }
         }
     }
 }

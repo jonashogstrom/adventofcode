@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Windows.Devices.Bluetooth.Advertisement;
 using AdventofCode.Utils;
 using NUnit.Framework;
 
@@ -39,36 +38,53 @@ namespace AdventofCode.AoC_2023
 
             LogAndReset("Parse", sw);
 
-            TiltMapN(map);
-            part1 += CalculateLoad(map);
+            var bottomRow = map.Bottom;
+
+            map.AddBorders('#');
+            var boulders = map.Keys.Where(k => map[k] == 'O').ToHashSet();
+            var rocks = map.Keys.Where(k => map[k] == '#').ToHashSet();
+
+            var map2 = InitMap2(map, boulders, rocks);
+
+            boulders = TiltMap2(map2, boulders.OrderBy(b => b.Row), rocks, Coord.N);
+            part1 += CalculateLoad(boulders, bottomRow);
+
+
 
             LogAndReset("*1", sw);
 
             map = source.ToSparseBuffer('.');
-            //
+
+            map.AddBorders('#');
+            boulders = map.Keys.Where(k => map[k] == 'O').ToHashSet();
+            rocks = map.Keys.Where(k => map[k] == '#').ToHashSet();
+
+            map2 = InitMap2(map, boulders, rocks);
+
+            Log(() => map.ToString());
+
             var loads = new List<long>();
 
+
             var iteration = 0;
-            var cycle = -1;
+            int cycle;
             while (true)
             {
-                //                for (var i = 0L; i < max - skipcycles * cycle; i++)
-                //            {
-                TiltMapN(map);
-                TiltMapW(map);
-                TiltMapS(map);
-                TiltMapE(map);
-                var load = CalculateLoad(map);
+                boulders = TiltMap2(map2, boulders.OrderBy(b => b.Row), rocks, Coord.N);
+                boulders = TiltMap2(map2, boulders.OrderBy(b => b.Col), rocks, Coord.W);
+                boulders = TiltMap2(map2, boulders.OrderBy(b => -b.Row), rocks, Coord.S);
+                boulders = TiltMap2(map2, boulders.OrderBy(b => -b.Col), rocks, Coord.E);
+                var load = CalculateLoad(boulders, bottomRow);
                 loads.Add(load);
-                Log($"Round: {iteration}, load: {load}", -1);
-                if (FindCycle(loads, out cycle))
+                Log(() => $"Round: {iteration}, load: {load}");
+                if (loads.FindCycle(out cycle))
                     break;
                 iteration++;
             }
             var max = 1000000000;
             var skipCycles = max / cycle;
 
-            var part2Pos = max - skipCycles * cycle -1;
+            var part2Pos = max - skipCycles * cycle - 1;
             while (part2Pos + cycle < loads.Count)
                 part2Pos += cycle;
 
@@ -79,73 +95,54 @@ namespace AdventofCode.AoC_2023
             return (part1, part2);
         }
 
-        private bool FindCycle(List<long> loads, out int cycle)
+        private static DenseArray<char> InitMap2(SparseBuffer<char> map, HashSet<Coord> boulders, HashSet<Coord> rocks)
         {
-            for (int i = 2; i < loads.Count / 2; i++)
-            {
-                var last = loads.GetRange(loads.Count - i, i);
-                var prev = loads.GetRange(loads.Count - i*2, i);
-                if (Enumerable.SequenceEqual(last, prev))
-                {
-                    cycle = i;
-                    return true;
-                }
-            }
+            var map2 = new DenseArray<char>(map.Width, map.Height, '.');
 
-            cycle = -1;
-            return false;
+            foreach (var b in boulders)
+                map2.SetValue(b.Row + 1, b.Col + 1, 'O');
+            foreach (var b in rocks)
+                map2.SetValue(b.Row + 1, b.Col + 1, '#');
+            return map2;
         }
 
-        private static long CalculateLoad(SparseBuffer<char> map)
+        private HashSet<Coord> TiltMap2(DenseArray<char> denseArray, IOrderedEnumerable<Coord> boulders,
+            HashSet<Coord> rocks, Coord dir)
+        {
+            var bouldersList = boulders.ToList();
+            var boulderMap = bouldersList.ToHashSet();
+            foreach (var b in bouldersList)
+            {
+                var r = b.Row;
+                var c = b.Col;
+                var nextr = r + dir.Row;
+                var nextc = c + dir.Col;
+                while (denseArray.GetValue(nextr+1, nextc+1)== '.')
+                {
+                    r = nextr;
+                    c = nextc;
+                    nextr = r + dir.Row;
+                    nextc = c + dir.Col;
+                }
+
+                if (r != b.Row || c != b.Col)
+                {
+                    boulderMap.Remove(b);
+                    boulderMap.Add(new Coord(r, c));
+                    denseArray.SetValue(b.Row+1, b.Col+1, '.');
+                    denseArray.SetValue(r+1, c+1, 'O');
+                }
+            }
+            Log(denseArray.ToString);
+            return boulderMap;
+        }
+
+        private static long CalculateLoad(HashSet<Coord> boulders, int bottomRow)
         {
             var load = 0L;
-            foreach (var k in map.Keys)
-                if (map[k] == 'O')
-                    load += map.Bottom - k.Row + 1;
+            foreach (var k in boulders)
+                load += bottomRow - k.Row + 1;
             return load;
-        }
-
-        private void TiltMapN(SparseBuffer<char> map)
-        {
-            for (int r = 0; r <= map.Bottom; r++)
-                for (int c = 0; c <= map.Right; c++)
-                    CheckMove(map, new Coord(r, c), Coord.N);
-        }
-
-        private void TiltMapW(SparseBuffer<char> map)
-        {
-            for (int c = 0; c <= map.Right; c++)
-                for (int r = 0; r <= map.Bottom; r++)
-                    CheckMove(map, new Coord(r, c), Coord.W);
-        }
-
-        private void TiltMapS(SparseBuffer<char> map)
-        {
-            for (int r = map.Bottom; r >= 0; r--)
-                for (int c = 0; c <= map.Right; c++)
-                    CheckMove(map, new Coord(r, c), Coord.S);
-        }
-        private void TiltMapE(SparseBuffer<char> map)
-        {
-            for (int c = map.Right; c >= 0; c--)
-                for (int r = 0; r <= map.Bottom; r++)
-                    CheckMove(map, new Coord(r, c), Coord.E);
-        }
-
-        private void CheckMove(SparseBuffer<char> map, Coord coord, Coord dir)
-        {
-            if (map[coord] == 'O')
-            {
-                var next = coord.Move(dir);
-                while (next.Row >= 0 && next.Row <= map.Bottom &&
-                       next.Col >= 0 && next.Col <= map.Right && map[next] == '.')
-                {
-                    map[coord] = '.';
-                    map[next] = 'O';
-                    coord = next;
-                    next = coord.Move(dir);
-                }
-            }
         }
     }
 }
