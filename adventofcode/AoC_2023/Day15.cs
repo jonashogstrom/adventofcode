@@ -23,7 +23,7 @@ namespace AdventofCode.AoC_2023
         [Test]
         [TestCase(1320, 145, "Day15_test.txt")]
         [TestCase(52, null, "HASH")]
-        [TestCase(495972, null, "Day15.txt")]
+        [TestCase(495972, 245223, "Day15.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -49,11 +49,10 @@ namespace AdventofCode.AoC_2023
 
             LogAndReset("*1", sw);
 
-//            LogLevel = 20;
+            var hashMap = new List<LinkedList<(string, int)>>();
+            for (var i = 0; i < 256; i++)
+                hashMap.Add(new LinkedList<(string, int)>());
 
-            var hashMap = new List<List<(string, int)>>();
-            for (int i = 0; i < 256; i++)
-                hashMap.Add(new List<(string, int)>());
             foreach (var p in lines)
             {
                 var label = "";
@@ -62,7 +61,7 @@ namespace AdventofCode.AoC_2023
 
                 if (p.EndsWith('-'))
                 {
-                    label = p.Substring(0, p.Length - 1);
+                    label = p[..^1];
                     op = Op.Remove;
                 }
                 else if (p.Contains('='))
@@ -73,64 +72,54 @@ namespace AdventofCode.AoC_2023
                     focalLength = int.Parse(temp[1]);
                 }
 
-                var boxnumber = Hash(label);
+                var boxNumber = Hash(label);
 
-                var box = hashMap[boxnumber];
+                var box = hashMap[boxNumber];
+                var n = box.First;
                 switch (op)
                 {
                     case Op.Add:
-                        var found = false;
-                        var ix = 0;
-                        foreach (var v in box)
-                        {
-                            if (v.Item1 == label)
-                            {
-                                box[ix] = (label, focalLength);
-                                found = true;
-                                break;
-                            }
-                            ix++;
-                        }
-
-                        if (!found)
-                            box.Add((label, focalLength));
+                        while (n != null && n.Value.Item1 != label)
+                            n = n.Next;
+                        if (n != null)
+                            n.Value = (label, focalLength);
+                        else
+                            box.AddLast((label, focalLength));
                         break;
                     case Op.Remove:
-                        var ix2 = 0;
-                        foreach (var v in box)
-                        {
-                            if (v.Item1 == label)
-                            {
-                                box.RemoveAt(ix2);
-                                break;
-                            }
-
-                            ix2++;
-                        }
+                        while (n != null && n.Value.Item1 != label)
+                            n = n.Next;
+                        if (n != null)
+                            box.Remove(n);
 
                         break;
-                    default: throw new Exception();
                 }
-                Log($"After \"{p}\":");
-                for (int i = 0; i < 256; i++)
-                    if (hashMap[i].Count > 0)
-                    {
-                        Log($"Box: {i}: " + string.Join(' ', hashMap[i].Select(x => $"[{x.Item1} {x.Item2}]")));
-                    }
+
+                if (LogLevel > 0)
+                {
+                    Log(() => $"After \"{p}\":");
+                    for (int i = 0; i < 256; i++)
+                        if (hashMap[i].Count > 0)
+                        {
+                            Log(() => $"Box: {i}: " +
+                                      string.Join(' ', hashMap[i].Select(x => $"[{x.Item1} {x.Item2}]")));
+                        }
+                }
             }
 
             for (var boxnum = 0; boxnum < 256; boxnum++)
-            for (var slot = 0; slot < hashMap[boxnum].Count; slot++)
             {
-                var entry = hashMap[boxnum][slot];
-                var power = (boxnum + 1) * (slot + 1) * entry.Item2;
-                Log($"{entry.Item1}: {boxnum+1} (box {boxnum}) * {slot+1} (xxx slot) * {entry.Item2} (focal length) = {power}", -1);
-                part2 += power;
+                var slot = 0;
+
+                foreach (var entry in hashMap[boxnum])
+                {
+                    var power = (boxnum + 1) * (slot + 1) * entry.Item2;
+                    Log(() => $"{entry.Item1}: {boxnum + 1} (box {boxnum}) * {slot + 1} (xxx slot) * {entry.Item2} (focal length) = {power}");
+                    part2 += power;
+                    slot++;
+                }
             }
 
-
-            // not 296701
-            // not 327061
             LogAndReset("*2", sw);
 
             return (part1, part2);
@@ -138,16 +127,7 @@ namespace AdventofCode.AoC_2023
 
         private int Hash(string s)
         {
-            var hash = 0;
-            foreach (var c in s)
-            {
-                hash += (int)c;
-                hash *= 17;
-                hash = hash % 256;
-            }
-
-            return hash;
-
+            return s.Aggregate(0, (current, c) => (current + c) * 17 % 256);
         }
     }
 
