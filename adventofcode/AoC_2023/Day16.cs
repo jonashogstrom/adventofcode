@@ -45,16 +45,31 @@ namespace AdventofCode.AoC_2023
 
             LogAndReset("*1", sw);
 
-            foreach (var r in map.AllRowIndices)
+            foreach (var c in map.TopEdge)
             {
-                part2 = Math.Max(part2, RecStart(map, new Coord(r, map.Left), Coord.E));
-                part2 = Math.Max(part2, RecStart(map, new Coord(r, map.Right), Coord.W));
+                part2 = Math.Max(part2, RecStart(map, c, Coord.S));
             }
-            foreach (var c in map.AllColIndices)
+            foreach (var c in map.BottomEdge)
             {
-                part2 = Math.Max(part2, RecStart(map, new Coord(map.Top, c), Coord.S));
-                part2 = Math.Max(part2, RecStart(map, new Coord(map.Bottom, c), Coord.N));
+                part2 = Math.Max(part2, RecStart(map, c, Coord.N));
             }
+            foreach (var c in map.LeftEdge)
+            {
+                part2 = Math.Max(part2, RecStart(map, c, Coord.E));
+            }
+            foreach (var c in map.RightEdge)
+            {
+                part2 = Math.Max(part2, RecStart(map, c, Coord.W));
+            }
+
+
+            // part2 = Math.Max(part2, RecStart(map, new Coord(r, map.Right), Coord.W));
+            // }
+            // foreach (var c in map.AllColIndices)
+            // {
+            //     part2 = Math.Max(part2, RecStart(map, new Coord(map.Top, c), Coord.S));
+            //     part2 = Math.Max(part2, RecStart(map, new Coord(map.Bottom, c), Coord.N));
+            // }
 
             LogAndReset("*2", sw);
 

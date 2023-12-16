@@ -58,21 +58,37 @@ namespace AdventofCode
         {
             get
             {
-                for (int i=Top; i<=Bottom; i++)
+                for (int i = Top; i <= Bottom; i++)
                     yield return i;
             }
-        } 
+        }
+
+        public IEnumerable<Coord> LeftEdge => CoordsInCol(Left);
+        public IEnumerable<Coord> RightEdge => CoordsInCol(Right);
+        public IEnumerable<Coord> TopEdge => CoordsInRow(Top);
+        public IEnumerable<Coord> BottomEdge => CoordsInRow(Bottom);
+        public IEnumerable<Coord> CoordsInCol(int col)
+        {
+            foreach (var r in AllRowIndices)
+                yield return new Coord(r, col);
+        }
+        public IEnumerable<Coord> CoordsInRow(int row)
+        {
+            foreach (var c in AllColIndices)
+                yield return new Coord(row, c);
+        }
+
 
         public IEnumerable<int> AllColIndices
         {
             get
             {
-                for (int i=Left; i<=Right; i++)
+                for (int i = Left; i <= Right; i++)
                     yield return i;
             }
-        } 
+        }
 
-        
+
 
         public void RemoveDefaults()
         {
