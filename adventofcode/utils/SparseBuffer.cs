@@ -54,6 +54,26 @@ namespace AdventofCode
             }
         }
 
+        public IEnumerable<int> AllRowIndices
+        {
+            get
+            {
+                for (int i=Top; i<=Bottom; i++)
+                    yield return i;
+            }
+        } 
+
+        public IEnumerable<int> AllColIndices
+        {
+            get
+            {
+                for (int i=Left; i<=Right; i++)
+                    yield return i;
+            }
+        } 
+
+        
+
         public void RemoveDefaults()
         {
             foreach (var k in Keys.ToArray())
