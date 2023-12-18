@@ -62,7 +62,7 @@ namespace AdventofCode
                     yield return i;
             }
         }
-
+        
         public IEnumerable<Coord> LeftEdge => CoordsInCol(Left);
         public IEnumerable<Coord> RightEdge => CoordsInCol(Right);
         public IEnumerable<Coord> TopEdge => CoordsInRow(Top);
@@ -149,11 +149,14 @@ namespace AdventofCode
         {
             get
             {
-                for (int x = this.Left; x <= this.Right; x++)
-                    for (int y = this.Top; y <= this.Bottom; y++)
+                for (int x = Left; x <= Right; x++)
+                    for (int y = Top; y <= Bottom; y++)
                         yield return new Coord(y, x);
             }
         }
+
+        public Coord TopLeft => new(Top, Left);
+        public Coord BottomRight => new(Bottom, Right);
 
         public string ToString(Func<T, string> func)
         {

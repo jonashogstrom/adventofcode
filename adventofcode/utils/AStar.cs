@@ -1,35 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using Windows.Perception;
 
 namespace AdventofCode.Utils;
 
 public class AStar
 {
-    public IEnumerable<Coord> FindPath(Coord start, Coord target, Graph graph)
+    public (List<Coord> res, Dictionary<Coord, long> cost_so_far, Dictionary<Coord, Coord> came_from, List<Coord>, long, Dictionary<Coord, long>) FindPath(Coord start, Coord target, Graph graph)
     {
 
         var frontier = new PriorityQueue<Coord, long>();
         frontier.Enqueue(start, 0);
-        var came_from = new Dictionary<Coord, Coord>();
-        var cost_so_far = new Dictionary<Coord, long>();
-        came_from[start] = null;
-        cost_so_far[start] = 0;
+        var cameFrom = new Dictionary<Coord, Coord>();
+        var costSoFar = new Dictionary<Coord, long>();
+        cameFrom[start] = null;
+        costSoFar[start] = 0;
+        var pathSoFar = new Dictionary<Coord, List<Coord>>
+        {
+            [start] = new List<Coord> {start}
+        };
 
-        while (frontier.Count != 0)
+        while (frontier.Count>0)
         {
             var current = frontier.Dequeue();
 
-            if (current.Equals(target))
-                break;
+            // if (current.Equals(target))
+            //     break;
 
             foreach (var next in graph.neighbors(current))
             {
-                var new_cost = cost_so_far[current] + graph.cost(current, next);
-                if (!cost_so_far.TryGetValue(next, out var cost) || new_cost < cost)
+                var newCost = costSoFar[current] + graph.Cost(pathSoFar[current], current, next);
+                if (!costSoFar.TryGetValue(next, out var cost) || newCost < cost)
                 {
-                    cost_so_far[next] = new_cost;
-                    var priority = new_cost + graph.estimatedCost(target, next);
+                    var path = new List<Coord>(pathSoFar[current]) { next };
+                    pathSoFar[next] = path;
+                    costSoFar[next] = newCost;
+                    var priority = newCost + graph.EstimatedCost(target, next);
                     frontier.Enqueue(next, priority);
-                    came_from[next] = current;
+                    cameFrom[next] = current;
+                    // if (next.Equals(new Coord(0, 4)))
+                    // {
+                    //     Console.WriteLine("Test");
+                    // }
                 }
             }
         }
@@ -39,11 +52,11 @@ public class AStar
         while (n != null)
         {
             res.Add(n);
-            n = came_from[n];
+            n = cameFrom[n];
         }
 
         res.Reverse();
-        return res;
+        return (res, costSoFar, cameFrom, pathSoFar[target], costSoFar[target], costSoFar);
 
     }
 }
@@ -52,8 +65,11 @@ public class Graph
 {
     private readonly IEnumerable<Coord> _empty = new Coord[] { };
     private readonly Dictionary<(Coord from, Coord to), long> _cost = new();
-    private readonly Dictionary<Coord, List<Coord>> _edges = new();
+    private readonly Dictionary<Coord, HashSet<Coord>> _edges = new();
     public int EdgeCount => _edges.Count;
+
+    public Func<Coord, Coord, int> EstimatedCostFunc { get; set; }
+    public Func<IList<Coord>, Coord, Coord, int> ActualCostFunc { get; set; }
 
     public IEnumerable<Coord> neighbors(Coord coord)
     {
@@ -66,8 +82,8 @@ public class Graph
     {
         if (!_edges.TryGetValue(from, out var edges))
         {
-            edges = new List<Coord>();
-            _edges.Add(from, edges);
+            edges = new HashSet<Coord>();
+            _edges[from] = edges;
         }
 
         edges.Add(to);
@@ -75,15 +91,22 @@ public class Graph
             _cost.Add((from, to), dist.Value);
     }
 
-    public long cost(Coord from, Coord to)
+    public long Cost(IList<Coord> path, Coord from, Coord to)
     {
+        if (ActualCostFunc != null)
+        {
+            var cost = ActualCostFunc(path, from, to);
+            return cost;
+        }
         if (_cost.TryGetValue((from, to), out var res))
             return res;
         return from.Dist(to);
     }
 
-    public long estimatedCost(Coord from, Coord to)
+    public long EstimatedCost(Coord from, Coord to)
     {
+        if (EstimatedCostFunc != null)
+            return EstimatedCostFunc(from, to);
         return from.Dist(to);
     }
 

@@ -112,6 +112,10 @@
     <None Remove="AoC_2023\Day15_test.txt" />
     <None Remove="AoC_2023\Day16.txt" />
     <None Remove="AoC_2023\Day16_test.txt" />
+    <None Remove="AoC_2023\Day17.txt" />
+    <None Remove="AoC_2023\Day17_test.txt" />
+    <None Remove="AoC_2023\Day18.txt" />
+    <None Remove="AoC_2023\Day18_test.txt" />
     <None Remove="AoC_2023\DayTemplate.txt" />
     <None Remove="AoC_2023\DayTemplate_test.txt" />
   </ItemGroup>
@@ -444,6 +448,10 @@
     <EmbeddedResource Include="AoC_2023\Day15_test.txt" />
     <EmbeddedResource Include="AoC_2023\Day16.txt" />
     <EmbeddedResource Include="AoC_2023\Day16_test.txt" />
+    <EmbeddedResource Include="AoC_2023\Day17.txt" />
+    <EmbeddedResource Include="AoC_2023\Day17_test.txt" />
+    <EmbeddedResource Include="AoC_2023\Day18.txt" />
+    <EmbeddedResource Include="AoC_2023\Day18_test.txt" />
     <EmbeddedResource Include="AoC_2023\DayTemplate_test.txt" />
     <EmbeddedResource Include="AoC_2023\DayTemplate.txt" />
     <EmbeddedResource Include="AoC_2023\Day02.txt" />

@@ -104,7 +104,7 @@ namespace AdventofCode.AoC_2023
 
         private void Rec(SparseBuffer<char> map, Dictionary<Coord, HashSet<Coord>> memory, Coord beam, Coord beamdir)
         {
-            if (beam.Row < map.Top || beam.Row > map.Bottom || beam.Col < map.Left || beam.Col > map.Right)
+            if (!map.InsideBounds(beam))
             {
                 return;
             }
