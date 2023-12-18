@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Accord.Collections;
 using AdventofCode.Utils;
+using NUnit.Framework;
 
 namespace AdventofCode
 {
@@ -147,6 +149,57 @@ namespace AdventofCode
             }
 
             yield return count;
+        }
+
+        public static long CalcPolySize(this List<Coord> corners)
+        {
+            var sum = 0L;
+            // A = 0.5 * |(x1*y2 - x2*y1) + (x2*y3 - x3*y2) + ... + (xn*y1 - x1*yn)| 
+            for (var i = 0; i < corners.Count; i++)
+            {
+                var p1 = corners[i];
+                var p2 = corners[(i + 1) % corners.Count];
+                var det = CalcDet(p1, p2);
+                sum += det;
+            }
+
+            return Math.Abs(sum) / 2;
+        }
+
+        public static long CalcManhattanSize(this List<Coord> corners, bool excludePerimeter = false)
+        {
+            // for Manhattan maps, each perimeter square will give a half square extra
+            // inner corners will give a negative quarter square and outer corners will give a positive quarter square
+            // there are four more outer corners, so the sum of all corners will be 4*1/4 square = 1 square
+
+            var sum = 0L;
+            var perimeter = 0L;
+            // A = 0.5 * |(x1*y2 - x2*y1) + (x2*y3 - x3*y2) + ... + (xn*y1 - x1*yn)| 
+            for (var i = 0; i < corners.Count; i++)
+            {
+                var p1 = corners[i];
+                var p2 = corners[(i + 1) % corners.Count];
+                var det = CalcDet(p1, p2);
+                perimeter += p1.Dist(p2);
+                Assert.That(p1.X == p2.X || p1.Y == p2.Y);
+                sum += det;
+            }
+
+            var area = Math.Abs(sum) / 2 + perimeter/2 + 1;
+            if (excludePerimeter)
+            {
+                area -= perimeter;
+            }
+
+            return area;
+        }
+
+
+
+        private static long CalcDet(Coord p1, Coord p2)
+        {
+            var det = (long)p1.X * (long)p2.Y - (long)p2.X * (long)p1.Y;
+            return det;
         }
     }
 

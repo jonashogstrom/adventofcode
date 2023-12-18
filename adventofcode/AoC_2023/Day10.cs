@@ -106,34 +106,40 @@ namespace AdventofCode.AoC_2023
                 newMap[x] = trans[map[x]];
             }
 
-            var inside = 0;
+            // replaced code by computing the manhattan size of the loop and removing the perimeter
 
-            var coords = map.AllKeysInMap.ToList();
-            foreach (var c in coords)
-            {
-                if (newMap[c] == '.')
-                {
-                    var edgeCounter = 0;
-                    var p = c;
+            // determine if a square is inside by counting how many times the loop is intersected when moving west from the cell
 
-                    while (p.X >= 0)
-                    {
-                        if (visited.Contains(p) && g.HasEdge(p, p.Move(Coord.S)))
-                            edgeCounter++;
-                        p = p.Move(Coord.W);
-                    }
+            // var inside = 0;
+            //
+            // var coords = map.AllKeysInMap.ToList();
+            // foreach (var c in coords)
+            // {
+            //     if (newMap[c] == '.')
+            //     {
+            //         var edgeCounter = 0;
+            //         var p = c;
+            //
+            //         while (p.X >= 0)
+            //         {
+            //             if (visited.Contains(p) && g.HasEdge(p, p.Move(Coord.S)))
+            //                 edgeCounter++;
+            //             p = p.Move(Coord.W);
+            //         }
+            //
+            //         if (edgeCounter % 2 == 1)
+            //         {
+            //             newMap[c] = '*';
+            //             inside++;
+            //         }
+            //         else
+            //             newMap[c] = ' ';
+            //     }
+            // }
+            //
+            // part2 = inside;
 
-                    if (edgeCounter % 2 == 1)
-                    {
-                        newMap[c] = '*';
-                        inside++;
-                    }
-                    else
-                        newMap[c] = ' ';
-                }
-            }
-
-            part2 = inside;
+            part2 = path.CalcManhattanSize(true);
             Log(newMap.ToString(c => c.ToString()), -1);
 
             LogAndReset("*2", sw);
