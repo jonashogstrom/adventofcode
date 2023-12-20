@@ -179,10 +179,9 @@ namespace AdventofCode
             {
                 var p1 = corners[i];
                 var p2 = corners[(i + 1) % corners.Count];
-                var det = CalcDet(p1, p2);
-                perimeter += p1.Dist(p2);
                 Assert.That(p1.X == p2.X || p1.Y == p2.Y);
-                sum += det;
+                perimeter += p1.Dist(p2);
+                sum += (long)p1.X * p2.Y - (long)p2.X * p1.Y;
             }
 
             var area = Math.Abs(sum) / 2 + perimeter/2 + 1;
@@ -190,16 +189,12 @@ namespace AdventofCode
             {
                 area -= perimeter;
             }
-
             return area;
         }
 
-
-
         private static long CalcDet(Coord p1, Coord p2)
         {
-            var det = (long)p1.X * (long)p2.Y - (long)p2.X * (long)p1.Y;
-            return det;
+            return (long)p1.X * p2.Y - (long)p2.X * p1.Y;
         }
     }
 

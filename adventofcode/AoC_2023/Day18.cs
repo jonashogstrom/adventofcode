@@ -2,11 +2,7 @@
 using System.Diagnostics;
 using NUnit.Framework;
 using System.Collections.Generic;
-using AdventofCode.Utils;
 using System.Linq;
-using System.Runtime.InteropServices;
-using Windows.System.Update;
-using Windows.UI;
 
 
 namespace AdventofCode.AoC_2023
@@ -21,6 +17,7 @@ namespace AdventofCode.AoC_2023
         public bool Debug { get; set; }
 
         [Test]
+        [Repeat(5)]
         [TestCase(62, 952408144115, "Day18_test.txt")]
         [TestCase(50746, 70086216556038, "Day18.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
@@ -47,13 +44,15 @@ namespace AdventofCode.AoC_2023
                 var dir = Coord.trans2Coord[parts[0][0]];
                 corners.Add(corners.Last().Move(dir, len));
 
-                var len2 = Convert.ToInt32("0x" + parts[2].Substring(0, 5), 16);
-                var dir2 = Coord.E.RotateCWDegrees(90 * int.Parse(parts[2].Substring(5)));
+                var len2 = Convert.ToInt32("0x" + parts[2][..5], 16);
+                var dir2 = Coord.E.RotateCWDegrees(90 * int.Parse(parts[2][5..]));
                 corners2.Add(corners2.Last().Move(dir2, len2));
             }
+
             LogAndReset("Parse", sw);
             var part1 = corners.CalcManhattanSize();
             LogAndReset("*1", sw);
+
             part2 = corners2.CalcManhattanSize();
             LogAndReset("*2", sw);
 
