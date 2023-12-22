@@ -99,11 +99,18 @@ namespace AdventofCode
             }
         }
 
-        public static bool FindCycle<T>(this ICollection<T> items, out int cycle, int minCycleLen = 2, int maxCycleLen = Int32.MaxValue)
+        public static bool FindCycle<T>(this ICollection<T> items, out int cycle, int minCycleLen = 2,
+            int maxCycleLen = Int32.MaxValue)
+            where T : IEquatable<T>
+        {
+            return FindCycle(items, out cycle, out var first, minCycleLen, maxCycleLen);
+        }
+
+        public static bool FindCycle<T>(this ICollection<T> items, out int cycle, out int first, int minCycleLen = 2, int maxCycleLen = Int32.MaxValue)
             where T : IEquatable<T>
         {
             var max = Math.Min(items.Count/2, maxCycleLen);
-            for (var len = minCycleLen; len < max; len++)
+            for (var len = minCycleLen; len <= max; len++)
             {
                 var ok = true;
                 for (var j = 0; j < len; j++)
@@ -115,11 +122,13 @@ namespace AdventofCode
                 if (ok)
                 {
                     cycle = len;
+                    first = items.Count - cycle * 2;
                     return true;
                 }
             }
 
             cycle = -1;
+            first = -1;
             return false;
         }
 
