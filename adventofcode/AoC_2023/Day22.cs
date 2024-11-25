@@ -2,13 +2,7 @@
 using System.Diagnostics;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.Data.Common;
-using AdventofCode.Utils;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
-using Windows.Security.Cryptography.Core;
-using Accord;
-using WinRT.Interop;
 
 
 namespace AdventofCode.AoC_2023

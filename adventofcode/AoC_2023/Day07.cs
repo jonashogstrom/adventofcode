@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Windows.Devices.PointOfService;
 using Accord;
 using AdventofCode.Utils;
 using NUnit.Framework;

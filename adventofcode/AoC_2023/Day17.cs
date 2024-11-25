@@ -4,10 +4,6 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using AdventofCode.Utils;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using ABI.Windows.UI.Composition.Diagnostics;
-using Accord;
-using AdventofCode.AoC_2019;
 
 
 namespace AdventofCode.AoC_2023

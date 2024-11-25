@@ -4,8 +4,6 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using AdventofCode.Utils;
 using System.Linq;
-using Windows.Devices.PointOfService;
-using ABI.Windows.UI.ApplicationSettings;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
 

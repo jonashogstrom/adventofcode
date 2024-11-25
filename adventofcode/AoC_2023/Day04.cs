@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Windows.System.Update;
-using ABI.Windows.Devices.SmartCards;
 using AdventofCode.Utils;
 using NUnit.Framework;
 

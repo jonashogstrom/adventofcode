@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
-using ABI.Windows.Media.AppRecording;
-using Accord;
 using AdventofCode.Utils;
 using NUnit.Framework;
 
 namespace AdventofCode.AoC_2023
 {
-    using static AdventofCode.AoC_2018.Day20;
     // to use string-types, change baseclass to TestBaseClass2 and remove a bunch of ? in the methods below
     using Part1Type = Int64;
     using Part2Type = Int64;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Windows.Media.Casting;
 using AdventofCode.Utils;
 using NUnit.Framework;
 

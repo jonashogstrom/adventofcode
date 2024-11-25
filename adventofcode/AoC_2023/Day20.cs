@@ -4,8 +4,6 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using AdventofCode.Utils;
 using System.Linq;
-using Windows.Media.MediaProperties;
-using Windows.Networking.Sockets;
 using Accord;
 
 

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using Windows.Perception;
 
 namespace AdventofCode.Utils;
 
