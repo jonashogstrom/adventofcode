@@ -99,7 +99,7 @@ namespace AdventofCode.AoC_2019
 
         private IEnumerable<IEnumerable<int>> Permutations(IEnumerable<int> phases)
         {
-            Assert.AreEqual(phases.Count(), phases.Distinct().Count());
+            Assert.That(phases.Count(), Is.EqualTo(phases.Distinct().Count()));
             foreach (var i in phases)
             {
                 var rest = Permutations(phases.Where(x => x != i).ToArray()).ToArray();

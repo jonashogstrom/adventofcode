@@ -33,7 +33,7 @@ namespace AdventofCode.AoC_2022
         {
             var packet1 = ParsePacketList(p1, 0);
             var packet2 = ParsePacketList(p2, 0);
-            Assert.AreEqual(ComparePackets2(packet1, packet2), exp);
+            Assert.That(ComparePackets2(packet1, packet2), Is.EqualTo(exp));
         }
         protected override (Part1Type? part1, Part2Type? part2) DoComputeWithTimer(string[] source)
         {
@@ -140,7 +140,7 @@ namespace AdventofCode.AoC_2022
 
         private Packet ParsePacketList(string packetString, int pos, bool isDividerPackage = false)
         {
-            Assert.AreEqual(packetString[pos], '[');
+            Assert.That(packetString[pos], Is.EqualTo('['));
             pos++;
             var res = new Packet(isDividerPackage);
             while (true)
