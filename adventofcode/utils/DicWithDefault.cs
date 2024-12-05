@@ -10,15 +10,26 @@ namespace AdventofCode.Utils
         {
             _def = def;
         }
+        
+        public DicWithDefault(Func<TValue> factory)
+        {
+            _factory = factory;
+        }
 
         private readonly Dictionary<TKey, TValue> _dic = new Dictionary<TKey, TValue>();
         private readonly TValue _def;
+        private readonly Func<TValue> _factory;
         public IEnumerable<TKey> Keys => _dic.Keys;
 
         public TValue Get(TKey key)
         {
             if (_dic.TryGetValue(key, out var res))
                 return res;
+            if (_factory != null)
+            {
+                _dic[key] = _factory();
+                return _dic[key];
+            }
             return _def;
         }
 

@@ -7,7 +7,7 @@ namespace AdventofCode.Utils
     public static class StringExtensions
     {
         /// <summary>
-        /// Splits a list of strings into groups separated by empty strings
+        /// Splits a list of strings into groups separated by empty lines
         /// </summary>
         /// <param name="strings"></param>
         /// <returns></returns>
@@ -32,8 +32,7 @@ namespace AdventofCode.Utils
 
         public static IEnumerable<int> AsInt(this IEnumerable<string> strings)
         {
-            foreach (var s in strings)
-                yield return int.Parse(s);
+            return strings.Select(int.Parse);
         }
 
         public static SparseBuffer<char> ToSparseBuffer(this ICollection<string> input, char def = ' ')
@@ -45,10 +44,10 @@ namespace AdventofCode.Utils
         {
             var floor = new SparseBuffer<T>(def);
 
-            for (int row = 0; row < input.Count; row++)
+            for (var row = 0; row < input.Count; row++)
             {
                 var r = input.ElementAt(row);
-                for (int col = 0; col < r.Length; col++)
+                for (var col = 0; col < r.Length; col++)
                 {
                     var c = Coord.FromXY(col, row);
                     floor[c] = f(r[col]);
