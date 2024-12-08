@@ -496,7 +496,7 @@
     <EmbeddedResource Include="AoC_2024\Day05.txt" />
     <EmbeddedResource Include="AoC_2024\Day05_test.txt" />
     <EmbeddedResource Include="AoC_2024\Day06.txt" />
-    <EmbeddedResource Include="AoC_2024\Day06_jay1.txt" />
+    <EmbeddedResource Include="AoC_2024\Day06_test_jay1.txt" />
     <EmbeddedResource Include="AoC_2024\Day06_test.txt" />
     <EmbeddedResource Include="AoC_2024\Day07.txt" />
     <EmbeddedResource Include="AoC_2024\Day07_test.txt" />

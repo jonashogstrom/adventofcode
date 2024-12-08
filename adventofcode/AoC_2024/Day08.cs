@@ -35,10 +35,10 @@ namespace AdventofCode.AoC_2024
             var sw = Stopwatch.StartNew();
 
             var map = source.ToSparseBuffer(' ');
+            var groups = map.Keys.GroupBy(k => map[k]).ToList();
 
             LogAndReset("Parse", sw);
 
-            var groups = map.Keys.GroupBy(k => map[k]).ToList();
             var antinodes = new HashSet<Coord>();
             foreach (var g in groups)
             {

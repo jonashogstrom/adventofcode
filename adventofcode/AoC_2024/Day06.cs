@@ -20,8 +20,8 @@ namespace AdventofCode.AoC_2024
 
         [Test]
         [TestCase(41, 6, "Day06_test.txt")]
-        [TestCase(5086, null, "Day06.txt")]
-        [TestCase(4789, 1304, "Day06_jay1.txt")]
+        [TestCase(5086, 1770, "Day06.txt")]
+        [TestCase(4789, 1304, "Day06_test_jay1.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -39,7 +39,7 @@ namespace AdventofCode.AoC_2024
             var map = source.ToSparseBuffer('.');
             var start = map.Keys.Single(k => map[k] != '#');
             var startDir = Coord.CharToDir(map[start]);
-            
+
             var dir = startDir;
             var pos = start;
             LogAndReset("Parse", sw);
@@ -49,25 +49,22 @@ namespace AdventofCode.AoC_2024
                 path.Add(pos);
                 if (map[pos.Move(dir)] == '#')
                     dir = dir.RotateCW90();
-//                map[pos] = Coord.trans2Arrow[dir];
+                map[pos] = Coord.trans2Arrow[dir];
                 pos = pos.Move(dir);
             }
 
-            part1 = path.Count(); 
+            part1 = path.Count();
 
             LogAndReset("*1", sw);
-            
+
+            map = source.ToSparseBuffer('.');
             var mapCounter = 0;
             var obstacles = new List<Coord>();
             var testable = path.Where(k => !k.Equals(start)).ToArray();
             foreach (var obstacle in testable)
             {
-//                map = source.ToSparseBuffer('.');
                 mapCounter++;
                 map[obstacle] = 'O';
-                // Log(()=>$"=== Attempt {mapCounter} ===");
-                // Log(()=>map.ToString());
-                //
                 var pathWithDir = new HashSet<(Coord, Coord)>();
                 dir = startDir;
                 pos = start;
@@ -77,18 +74,19 @@ namespace AdventofCode.AoC_2024
                     {
                         // cycle found
                         part2++;
-                        // Log(()=>$"=== Solution {part2} ===");
-                        // Log(()=>map.ToString());
                         obstacles.Add(obstacle);
                         break;
                     }
 
                     pathWithDir.Add((pos, dir));
-                    
-                    if (map[pos.Move(dir)] == '#' || map[pos.Move(dir)] == 'O')
+                    var next = pos.Move(dir);
+                    while (map[next] == '#' || map[next] == 'O')
+                    {
                         dir = dir.RotateCW90();
-//                    map[pos] = Coord.trans2Arrow[dir];
-                    pos = pos.Move(dir);
+                        next = pos.Move(dir);
+                    }
+
+                    pos = next;
                 }
 
                 map[obstacle] = '.';
