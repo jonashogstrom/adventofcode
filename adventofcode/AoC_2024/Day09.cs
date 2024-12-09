@@ -13,8 +13,6 @@ namespace AdventofCode.AoC_2024
     using Part1Type = Int64;
     using Part2Type = Int64;
 
-    // 6234514521086 is too low
-    // 6237075041489
     [TestFixture]
     class Day09 : TestBaseClass<Part1Type, Part2Type>
     {
@@ -22,7 +20,7 @@ namespace AdventofCode.AoC_2024
 
         [Test]
         [TestCase(1928, 2858, "Day09_test.txt")]
-        [TestCase(6216544403458, null, "Day09.txt")]
+        [TestCase(6216544403458, 6237075041489, "Day09.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -41,6 +39,7 @@ namespace AdventofCode.AoC_2024
             var state = 1;
             var file = 0;
 
+            LogAndReset("Parse", sw);
             foreach (var d in source.First().Select(c => int.Parse(c.ToString())))
             {
                 for (var i = 0; i < d; i++)
@@ -63,24 +62,9 @@ namespace AdventofCode.AoC_2024
 
             for (var i = 0; i < disk.Count; i++)
                 part1 += disk[i].HasValue ? disk[i].Value * i : 0;
-
-            LogAndReset("Parse", sw);
-
-            // solve part 1 here
-
+            
             LogAndReset("*1", sw);
 
-
-            /*
-00...111...2...333.44.5555.6666.777.888899
-0099.111...2...333.44.5555.6666.777.8888..
-0099.1117772...333.44.5555.6666.....8888..
-0099.111777244.333....5555.6666.....8888..
-00992111777.44.333....5555.6666.....8888..
-
-0099211177744333555566668888
-             */
-            // 2333133121414131402
             var str = source.First().Select(c => int.Parse(c.ToString())).ToList();
             var disk2 = new LinkedList<(int len, int val)>();
             for (int i = 0; i < str.Count; i++)
@@ -89,23 +73,16 @@ namespace AdventofCode.AoC_2024
                 disk2.AddLast(valueTuple);
             }
 
-            var nodeCount = disk2.Count;
-
             var f = disk2.Last;
-            var step = 0;
             while (f.Previous != null)
             {
-                if (step == 4518)
-                {
-                    Debugger.Break();
-                }
-
                 var hole = disk2.First.Next;
                 while (hole != null && hole.Value.len < f.Value.len && hole.Previous != f && hole.Next != null)
                     hole = hole.Next.Next;
 
                 if (hole != null && hole.Next == f)
                 {
+                    // special handling when the file moves to the hole immediately to the left
                     var holeLength = hole.Value.len;
                     hole.Value = hole.Value with { len = 0 };
                     if (f.Next != null)
@@ -115,7 +92,7 @@ namespace AdventofCode.AoC_2024
                 }
                 else if (hole != null && hole.Previous != f && hole.Next != null)
                 {
-                    Log($"Found a hole for file {f.Value.val} ({f.Value.len} long and hole is {hole.Value.len})");
+                    Log(()=>$"Found a hole for file {f.Value.val} ({f.Value.len} long and hole is {hole.Value.len})");
                     var tempf = f.Previous.Previous;
                     disk2.Remove(f);
                     var newHole = new LinkedListNode<(int, int)>((0, -1));
@@ -137,47 +114,25 @@ namespace AdventofCode.AoC_2024
                 }
                 else
                     f = f.Previous.Previous;
-
-                if (disk2.Count != nodeCount)
-                    throw new Exception();
-                if (disk2.Last().val == -1)
-                    throw new Exception();
-                step++;
             }
 
             state = 1;
             var pos = 0;
             f = disk2.First;
-            var str2 = new StringBuilder();
-            var nodeIndex = 0;
             while (f != null)
             {
-                if (state == 1 && f.Value.val == -1)
-                    throw new Exception();
-                if (state == 0 && f.Value.val != -1)
-                    throw new Exception();
-
                 for (int i = 0; i < f.Value.len; i++)
                 {
                     if (state == 1)
-                    {
                         part2 += f.Value.val * pos;
-                        str2.Append(f.Value.val.ToString());
-                    }
-                    else
-                    {
-                        str2.Append('.');
-                    }
 
                     pos++;
                 }
 
                 state = 1 - state;
                 f = f.Next;
-                nodeIndex++;
             }
 
-            Log(str2.ToString());
             LogAndReset("*2", sw);
 
             return (part1, part2);
