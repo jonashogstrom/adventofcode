@@ -57,6 +57,28 @@ namespace AdventofCode.Utils
             return floor;
         }
 
+        public static SparseBufferStr<char> ToSparseBufferStr(this ICollection<string> input, char def = ' ')
+        {
+            return ToSparseBufferStr(input, def, c => c);
+        }
+
+        public static SparseBufferStr<T> ToSparseBufferStr<T>(this ICollection<string> input, T def, Func<char, T> f)
+        {
+            var floor = new SparseBufferStr<T>(def);
+
+            for (var row = 0; row < input.Count; row++)
+            {
+                var r = input.ElementAt(row);
+                for (var col = 0; col < r.Length; col++)
+                {
+                    var c = CoordStr.FromXY(col, row);
+                    floor[c] = f(r[col]);
+                }
+            }
+
+            return floor;
+        }
+
         /// <summary>
         /// Parses a binary number into a long
         /// </summary>

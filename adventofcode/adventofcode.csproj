@@ -503,7 +503,8 @@
     <EmbeddedResource Include="AoC_2024\Day07_test2.txt" />
     <EmbeddedResource Include="AoC_2024\Day08.txt" />
     <EmbeddedResource Include="AoC_2024\Day08_test.txt" />
+    <EmbeddedResource Include="AoC_2024\Day09.txt" />
     <EmbeddedResource Include="AoC_2024\DayTemplate.txt" />
-    <EmbeddedResource Include="AoC_2024\DayTemplate_test.txt" />
+    <EmbeddedResource Include="AoC_2024\Day09_test.txt" />
   </ItemGroup>
 </Project>

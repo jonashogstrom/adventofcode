@@ -36,20 +36,20 @@ namespace AdventofCode.AoC_2024
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
 
-            var map = source.ToSparseBuffer('.');
+            var map = source.ToSparseBufferStr('.');
             var start = map.Keys.Single(k => map[k] != '#');
-            var startDir = Coord.CharToDir(map[start]);
+            var startDir = CoordStr.CharToDir(map[start]);
 
             var dir = startDir;
             var pos = start;
             LogAndReset("Parse", sw);
-            var path = new HashSet<Coord>();
+            var path = new HashSet<CoordStr>();
             while (map.InsideBounds(pos))
             {
                 path.Add(pos);
                 if (map[pos.Move(dir)] == '#')
                     dir = dir.RotateCW90();
-                map[pos] = Coord.trans2Arrow[dir];
+                map[pos] = CoordStr.trans2Arrow[dir];
                 pos = pos.Move(dir);
             }
 
@@ -57,15 +57,15 @@ namespace AdventofCode.AoC_2024
 
             LogAndReset("*1", sw);
 
-            map = source.ToSparseBuffer('.');
+            map = source.ToSparseBufferStr('.');
             var mapCounter = 0;
-            var obstacles = new List<Coord>();
+            var obstacles = new List<CoordStr>();
             var testable = path.Where(k => !k.Equals(start)).ToArray();
             foreach (var obstacle in testable)
             {
                 mapCounter++;
                 map[obstacle] = 'O';
-                var pathWithDir = new HashSet<(Coord, Coord)>();
+                var pathWithDir = new HashSet<(CoordStr, CoordStr)>();
                 dir = startDir;
                 pos = start;
                 while (map.InsideBounds(pos))
