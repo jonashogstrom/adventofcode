@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using AdventofCode.Utils;
 using System.Linq;
+using System.Text;
 
 
 namespace AdventofCode.AoC_2024
@@ -13,6 +14,7 @@ namespace AdventofCode.AoC_2024
     using Part2Type = Int64;
 
     // 6234514521086 is too low
+    // 6237075041489
     [TestFixture]
     class Day09 : TestBaseClass<Part1Type, Part2Type>
     {
@@ -83,26 +85,40 @@ namespace AdventofCode.AoC_2024
             var disk2 = new LinkedList<(int len, int val)>();
             for (int i = 0; i < str.Count; i++)
             {
-                var valueTuple = (str[i], i % 2 == 0 ? i / 2 : 0);
-                var newNode = new LinkedListNode<(int len, int val)>(valueTuple);
+                var valueTuple = (str[i], i % 2 == 0 ? i / 2 : -1);
                 disk2.AddLast(valueTuple);
             }
 
             var nodeCount = disk2.Count;
 
             var f = disk2.Last;
+            var step = 0;
             while (f.Previous != null)
             {
+                if (step == 4518)
+                {
+                    Debugger.Break();
+                }
+
                 var hole = disk2.First.Next;
                 while (hole != null && hole.Value.len < f.Value.len && hole.Previous != f && hole.Next != null)
                     hole = hole.Next.Next;
 
-                if (hole != null && hole.Previous != f && hole.Next != null)
+                if (hole != null && hole.Next == f)
                 {
-                    Log($"Found a hole for file {f.Value.val} ({f.Value.len} long and hole is {hole.Value.len})", LogLevel);
+                    var holeLength = hole.Value.len;
+                    hole.Value = hole.Value with { len = 0 };
+                    if (f.Next != null)
+                    {
+                        f.Next.Value = f.Next.Value with { len = f.Next.Value.len + holeLength - f.Value.len };
+                    }
+                }
+                else if (hole != null && hole.Previous != f && hole.Next != null)
+                {
+                    Log($"Found a hole for file {f.Value.val} ({f.Value.len} long and hole is {hole.Value.len})");
                     var tempf = f.Previous.Previous;
                     disk2.Remove(f);
-                    var newHole = new LinkedListNode<(int, int)>((0, 0));
+                    var newHole = new LinkedListNode<(int, int)>((0, -1));
                     disk2.AddAfter(hole.Previous, newHole);
                     disk2.AddAfter(newHole, f);
                     hole.Value = hole.Value with { len = hole.Value.len - f.Value.len };
@@ -124,33 +140,44 @@ namespace AdventofCode.AoC_2024
 
                 if (disk2.Count != nodeCount)
                     throw new Exception();
+                if (disk2.Last().val == -1)
+                    throw new Exception();
+                step++;
             }
 
             state = 1;
             var pos = 0;
             f = disk2.First;
-            var str2 = "";
+            var str2 = new StringBuilder();
+            var nodeIndex = 0;
             while (f != null)
             {
+                if (state == 1 && f.Value.val == -1)
+                    throw new Exception();
+                if (state == 0 && f.Value.val != -1)
+                    throw new Exception();
+
                 for (int i = 0; i < f.Value.len; i++)
                 {
                     if (state == 1)
                     {
                         part2 += f.Value.val * pos;
-                        str2 += f.Value.val.ToString();
+                        str2.Append(f.Value.val.ToString());
                     }
                     else
                     {
-                        str2 += '.';
+                        str2.Append('.');
                     }
+
                     pos++;
                 }
 
                 state = 1 - state;
                 f = f.Next;
+                nodeIndex++;
             }
 
-            Log(str2);
+            Log(str2.ToString());
             LogAndReset("*2", sw);
 
             return (part1, part2);
