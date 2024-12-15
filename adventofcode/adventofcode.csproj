@@ -139,6 +139,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NUnit" Version="4.2.2" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AoC_2018\day1.txt" />
@@ -514,6 +515,19 @@
     <EmbeddedResource Include="AoC_2024\Day11.txt" />
     <EmbeddedResource Include="AoC_2024\Day11_test.txt" />
     <EmbeddedResource Include="AoC_2024\Day11_test0.txt" />
+    <EmbeddedResource Include="AoC_2024\Day12.txt" />
+    <EmbeddedResource Include="AoC_2024\Day12_test.txt" />
+    <EmbeddedResource Include="AoC_2024\Day12_test2.txt" />
+    <EmbeddedResource Include="AoC_2024\Day12_test3.txt" />
+    <EmbeddedResource Include="AoC_2024\Day12_test4.txt" />
+    <EmbeddedResource Include="AoC_2024\Day12_test5.txt" />
+    <EmbeddedResource Include="AoC_2024\Day13.txt" />
+    <EmbeddedResource Include="AoC_2024\Day13_test.txt" />
+    <EmbeddedResource Include="AoC_2024\Day14.txt" />
+    <EmbeddedResource Include="AoC_2024\Day14_test.txt" />
+    <EmbeddedResource Include="AoC_2024\Day15.txt" />
+    <EmbeddedResource Include="AoC_2024\Day15_test1.txt" />
+    <EmbeddedResource Include="AoC_2024\Day15_test2.txt" />
     <EmbeddedResource Include="AoC_2024\DayTemplate.txt" />
     <EmbeddedResource Include="AoC_2024\Day09_test.txt" />
     <EmbeddedResource Include="AoC_2024\DayTemplate_test.txt" />
