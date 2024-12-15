@@ -88,6 +88,12 @@ namespace AdventofCode
             }
         }
 
+        public static void ForEach<T>(this IEnumerable<T> s, Action<T> action)
+        {
+            foreach(var x in s)
+                action(x);
+        }
+
         public static IEnumerable<(T, T)> AsCombinations<T>(this IEnumerable<T> s)
         {
             var count = 0;

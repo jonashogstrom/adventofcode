@@ -22,6 +22,7 @@ namespace AdventofCode
 
         public static readonly CoordStr[] Directions4 = { N, E, S, W };
         public static readonly CoordStr[] Directions8 = { N, NE, E, SE, S, SW, W, NW };
+
         public static readonly HexDirection[] HexNeighbors =
         {
             HexDirection.sw, HexDirection.w, HexDirection.nw,
@@ -30,24 +31,25 @@ namespace AdventofCode
 
         public static readonly Dictionary<CoordStr, char> trans2NESW = new Dictionary<CoordStr, char>()
         {
-            {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'},
+            { N, 'N' }, { S, 'S' }, { E, 'E' }, { W, 'W' },
         };
 
         public static readonly Dictionary<CoordStr, string> trans28Dir = new Dictionary<CoordStr, string>()
         {
-            {N, "N"}, {S, "S"}, {E, "E"}, {W, "W"},
-            {NE, "NE"}, {SE, "SE"}, {NW, "NW"}, {SW, "SW"},
+            { N, "N" }, { S, "S" }, { E, "E" }, { W, "W" },
+            { NE, "NE" }, { SE, "SE" }, { NW, "NW" }, { SW, "SW" },
         };
 
         public static readonly Dictionary<CoordStr, char> trans2Arrow = new Dictionary<CoordStr, char>()
         {
-            {N, '^'}, {S, 'v'}, {E, '>'}, {W, '<'},
+            { N, '^' }, { S, 'v' }, { E, '>' }, { W, '<' },
         };
+
         public static readonly Dictionary<char, CoordStr> trans2Coord = new Dictionary<char, CoordStr>()
         {
-            {'N', N}, {'S', S}, {'E', E}, {'W', W},
-            {'^', N}, {'v', S}, {'>', E}, {'<', W},
-            {'U', N}, {'D', S}, {'R', E}, {'L', W},
+            { 'N', N }, { 'S', S }, { 'E', E }, { 'W', W },
+            { '^', N }, { 'v', S }, { '>', E }, { '<', W },
+            { 'U', N }, { 'D', S }, { 'R', E }, { 'L', W },
         };
 
         public int Row { get; set; }
@@ -78,6 +80,7 @@ namespace AdventofCode
         {
             return v1.CompareTo(v2);
         }
+
         /// <summary>
         /// Return a list of coordinates from current pos to target pos (c2) as long as the path is either NSWE or a 45 degree angle
         /// </summary>
@@ -94,7 +97,8 @@ namespace AdventofCode
             var rDist = Math.Abs(Row - c2.Row);
             var cDist = Math.Abs(Col - c2.Col);
             if (rDist != 0 && cDist != 0 && rDist != cDist)
-                throw new Exception($"Path is not a multiple of 45 degrees! {this} => {c2} (rDist: {rDist}, cDist: {cDist})");
+                throw new Exception(
+                    $"Path is not a multiple of 45 degrees! {this} => {c2} (rDist: {rDist}, cDist: {cDist})");
             var steps = Math.Max(rDist, cDist) + 1;
             for (int s = 0; s < steps; s++)
             {
@@ -147,6 +151,7 @@ namespace AdventofCode
         {
             return trans2Coord[c];
         }
+
         public static bool TryCharToDir(char c, out CoordStr dir)
         {
             return trans2Coord.TryGetValue(c, out dir);
@@ -161,6 +166,7 @@ namespace AdventofCode
         {
             return new CoordStr(-Col, Row);
         }
+
         public CoordStr RotateCCWDegrees(int degrees)
         {
             if (degrees % 90 != 0)
@@ -203,7 +209,16 @@ namespace AdventofCode
             return new CoordStr(Row + coord.Row * count, Col + coord.Col * count);
         }
 
-      
+        public CoordStr MoveX(int col)
+        {
+            return new CoordStr(Row, Col + col);
+        }
+
+        public CoordStr MoveY(int row)
+        {
+            return new CoordStr(Row + row, Col);
+        }
+
 
         public int Dist(CoordStr pos)
         {

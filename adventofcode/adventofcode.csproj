@@ -528,6 +528,7 @@
     <EmbeddedResource Include="AoC_2024\Day15.txt" />
     <EmbeddedResource Include="AoC_2024\Day15_test1.txt" />
     <EmbeddedResource Include="AoC_2024\Day15_test2.txt" />
+    <EmbeddedResource Include="AoC_2024\Day15_test3.txt" />
     <EmbeddedResource Include="AoC_2024\DayTemplate.txt" />
     <EmbeddedResource Include="AoC_2024\Day09_test.txt" />
     <EmbeddedResource Include="AoC_2024\DayTemplate_test.txt" />
