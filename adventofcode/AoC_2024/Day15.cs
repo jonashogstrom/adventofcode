@@ -4,11 +4,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using AdventofCode.Utils;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
-using Accord;
-using NUnit.Framework.Constraints;
-
 
 namespace AdventofCode.AoC_2024
 {
@@ -124,18 +120,13 @@ namespace AdventofCode.AoC_2024
                     {
                         robot = p;
                     }
-                        
                 }
-                
             }
 
             foreach (var b in blocks2)
-            {
                 part2 += b.Coord.Row*100+b.Coord.Col;
-            }
             
             LogAndReset("*2", sw);
-
             return (part1, part2);
         }
 
@@ -150,7 +141,6 @@ namespace AdventofCode.AoC_2024
                 _map = map;
                 _coord = coord;
                 _blockPositions = blockPositions;
-                
                 MyCoords().ForEach(c=>_blockPositions.Add(c, this));
             }
 
@@ -211,25 +201,6 @@ namespace AdventofCode.AoC_2024
 
                 return newCoords;
             }
-        }
-
-        private void DrawMap2(HashSet<CoordStr> blocks, HashSet<CoordStr> walls, CoordStr robot)
-        {
-            var map = new SparseBufferStr<char>('.');
-            foreach (var b in blocks)
-            {
-                map[b] = '[';
-                map[b.MoveX(1)] = ']';
-            }
-
-            foreach (var w in walls)
-            {
-                map[w] = '#';
-                map[w.MoveX(1)] = '#';
-            }
-
-            map[robot] = '@';
-            Log(map.ToString());
         }
     }
 }
