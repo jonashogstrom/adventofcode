@@ -5,9 +5,14 @@ namespace AdventofCode.Utils;
 
 public class AStar
 {
-    public (List<Coord> res, Dictionary<Coord, long> cost_so_far, Dictionary<Coord, Coord> came_from, List<Coord>, long, Dictionary<Coord, long>) FindPath(Coord start, Coord target, Graph graph)
+    public (
+        List<Coord> res, 
+        Dictionary<Coord, long> cost_so_far, 
+        Dictionary<Coord, Coord> came_from, 
+        List<Coord>, 
+        long, 
+        Dictionary<Coord, long>) FindPath(Coord start, Coord target, Graph graph)
     {
-
         var frontier = new PriorityQueue<Coord, long>();
         frontier.Enqueue(start, 0);
         var cameFrom = new Dictionary<Coord, Coord>();
