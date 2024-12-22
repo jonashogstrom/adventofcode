@@ -46,7 +46,6 @@ namespace AdventofCode.AoC_2024
                 part1 += temp;
             }
 
-
             LogAndReset("*1", sw);
 
             if (sequenceValues.Any())
