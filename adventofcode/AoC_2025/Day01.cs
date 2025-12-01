@@ -17,7 +17,7 @@ class Day01 : TestBaseClass<Part1Type, Part2Type>
 
     [Test]
     [TestCase(3, 6, "Day01_test.txt")]
-    [TestCase(1055, null, "Day01.txt")]
+    [TestCase(1055, 6386, "Day01.txt")]
     public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
     {
         LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -36,33 +36,30 @@ class Day01 : TestBaseClass<Part1Type, Part2Type>
 
         LogAndReset("Parse", sw);
 
-        int pos = 50;
+        var pos1 = 50;
+        var pos2 = 50;
         foreach (var l in source)
         {
-            int dir = l[0]=='R' ? +1 : -1;
-            var dist = int.Parse(l.Substring(1));
-            pos = (pos + dist * dir) % 100;
-            if (pos == 0)
+            // line parsing
+            var dir = l[0]=='R' ? +1 : -1;
+            var dist = int.Parse(l[1..]);
+
+            // solve part 1
+            pos1 = (pos1 + dist * dir) % 100;
+            if (pos1 == 0)
                 part1++;
+
+            // solve part 2
+            for (var i = 0; i < dist; i++)
+            {
+                pos2 = (pos2 + 1 * dir) % 100;
+                if (pos2 == 0)
+                    part2++;
+            }
         }
-        // solve part 1 here
 
         LogAndReset("*1", sw);
 
-        pos = 50;
-        foreach (var l in source)
-        {
-            int dir = l[0]=='R' ? +1 : -1;
-            var dist = int.Parse(l.Substring(1));
-            for (int i = 0; i < dist; i++)
-            {
-                pos = (pos + 1 * dir) % 100;
-                if (pos == 0)
-                    part2++;
-            }
-
-
-        }
 
         LogAndReset("*2", sw);
 
