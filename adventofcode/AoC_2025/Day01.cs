@@ -41,21 +41,37 @@ class Day01 : TestBaseClass<Part1Type, Part2Type>
         foreach (var l in source)
         {
             // line parsing
-            var dir = l[0]=='R' ? +1 : -1;
+            var dir = l[0] == 'R' ? +1 : -1;
             var dist = int.Parse(l[1..]);
 
+            var oldpos = pos1;
             // solve part 1
-            pos1 = (pos1 + dist * dir) % 100;
-            if (pos1 == 0)
+            pos1 = pos1 + dist * dir;
+            if (pos1 % 100 == 0)
                 part1++;
 
-            // solve part 2
-            for (var i = 0; i < dist; i++)
-            {
-                pos2 = (pos2 + 1 * dir) % 100;
-                if (pos2 == 0)
-                    part2++;
-            }
+            var oldpos2 = pos2;
+            // eliminate entire "laps", they will pass 0 exactly once each.
+            var laps = dist / 100;
+            part2 += laps;
+
+            dist -= laps * 100;
+            pos2 += dist * dir;
+
+            if (oldpos % 100 != 0) // if we start at 0 and make a non-whole lap, we won't end at 0
+                if (pos2 % 100 == 0 || // pos2 arrives at a 0 
+                    oldpos2 / 100 != pos2 / 100 || // old pos and pos2 are in different laps
+                    oldpos2 * pos2 < 0) // oldpos and pos2 has different signs (on different sides of the actual 0
+                part2++;
+
+            // naive solution part 2, with loops
+            // for (var i = 0; i < dist; i++)
+            // {
+            //     pos2 = (pos2 + 1 * dir) % 100;
+            //     if (pos2 == 0)
+            //         part2++;
+            // }
+            Console.WriteLine($"{l}: {oldpos} => {pos1} | {part2}");
         }
 
         LogAndReset("*1", sw);
