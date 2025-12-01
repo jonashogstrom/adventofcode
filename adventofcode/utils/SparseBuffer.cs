@@ -69,13 +69,11 @@ namespace AdventofCode
         public IEnumerable<Coord> BottomEdge => CoordsInRow(Bottom);
         public IEnumerable<Coord> CoordsInCol(int col)
         {
-            foreach (var r in AllRowIndices)
-                yield return new Coord(r, col);
+            return AllRowIndices.Select(r => new Coord(r, col));
         }
         public IEnumerable<Coord> CoordsInRow(int row)
         {
-            foreach (var c in AllColIndices)
-                yield return new Coord(row, c);
+            return AllColIndices.Select(c => new Coord(row, c));
         }
 
 
@@ -83,7 +81,7 @@ namespace AdventofCode
         {
             get
             {
-                for (int i = Left; i <= Right; i++)
+                for (var i = Left; i <= Right; i++)
                     yield return i;
             }
         }
@@ -112,13 +110,13 @@ namespace AdventofCode
             sb.AppendLine($"Top: {topLeft.Y} Bottom: {bottomRight.Y} Left: {topLeft.X} Right: {bottomRight.X}");
             sb.Append("      ");
             var padding = (cellWidth - 1) / 2;
-            for (int x = topLeft.X; x <= bottomRight.X; x++)
+            for (var x = topLeft.X; x <= bottomRight.X; x++)
             {
                 sb.Append((Math.Abs(x) % 10).ToString().PadLeft(1 + padding).PadRight(cellWidth));
             }
             sb.AppendLine();
             sb.AppendLine("     ╔" + new string('═', Width * cellWidth) + '╗');
-            for (int y = topLeft.Y; y <= bottomRight.Y; y++)
+            for (var y = topLeft.Y; y <= bottomRight.Y; y++)
             {
                 if (y < 0)
                     sb.Append($"{y:D3} ║");
@@ -126,7 +124,7 @@ namespace AdventofCode
                 {
                     sb.Append($"{y:D4} ║");
                 }
-                for (int x = topLeft.X; x <= bottomRight.X; x++)
+                for (var x = topLeft.X; x <= bottomRight.X; x++)
                 {
                     sb.Append(func(Get(x, y), Coord.FromXY(x, y)));
                 }
@@ -149,8 +147,8 @@ namespace AdventofCode
         {
             get
             {
-                for (int x = Left; x <= Right; x++)
-                    for (int y = Top; y <= Bottom; y++)
+                for (var x = Left; x <= Right; x++)
+                    for (var y = Top; y <= Bottom; y++)
                         yield return new Coord(y, x);
             }
         }
@@ -191,9 +189,9 @@ namespace AdventofCode
         {
             var floor = new SparseBuffer<T>(def);
 
-            for (int row = 0; row < input.Length; row++)
+            for (var row = 0; row < input.Length; row++)
             {
-                for (int col = 0; col < input[row].Length; col++)
+                for (var col = 0; col < input[row].Length; col++)
                 {
                     var c = Coord.FromXY(col, row);
                     floor[c] = input[row][col];

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using AdventofCode.Utils;
 using System.Linq;
 
-
 namespace AdventofCode.AoC_2024
 {
     // to use string-types, change baseclass to TestBaseClass2 and remove a bunch of ? in the methods below

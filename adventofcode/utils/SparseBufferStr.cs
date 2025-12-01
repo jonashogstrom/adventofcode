@@ -7,11 +7,11 @@ namespace AdventofCode
 {
     public class SparseBufferStr<T>
     {
-        private static CoordStr Origin = new CoordStr(0, 0);
+        private static CoordStr Origin = new(0, 0);
         private CoordStr topLeft = Origin;
         private CoordStr bottomRight = Origin;
         private readonly T _def;
-        private readonly Dictionary<CoordStr, T> _board = new Dictionary<CoordStr, T>();
+        private readonly Dictionary<CoordStr, T> _board = new();
         public int Top => topLeft.Y;
         public int Bottom => bottomRight.Y;
         public int Left => topLeft.X;

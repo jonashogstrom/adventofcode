@@ -20,26 +20,26 @@ namespace AdventofCode
         public static Coord SE = S.Move(E);
         public static Coord SW = S.Move(W);
 
-        public static readonly Coord[] Directions4 = { N, E, S, W };
-        public static readonly Coord[] Directions8 = { N, NE, E, SE, S, SW, W, NW };
+        public static readonly Coord[] Directions4 = [N, E, S, W];
+        public static readonly Coord[] Directions8 = [N, NE, E, SE, S, SW, W, NW];
         public static readonly HexDirection[] HexNeighbors =
         {
             HexDirection.sw, HexDirection.w, HexDirection.nw,
             HexDirection.ne, HexDirection.e, HexDirection.se,
         };
 
-        public static readonly Dictionary<Coord, char> trans2NESW = new Dictionary<Coord, char>()
+        public static readonly Dictionary<Coord, char> trans2NESW = new()
         {
             {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'},
         };
 
-        public static readonly Dictionary<Coord, string> trans28Dir = new Dictionary<Coord, string>()
+        public static readonly Dictionary<Coord, string> trans28Dir = new()
         {
             {N, "N"}, {S, "S"}, {E, "E"}, {W, "W"},
             {NE, "NE"}, {SE, "SE"}, {NW, "NW"}, {SW, "SW"},
         };
 
-        public static readonly Dictionary<Coord, char> trans2Arrow = new Dictionary<Coord, char>()
+        public static readonly Dictionary<Coord, char> trans2Arrow = new()
         {
             {N, '^'}, {S, 'v'}, {E, '>'}, {W, '<'},
         };
@@ -116,7 +116,7 @@ namespace AdventofCode
         /// <exception cref="Exception"></exception>
         public static Coord Parse(string s)
         {
-            var parts = s.Split(new[] { '(', ',', ' ', ';', ')' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = s.Split(['(', ',', ' ', ';', ')'], StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2)
                 throw new Exception("Invalid coord string: " + s);
             return new Coord(int.Parse(parts[1]), int.Parse(parts[0]));
@@ -188,14 +188,12 @@ namespace AdventofCode
 
         public IEnumerable<Coord> GenAdjacent4()
         {
-            foreach (var d in Directions4)
-                yield return Move(d);
+            return Directions4.Select(d => Move(d));
         }
 
         public IEnumerable<Coord> GenAdjacent8()
         {
-            foreach (var d in Directions8)
-                yield return Move(d);
+            return Directions8.Select(d => Move(d));
         }
 
         public Coord Move(Coord coord, int count = 1)
@@ -205,43 +203,35 @@ namespace AdventofCode
 
         public Coord HexMove(HexDirection hexDirection)
         {
-            if (hexDirection == HexDirection.e)
-                return Move(E);
-            if (hexDirection == HexDirection.w)
-                return Move(W);
+            switch (hexDirection)
+            {
+                case HexDirection.e:
+                    return Move(E);
+                case HexDirection.w:
+                    return Move(W);
+            }
 
             if (Y % 2 == 0)
             {
-                switch (hexDirection)
+                return hexDirection switch
                 {
-                    case HexDirection.nw:
-                        return Move(N);
-                    case HexDirection.ne:
-                        return Move(NE);
-                    case HexDirection.sw:
-                        return Move(S);
-                    case HexDirection.se:
-                        return Move(SE);
-                    default:
-                        throw new Exception();
-                }
-
+                    HexDirection.nw => Move(N),
+                    HexDirection.ne => Move(NE),
+                    HexDirection.sw => Move(S),
+                    HexDirection.se => Move(SE),
+                    _ => throw new Exception()
+                };
             }
             else
             {
-                switch (hexDirection)
+                return hexDirection switch
                 {
-                    case HexDirection.nw:
-                        return Move(NW);
-                    case HexDirection.ne:
-                        return Move(N);
-                    case HexDirection.sw:
-                        return Move(SW);
-                    case HexDirection.se:
-                        return Move(S);
-                    default:
-                        throw new Exception();
-                }
+                    HexDirection.nw => Move(NW),
+                    HexDirection.ne => Move(N),
+                    HexDirection.sw => Move(SW),
+                    HexDirection.se => Move(S),
+                    _ => throw new Exception()
+                };
             }
         }
 
@@ -281,7 +271,7 @@ namespace AdventofCode
 
         public Coord Subtract(Coord other)
         {
-            return Coord.FromXY(X - other.X, Y - other.Y);
+            return FromXY(X - other.X, Y - other.Y);
         }
     }
 

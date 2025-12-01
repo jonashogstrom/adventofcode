@@ -548,8 +548,19 @@
     <EmbeddedResource Include="AoC_2024\Day22.txt" />
     <EmbeddedResource Include="AoC_2024\Day22_test.txt" />
     <EmbeddedResource Include="AoC_2024\Day22_test2.txt" />
+    <EmbeddedResource Include="AoC_2024\Day23.txt" />
+    <EmbeddedResource Include="AoC_2024\Day24.txt" />
+    <EmbeddedResource Include="AoC_2024\Day24_test.txt" />
+    <EmbeddedResource Include="AoC_2024\Day24_test2.txt" />
+    <EmbeddedResource Include="AoC_2024\Day25.txt" />
+    <EmbeddedResource Include="AoC_2024\Day25_test.txt" />
     <EmbeddedResource Include="AoC_2024\DayTemplate.txt" />
     <EmbeddedResource Include="AoC_2024\Day09_test.txt" />
+    <EmbeddedResource Include="AoC_2024\Day23_test.txt" />
     <EmbeddedResource Include="AoC_2024\DayTemplate_test.txt" />
+    <EmbeddedResource Include="AoC_2025\Day01.txt" />
+    <EmbeddedResource Include="AoC_2025\Day01_test.txt" />
+    <EmbeddedResource Include="AoC_2025\DayTemplate.txt" />
+    <EmbeddedResource Include="AoC_2025\DayTemplate_test.txt" />
   </ItemGroup>
 </Project>
