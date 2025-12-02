@@ -17,7 +17,7 @@ namespace AdventofCode.AoC_2025
 
         [Test]
         [TestCase(1227775554, 4174379265L, "Day02_test.txt")]
-        [TestCase(44487518055, null, "Day02.txt")]
+        [TestCase(44487518055, 53481866137, "Day02.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -32,7 +32,7 @@ namespace AdventofCode.AoC_2025
             Part2Type part2 = 0;
             var sw = Stopwatch.StartNew();
 
-            var ranges = source[0].Split(',').Select(s => s.Split('-').Select(long.Parse).ToArray());
+            var ranges = source[0].Split(',').Select(s => s.Split('-').Select(long.Parse).ToArray()).ToArray();
 
             LogAndReset("Parse", sw);
             foreach (var range in ranges)
@@ -62,12 +62,20 @@ namespace AdventofCode.AoC_2025
                         if (s.Length % l == 0)
                         {
                             var times = s.Length / l;
-                            var sb = new StringBuilder();
-                            var part = s[..l];
-                            for (var i = 0; i < times; i++)
-                                sb.Append(part);
-                            var s2 = sb.ToString();
-                            if (s == s2)
+                            var containsOnlyRepeats = true;
+                            var p0 = s[..l];
+                            for (int x = 1; x < times; x++)
+                            {
+                                var start = l * x;
+                                var stop = start + l;
+
+                                if (p0 != s[start..stop])
+                                {
+                                    containsOnlyRepeats = false;
+                                    break;
+                                }
+                            }
+                            if (containsOnlyRepeats)
                             {
                                 invalid = true;
                                 break;
@@ -79,9 +87,6 @@ namespace AdventofCode.AoC_2025
                         part2 += p;
                         //Console.WriteLine(s+" is invalid");
                     }
-                                
-                                
-
                 }
             }
 
