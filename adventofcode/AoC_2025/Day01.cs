@@ -54,10 +54,10 @@ class Day01 : TestBaseClass<Part1Type, Part2Type>
             // eliminate entire "laps", they will pass 0 exactly once each.
             var laps = dist / 100;
             part2 += laps;
-
+            
             dist -= laps * 100;
             pos2 += dist * dir;
-
+            
             if (oldpos % 100 != 0) // if we start at 0 and make a non-whole lap, we won't end at 0
                 if (pos2 % 100 == 0 || // pos2 arrives at a 0 
                     oldpos2 / 100 != pos2 / 100 || // old pos and pos2 are in different laps
@@ -71,7 +71,7 @@ class Day01 : TestBaseClass<Part1Type, Part2Type>
             //     if (pos2 == 0)
             //         part2++;
             // }
-            Console.WriteLine($"{l}: {oldpos} => {pos1} | {part2}");
+            //Console.WriteLine($"{l}: {oldpos} => {pos1} | {part2}");
         }
 
         LogAndReset("*1", sw);
