@@ -85,7 +85,7 @@ namespace AdventofCode.AoC_2025
                     if (invalid)
                     {
                         part2 += p;
-                        //Console.WriteLine(s+" is invalid");
+                        Log(()=>s+" is invalid");
                     }
                 }
             }

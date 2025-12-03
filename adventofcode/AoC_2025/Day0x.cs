@@ -14,12 +14,12 @@ namespace AdventofCode.AoC_2025
         public bool Debug { get; set; }
 
         [Test]
-        [TestCase(9999999, null, "DayXXX_test.txt")]
-        [TestCase(9999999, null, "DayXXX.txt")]
+        [TestCase(9999999, null, "<day>_test.txt")]
+        [TestCase(9999999, null, "<day>.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
-            var source = GetResource(resourceName);
+            var source = GetResource2(ref resourceName);
             var res = ComputeWithTimer(source);
             DoAsserts(res, exp1, exp2, resourceName);
         }

@@ -562,7 +562,9 @@
     <EmbeddedResource Include="AoC_2025\Day01_test.txt" />
     <EmbeddedResource Include="AoC_2025\Day02.txt" />
     <EmbeddedResource Include="AoC_2025\Day02_test.txt" />
-    <EmbeddedResource Include="AoC_2025\DayTemplate.txt" />
-    <EmbeddedResource Include="AoC_2025\DayTemplate_test.txt" />
+    <EmbeddedResource Include="AoC_2025\Day03.txt" />
+    <EmbeddedResource Include="AoC_2025\Day03_test.txt" />
+    <EmbeddedResource Include="AoC_2025\Day0x.txt" />
+    <EmbeddedResource Include="AoC_2025\Day0x_test.txt" />
   </ItemGroup>
 </Project>

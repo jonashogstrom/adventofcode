@@ -22,6 +22,12 @@ namespace AdventofCode
         }
         protected int LogLevel { get; set; }
 
+        protected string[] GetResource2(ref string nameOrValue)
+        {
+            nameOrValue = nameOrValue.Replace("<day>", GetType().Name);
+            return GetResource(nameOrValue);
+
+        }
         protected string[] GetResource(string nameOrValue)
         {
             _log.Clear();
