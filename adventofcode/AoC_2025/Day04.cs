@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -35,48 +36,83 @@ namespace AdventofCode.AoC_2025
             var sw = Stopwatch.StartNew();
 
             var map = source.ToSparseBuffer('.');
-            var map2 = source.ToSparseBuffer();
+            // var map2 = source.ToSparseBuffer();
             // parse input here
 
             LogAndReset("Parse", sw);
+            // solve part 1 here
 
             var rolls = new HashSet<Coord>(map.Keys);
-            
-            var gen = 0;
-            var ttq = false;
-            while (!ttq)
-            {
-                 ttq = true;
-                foreach (var k in map.Keys)
-                {
-                    if (map[k] == '@')
-                    {
-                        var neighbours = k.GenAdjacent8();
-                        if (neighbours.Where(n => map[n] == '@').Count() < 4)
-                        {
-                            if (gen == 0)
-                                part1++;
-                            part2++;
-                            map2[k] = '.';
-                            ttq = false;
-                        }
-                    }
-                }
-
-                gen++;
-                map = map2;
-            }
-
-            Log(()=>map2.ToString());
-            // solve part 1 here
+            part1 = rolls.Count(k => k.GenAdjacent8().Count(n => rolls.Contains(n)) < 4);
 
             LogAndReset("*1", sw);
 
-            // solve part 2 here
+            var q = new QHashSet<Coord>(rolls);
+            while (q.Any())
+            {
+                var k = q.Dequeue();
+                var neighbours = k.GenAdjacent8().Where(n=>rolls.Contains(n)).ToArray();
+                if (neighbours.Length < 4)
+                {
+                    part2++;
+                    rolls.Remove(k);
+                    foreach (var n in neighbours)
+                    {
+                        q.EnqueueUnique(n);
+                    }
+                }
+            }
 
+            Log(map.ToString());
             LogAndReset("*2", sw);
 
             return (part1, part2);
+        }
+    }
+
+    internal class QHashSet<T>
+    {
+        private readonly Queue<T> _q;
+        private readonly HashSet<T> _h;
+        private int _count;
+
+        public QHashSet(HashSet<T> initial)
+        {
+            _q  = new Queue<T>(initial);
+            _h =  new HashSet<T>(initial);
+            _count = _h.Count;
+        }
+
+        public bool Any()
+        {
+            return _count > 0;
+        }
+
+        public T Dequeue()
+        {
+                var value = _q.Dequeue();
+                _h.Remove(value);
+                _count--;
+                return value;
+        }
+
+        public bool Contains(T value)
+        {
+            return _h.Contains(value);
+        }
+
+        public void EnqueueUnique(T value)
+        {
+            if (!_h.Contains(value) && _h.Add(value))
+            {
+                _q.Enqueue(value);
+                _count++;
+            }
+        }
+
+        public Part2Type Count()
+        {
+            return _count;
         }
     }
 }
