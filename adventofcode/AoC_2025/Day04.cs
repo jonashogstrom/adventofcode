@@ -36,26 +36,24 @@ namespace AdventofCode.AoC_2025
             var sw = Stopwatch.StartNew();
 
             var map = source.ToSparseBuffer('.');
-            // var map2 = source.ToSparseBuffer();
-            // parse input here
 
             LogAndReset("Parse", sw);
-            // solve part 1 here
 
             var rolls = new HashSet<Coord>(map.Keys);
-            part1 = rolls.Count(k => k.GenAdjacent8().Count(n => rolls.Contains(n)) < 4);
+            part1 = rolls.Count(r => r.GenAdjacent8().Count(rolls.Contains) < 4);
 
             LogAndReset("*1", sw);
 
             var q = new QHashSet<Coord>(rolls);
             while (q.Any())
             {
-                var k = q.Dequeue();
-                var neighbours = k.GenAdjacent8().Where(n=>rolls.Contains(n)).ToArray();
+                var r = q.Dequeue();
+                var neighbours = r.GenAdjacent8().Where(rolls.Contains).ToArray();
                 if (neighbours.Length < 4)
                 {
                     part2++;
-                    rolls.Remove(k);
+                    rolls.Remove(r);
+                    map[r] = '.';
                     foreach (var n in neighbours)
                     {
                         q.EnqueueUnique(n);
