@@ -16,13 +16,13 @@ namespace AdventofCode.AoC_2025
     // wrong: 156678203344390
     
     [TestFixture]
-    class Day05 : TestBaseClass<Part1Type, Part2Type>
+    internal class Day05 : TestBaseClass<Part1Type, Part2Type>
     {
         public bool Debug { get; set; }
 
         [Test]
         [TestCase(3, 14, "<day>_test.txt")]
-        [TestCase(840, null, "<day>.txt")]
+        [TestCase(840, 359913027576322, "<day>.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -53,7 +53,6 @@ namespace AdventofCode.AoC_2025
 
             var orderedRanges = ranges.OrderBy(r => r[0]).ToList();
             var currentRange = orderedRanges.First();
-            LogLevel = 20;
             foreach (var r in orderedRanges.Skip(1))
             {
                 if (r[0] <= currentRange[1])
@@ -64,7 +63,7 @@ namespace AdventofCode.AoC_2025
                 }
                 else
                 {
-                    Log(()=>$"Consuming {f(currentRange)}", 0);
+                    Log(()=>$"Consuming {f(currentRange)}");
                     part2 += currentRange[1] - currentRange[0]+1;
                     currentRange = r;
                 }

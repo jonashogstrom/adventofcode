@@ -177,13 +177,13 @@ namespace AdventofCode
         #endregion
     }
 
-    class TestBaseClass<T, S> : TestBaseClass2<Nullable<T>, Nullable<S>>
+    public class TestBaseClass<T, S> : TestBaseClass2<Nullable<T>, Nullable<S>>
         where S : struct
         where T : struct
     {
     }
 
-    class TestBaseClass2<T, S> : BaseBaseDay
+    public class TestBaseClass2<T, S> : BaseBaseDay
     {
         private DateTime _startTime;
 

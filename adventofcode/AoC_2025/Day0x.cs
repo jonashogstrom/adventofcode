@@ -9,7 +9,7 @@ namespace AdventofCode.AoC_2025
     using Part2Type = Int64;
 
     [TestFixture]
-    class DayXXX : TestBaseClass<Part1Type, Part2Type>
+    internal class Day0x : TestBaseClass<Part1Type, Part2Type>
     {
         public bool Debug { get; set; }
 
