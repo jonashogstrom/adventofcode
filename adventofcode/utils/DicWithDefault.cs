@@ -61,6 +61,11 @@ namespace AdventofCode.Utils
         {
             _dic.Remove(c);
         }
+
+        public bool Any()
+        {
+            return _dic.Any();
+        }
     }
     public class DicWithDefaultFunc<TKey, TValue>
     {

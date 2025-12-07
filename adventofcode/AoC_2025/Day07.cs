@@ -8,7 +8,6 @@ using NUnit.Framework.Internal.Commands;
 
 namespace AdventofCode.AoC_2025
 {
-    // to use string-types, change baseclass to TestBaseClass2 and remove a bunch of ? in the methods below
     using Part1Type = Int64;
     using Part2Type = Int64;
 
@@ -19,7 +18,7 @@ namespace AdventofCode.AoC_2025
 
         [Test]
         [TestCase(21, 40, "<day>_test.txt")]
-        [TestCase(1660, null, "<day>.txt")]
+        [TestCase(1660, 305999729392659, "<day>.txt")]
         public void Test1(Part1Type? exp1, Part2Type? exp2, string resourceName)
         {
             LogLevel = resourceName.Contains("test") ? 20 : -1;
@@ -36,38 +35,42 @@ namespace AdventofCode.AoC_2025
 
             var map = source.ToSparseBuffer('.');
             
-
             LogAndReset("Parse", sw);
 
             var start = map.Keys.Single(k => map[k] == 'S');
-            var beams = new HashSet<Coord>() { start };
+            var beams = new DicWithDefault<Coord, long>(0)
+            {
+                [start] = 1
+            };
+            var timelines = 1L;
+            var splits = 0;
             while (beams.Any())
             {
-                var nextBeams = new HashSet<Coord>();
-                foreach (var beam in beams)
+                var nextBeams = new DicWithDefault<Coord, long>(0);
+                foreach (var beam in beams.Keys)
                 {
                     var pos = beam.Move(Coord.S);
+                    var count =  beams[beam];
                     if (pos.Y > map.Bottom)
                         continue;
                     if (map[pos] == '^')
                     {
-                        nextBeams.Add(pos.Move(Coord.E));
-                        nextBeams.Add(pos.Move(Coord.W));
-                        part1++;
+                        nextBeams[pos.Move(Coord.E)] += count;
+                        nextBeams[pos.Move(Coord.W)] += count;
+                        splits++;
+                        timelines += count;
                     }
-                    else nextBeams.Add(pos);
+                    else nextBeams[pos] += count;
                 }
 
                 beams = nextBeams;
 
             }
-            // solve part 1 here
 
-            LogAndReset("*1", sw);
+            part1 = splits;
+            part2 = timelines;
 
-            // solve part 2 here
-
-            LogAndReset("*2", sw);
+            LogAndReset("*12", sw);
 
             return (part1, part2);
         }
