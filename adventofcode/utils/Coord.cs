@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
 
@@ -22,6 +23,7 @@ namespace AdventofCode
 
         public static readonly Coord[] Directions4 = [N, E, S, W];
         public static readonly Coord[] Directions8 = [N, NE, E, SE, S, SW, W, NW];
+
         public static readonly HexDirection[] HexNeighbors =
         {
             HexDirection.sw, HexDirection.w, HexDirection.nw,
@@ -30,24 +32,25 @@ namespace AdventofCode
 
         public static readonly Dictionary<Coord, char> trans2NESW = new()
         {
-            {N, 'N'}, {S, 'S'}, {E, 'E'}, {W, 'W'},
+            { N, 'N' }, { S, 'S' }, { E, 'E' }, { W, 'W' },
         };
 
         public static readonly Dictionary<Coord, string> trans28Dir = new()
         {
-            {N, "N"}, {S, "S"}, {E, "E"}, {W, "W"},
-            {NE, "NE"}, {SE, "SE"}, {NW, "NW"}, {SW, "SW"},
+            { N, "N" }, { S, "S" }, { E, "E" }, { W, "W" },
+            { NE, "NE" }, { SE, "SE" }, { NW, "NW" }, { SW, "SW" },
         };
 
         public static readonly Dictionary<Coord, char> trans2Arrow = new()
         {
-            {N, '^'}, {S, 'v'}, {E, '>'}, {W, '<'},
+            { N, '^' }, { S, 'v' }, { E, '>' }, { W, '<' },
         };
+
         public static readonly Dictionary<char, Coord> trans2Coord = new Dictionary<char, Coord>()
         {
-            {'N', N}, {'S', S}, {'E', E}, {'W', W},
-            {'^', N}, {'v', S}, {'>', E}, {'<', W},
-            {'U', N}, {'D', S}, {'R', E}, {'L', W},
+            { 'N', N }, { 'S', S }, { 'E', E }, { 'W', W },
+            { '^', N }, { 'v', S }, { '>', E }, { '<', W },
+            { 'U', N }, { 'D', S }, { 'R', E }, { 'L', W },
         };
 
         public int Row { get; set; }
@@ -78,6 +81,7 @@ namespace AdventofCode
         {
             return v1.CompareTo(v2);
         }
+
         /// <summary>
         /// Return a list of coordinates from current pos to target pos (c2) as long as the path is either NSWE or a 45 degree angle
         /// </summary>
@@ -94,7 +98,8 @@ namespace AdventofCode
             var rDist = Math.Abs(Row - c2.Row);
             var cDist = Math.Abs(Col - c2.Col);
             if (rDist != 0 && cDist != 0 && rDist != cDist)
-                throw new Exception($"Path is not a multiple of 45 degrees! {this} => {c2} (rDist: {rDist}, cDist: {cDist})");
+                throw new Exception(
+                    $"Path is not a multiple of 45 degrees! {this} => {c2} (rDist: {rDist}, cDist: {cDist})");
             var steps = Math.Max(rDist, cDist) + 1;
             for (int s = 0; s < steps; s++)
             {
@@ -147,6 +152,7 @@ namespace AdventofCode
         {
             return trans2Coord[c];
         }
+
         public static bool TryCharToDir(char c, out Coord dir)
         {
             return trans2Coord.TryGetValue(c, out dir);
@@ -161,6 +167,7 @@ namespace AdventofCode
         {
             return new Coord(-Col, Row);
         }
+
         public Coord RotateCCWDegrees(int degrees)
         {
             if (degrees % 90 != 0)
@@ -322,6 +329,14 @@ namespace AdventofCode
         public int Max => new[] { x, y, z }.Max();
         public int Min => new[] { x, y, z }.Min();
 
+        public Coord3d(int[] coords) : this(coords[0], coords[1], coords[2])
+        {
+        }
+        
+        public Coord3d(string coords) : this(coords.Split(',').Select(int.Parse).ToArray())
+        {
+        }
+
         public Coord3d(int x, int y, int z)
         {
             this.x = x;
@@ -423,10 +438,25 @@ namespace AdventofCode
                    Math.Abs(y - c.y) +
                    Math.Abs(z - c.z);
         }
+
+        public double StraightLineDist(Coord3d c2)
+        {
+            return Math.Sqrt(Square(x - c2.x) + Square(y - c2.y) + Square(z - c2.z));
+        }
+
+        private double Square(double value)
+        {
+            return value * value;
+        }
     }
 
     public enum HexDirection
     {
-        nw, ne, e, se, sw, w
+        nw,
+        ne,
+        e,
+        se,
+        sw,
+        w
     }
 }

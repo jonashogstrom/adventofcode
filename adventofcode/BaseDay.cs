@@ -11,7 +11,6 @@ namespace AdventofCode
 {
     public class BaseBaseDay
     {
-
         protected bool _addLogHeader;
         protected StringBuilder _log;
 
